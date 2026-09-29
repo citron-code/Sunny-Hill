@@ -31,7 +31,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const profile = mkdtempSync(join(tmpdir(), 'sh-chrome-'));
 const chrome = spawn(CHROME, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`,
   '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--mute-audio', '--hide-scrollbars',
-  '--allow-file-access-from-files', '--window-size=1280,800', 'about:blank'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  '--allow-file-access-from-files', '--window-size=1280,800',
+  // software WebGL so the 3D view renders headless (slowly: frame times from here mean nothing)
+  '--use-angle=swiftshader', '--enable-unsafe-swiftshader', 'about:blank'], { stdio: ['ignore', 'pipe', 'pipe'] });
 let chromeErr = '';
 chrome.stderr.on('data', (d) => { chromeErr += d; });
 
