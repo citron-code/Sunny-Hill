@@ -17,6 +17,19 @@ gönderilir.
   gidip konuşmaya başlar.
 - İlerleme aynı cihazda, aynı tarayıcıda kaydedilir.
 
+## Sesler
+
+Oyun, cihazın kendi İngilizce seslerini kullanır ve her karaktere mümkünse ayrı bir ses verir
+(çocuklara çocuk sesi, annelere kadın sesi, Captain Bob'a erkek sesi). İngilizce ses yoksa
+Türkçe sesle okumaz; metin ekranda kalır ve veliye Chrome veya Edge ile açması söylenir.
+
+- **Microsoft Edge** (internet açıkken): 40'tan fazla doğal İngilizce ses, çocuk sesleri dahil. En iyi sonuç.
+- **Google Chrome** (internet açıkken): 3 İngilizce ses; çocuklar kadın sesinin inceltilmiş hâliyle konuşur.
+- **iPhone / iPad (Safari)** ve **Android**: cihazın yüklü İngilizce sesleri.
+- Türkçe Windows'ta internetsiz İngilizce ses isteniyorsa: Ayarlar › Zaman ve dil › Konuşma › Ses ekle › English (United States).
+
+Veli ekranında hangi seslerin bulunduğu yazar; "Dinle" butonu birkaç karakteri sırayla konuşturur.
+
 ## Metinleri değiştirmek
 
 Oyundaki bütün İngilizce metinler dosyanın başındaki `GAME_CONTENT` nesnesinde.
@@ -41,6 +54,13 @@ node tools/drive.mjs tools/recipes/nospeech.mjs   # sesli okuma desteği olmayan
 node tools/drive.mjs tools/recipes/nostorage.mjs  # localStorage kapalıyken oyunun çökmediğini kontrol eder
 node tools/drive.mjs tools/recipes/quest1.mjs     # yalnızca Görev 1
 node tools/drive.mjs tools/recipes/perf.mjs       # kare başına çizim süresi (üst sınır; headless yazılımla çizer)
+node tools/drive.mjs tools/recipes/voices.mjs     # hangi karaktere hangi ses düştü, sesler gerçekten konuşuyor mu
+```
+
+Sürücü varsayılan olarak Chrome'u kullanır. Edge ile denemek için (gerçek İngilizce seslerle):
+
+```bash
+CHROME="C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" node tools/drive.mjs tools/recipes/full.mjs
 node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi
 ```
 

@@ -220,6 +220,15 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 .parentCard li{font-size:20px;line-height:1.3}
 #pControls{font-size:20px;background:#eaf6ff;border-radius:14px;padding:8px 12px;margin:0}
 #pCredit{text-align:center;font-size:20px;color:#8a6a50}
+#pVoice{display:flex;align-items:center;gap:10px;font-size:20px;background:#effbe8;border-radius:14px;padding:8px 8px 8px 12px}
+#pVoice.bad{background:#fff0e6}
+#pVoiceText{flex:1 1 auto;line-height:1.3}
+#pVoiceTest{flex:0 0 auto;font-size:20px}
+#voiceWarn{position:fixed;z-index:58;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);width:min(560px,calc(100vw - 20px));
+  padding:12px 14px;display:flex;align-items:center;gap:12px;border-color:#ffb38a;font-size:20px;line-height:1.3}
+#vwText{flex:1 1 auto}
+#vwOk{flex:0 0 auto}
+@media (max-width:520px){ #voiceWarn,#pVoice{flex-direction:column;align-items:stretch} }
 .lbl{background:none;border:0;padding:4px 0;font-family:var(--font);font-weight:bold;font-size:24px;color:var(--ink);cursor:pointer;text-align:left;min-height:56px;touch-action:manipulation}
 .crCard{width:min(540px,100%);gap:10px}
 .crTop{display:flex;gap:12px;align-items:center}
@@ -296,6 +305,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 
 <div id="toast" class="hidden"></div>
 
+<div id="voiceWarn" class="card hidden" role="alert"><div id="vwText"></div><button id="vwOk" class="btn green"></button></div>
+
 <div id="mg" class="overlay hidden">
   <div id="mgCard" class="card">
     <div id="mgHead">
@@ -345,6 +356,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
     <h2 id="pTitle"></h2>
     <ul id="pList"></ul>
     <p id="pControls"></p>
+    <div id="pVoice"><span id="pVoiceText"></span><button id="pVoiceTest" class="btn blue"></button></div>
     <button id="pStart" class="btn yellow wide"></button>
     <div id="pCredit"></div>
   </div>
@@ -443,6 +455,14 @@ const GAME_CONTENT = {
     ],
     controls: 'Bilgisayarda ok tuşları veya WASD, telefon/tablette gitmek istediğiniz yere dokunun.',
     credit: 'ELT / Batuhan Özçönke',
+    // Ses durumu (veli ekranında ve gerekirse oyunun üstünde gösterilir)
+    voiceChecking: 'İngilizce sesler kontrol ediliyor…',
+    voiceFound: 'İngilizce sesler hazır: {voices}',
+    voiceNone: 'Bu tarayıcıda İngilizce ses bulunamadı, bu yüzden oyun sesli okuyamıyor. Doğru telaffuz için oyunu internet açıkken Google Chrome veya Microsoft Edge ile açın. Telefon/tablette: Ayarlar › Metin okuma › İngilizce sesi indirin.',
+    voiceNoApi: 'Bu tarayıcı sesli okumayı desteklemiyor. Lütfen oyunu Google Chrome, Microsoft Edge veya Safari ile açın.',
+    voiceTest: 'Dinle',
+    voiceClose: 'Tamam',
+    voiceSample: [['narrator', 'Welcome to Sunny Hill!'], ['milo', "Hi! I'm Milo."], ['rosa', 'Hello, dear!'], ['bob', 'Ahoy!']],
     start: 'Başla / Start',
   },
 
@@ -2486,7 +2506,8 @@ const LOOKS = {
   mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, shoes: '#ff5a8a' },
 };
 const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
-const VOICE = { sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3 };
+// pitch per speaker (see Speech.pitchFor)
+const VOICE = { narrator: 1, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3 };
 const NPC_DEFS = [
   { id: 'milo', x: 604, y: 432 },
   { id: 'leo', x: 646, y: 440 },
@@ -2638,7 +2659,7 @@ function updateHerd(dt) {
       if (Math.hypot(a.x - PEN_GATE.x, a.y - PEN_GATE.y) < 110 || Math.hypot(player.x - PEN_GATE.x, player.y - PEN_GATE.y) < 120) {
         a.st = 'going'; a.path = findPath(a.x, a.y, a.pen.x, a.pen.y); a.pathI = 0;
         if (state.q.home.indexOf(a.id) < 0) state.q.home.push(a.id);
-        Sfx.play('ok'); Toast.show('🏠 ' + (C.sounds[a.kind] || '')); Speech.speak(C.sounds[a.kind] || '', { pitch: 1.3 });
+        Sfx.play('ok'); Toast.show('🏠 ' + (C.sounds[a.kind] || '')); Speech.speak(C.sounds[a.kind] || '', { who: 'nomi' });
         saveAndRefresh();
       }
       continue;
@@ -2651,7 +2672,7 @@ function updateHerd(dt) {
     }
     if (active && Math.hypot(player.x - a.x, player.y - a.y) < 72) {
       a.st = 'follow'; a.path = null; Sfx.play('pop');
-      Toast.show(C.sounds[a.kind] || ''); Speech.speak(C.sounds[a.kind] || '', { pitch: 1.3 });
+      Toast.show(C.sounds[a.kind] || ''); Speech.speak(C.sounds[a.kind] || '', { who: 'nomi' });
     }
   }
 }
@@ -2816,11 +2837,11 @@ QUEST_LOGIC.chores = {           // Görev 3 — Help me with the chores (carry 
     if (!item) return;
     if (item.target === tg.id) {
       q.placed.push(item.id); q.carry = null; Sfx.play('ok');
-      Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { pitch: VOICE.rosa });
+      Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { who: 'rosa' });
       saveAndRefresh();
     } else {
       q.wrong[item.id] = (q.wrong[item.id] || 0) + 1;
-      Sfx.play('no'); Toast.show(U.tryAgain, true); Speech.speak(U.tryAgain, { pitch: VOICE.rosa });
+      Sfx.play('no'); Toast.show(U.tryAgain, true); Speech.speak(U.tryAgain, { who: 'rosa' });
     }
   },
   hintId() {            // after two wrong places the right one starts to glow
@@ -2886,7 +2907,7 @@ QUEST_LOGIC.bedtime = {          // Görev 6 — It's bedtime! (find pajamas, th
     if (q.carry && id === 'lily') {
       q.given.push(q.carry); q.carry = null; Sfx.play('ok'); saveAndRefresh();
       if (q.given.length >= PAJAMAS.length) this.sort(C);
-      else { Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { pitch: VOICE.lily }); }
+      else { Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { who: 'lily' }); }
       return true;
     }
     if (q.given.length >= PAJAMAS.length) { this.sort(C); return true; }
@@ -2984,7 +3005,7 @@ const Quests = {
     const acc = state.stars % 2 === 0 ? GAME_CONTENT.accessories[state.stars / 2 - 1] : null;
     if (acc && state.unlocked.indexOf(acc.id) < 0) {     // every second star opens an accessory
       state.unlocked.push(acc.id); wearAccessory(acc.id, true);
-      if (!state.finished) setTimeout(() => { Toast.show('🎁 ' + acc.got); Speech.speak(acc.got, { pitch: 1.1 }); }, 2600);
+      if (!state.finished) setTimeout(() => { Toast.show('🎁 ' + acc.got); Speech.speak(acc.got, { who: 'narrator' }); }, 2600);
     }
     Save.save();
     applyWorldState(false);
@@ -3043,11 +3064,11 @@ function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { co
 function fmt(s, vars) { return fillName(String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m))); }
 function speechMs(text) { const r = Speech.rate(); return String(text).split(' ').reduce((a, w) => a + (0.12 + w.length * 0.065) / r, 0.3) * 1000; }
 /* Speak, then run cb once when the voice finishes, or after a safe timeout if it never reports back. */
-function sayThen(text, pitch, cb) {
+function sayThen(text, who, cb) {
   const h = { dead: false, t: 0, cancel() { this.dead = true; clearTimeout(this.t); } };
   const fin = () => { if (h.dead) return; h.dead = true; clearTimeout(h.t); if (cb) cb(); };
   const est = speechMs(text);
-  const ok = Speech.speak(text, { pitch, onEnd: fin });
+  const ok = Speech.speak(text, { who, onEnd: fin });
   h.t = setTimeout(fin, ok ? est * 1.8 + 1500 : 600 + est * 0.5);
   return h;
 }
@@ -3071,7 +3092,7 @@ const MG = {                      // the mini game window
   },
   alive(tok) { return tok === this.token && game.mode === 'minigame'; },
   prompt(text, speak) { this.text = text; $('mgPrompt').textContent = text; if (speak !== false) this.say(text); },
-  say(text, cb) { if (this.speech) this.speech.cancel(); this.speech = sayThen(text, VOICE[this.who] || 1, cb); },
+  say(text, cb) { if (this.speech) this.speech.cancel(); this.speech = sayThen(text, this.who, cb); },
   replay() { if (this.onReplay) this.onReplay(); else if (this.text) this.say(this.text); },
   dots(i, n) { const d = $('mgDots'); d.innerHTML = ''; for (let k = 0; k < n; k++) d.appendChild(el('span', k < i ? 'on' : k === i ? 'cur' : '')); },
   next(label, fn) {
@@ -3415,7 +3436,7 @@ const Dialog = {
     this.boundary = false; this.fbStarted = false; this.mark(-1);
     const who = this.who, text = this.text, rate = Speech.rate();
     const ok = Speech.speak(text, {
-      pitch: VOICE[who] || 1,
+      who: who || 'narrator',
       onStart: () => this.fallback(),
       onBoundary: (ci) => { this.boundary = true; let k = 0; while (k + 1 < this.offs.length && this.offs[k + 1] <= ci) k++; this.mark(k); },
       onEnd: () => { this.mark(this.words.length); this.mouth = null; },
@@ -3493,7 +3514,7 @@ const Hud = {
     const key = who + '|' + text;
     if (key !== this.cardKey) { this.cardKey = key; drawPortrait($('qcPortrait'), who); $('qcText').textContent = fillName(text); }
   },
-  speakCard() { const [, text] = Quests.card(); Speech.speak(fillName(text), { pitch: 1.1 }); },
+  speakCard() { const [, text] = Quests.card(); Speech.speak(fillName(text), { who: 'narrator' }); },
 };
 const TALK_ICON = { talk: '💬', take: '✋', put: '👇', give: '🎁', open: '🔑', look: '👀' };
 const Talk = {
@@ -3565,8 +3586,8 @@ const UI = {
     tap('menuBtn', () => Menu.open());
     tap('mClose', () => Menu.close());
     tap('mSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Menu.render(); });
-    tap('mSlow', () => { state.settings.slow = true; Save.save(); Menu.render(); Speech.speak('Hello!'); });
-    tap('mNormal', () => { state.settings.slow = false; Save.save(); Menu.render(); Speech.speak('Hello!'); });
+    tap('mSlow', () => { state.settings.slow = true; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
+    tap('mNormal', () => { state.settings.slow = false; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
     tap('mLook', () => { Menu.close(); Wardrobe.open(); });
     tap('mInfo', () => { Menu.close(); Parent.open(true); });
     tap('mRestart', restart);
@@ -3578,16 +3599,19 @@ const UI = {
     tap('certAgain', restart);
     tap('certWalk', () => Cert.close());
     tap('pStart', () => Parent.start());
+    tap('pVoiceTest', () => Parent.test());
+    tap('vwOk', () => VoiceWarn.hide());
+    Speech.onChange = (st) => { if (game.mode === 'parent') Parent.voiceLine(); else if (st === 'none') VoiceWarn.show(); };
     tap('crOk', () => Creator.done());
-    tap('crNameLbl', () => Speech.speak(GAME_CONTENT.creator.name, { pitch: 1.1 }));
-    tap('crLookLbl', () => Speech.speak(GAME_CONTENT.creator.look, { pitch: 1.1 }));
+    tap('crNameLbl', () => Speech.speak(GAME_CONTENT.creator.name, { who: 'narrator' }));
+    tap('crLookLbl', () => Speech.speak(GAME_CONTENT.creator.look, { who: 'narrator' }));
     $('crName').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
     Fx.cv = $('fx'); Fx.g = Fx.cv.getContext('2d');
   },
   celebrate() {
     Fx.confetti();
     Sfx.play('star');
-    setTimeout(() => Speech.speak(GAME_CONTENT.ui.greatJob, { pitch: 1.15 }), 250);
+    setTimeout(() => Speech.speak(GAME_CONTENT.ui.greatJob, { who: 'narrator' }), 250);
     const b = $('banner');
     b.textContent = '⭐ ' + GAME_CONTENT.ui.greatJob + ' ⭐';
     b.classList.remove('hidden');
@@ -3657,8 +3681,25 @@ const Parent = {
     $('pControls').textContent = '🎮 ' + P.controls;
     $('pCredit').textContent = P.credit;
     $('pStart').textContent = readOnly ? '✖ ' + GAME_CONTENT.ui.close : P.start + ' ▶';
+    this.voiceLine();
     $('title').classList.add('hidden'); $('parent').classList.remove('hidden');
     setMode('parent');
+  },
+  voiceLine() {     // tells the parent whether this browser can speak English, with a sample to listen to
+    const P = GAME_CONTENT.parent, st = Speech.status;
+    $('pVoice').classList.toggle('bad', st === 'none');
+    $('pVoiceText').textContent = st === 'ok' ? '🔊 ' + fmt(P.voiceFound, { voices: Speech.describe() })
+      : st === 'none' ? '⚠️ ' + (Speech.ok ? P.voiceNone : P.voiceNoApi) : '⏳ ' + P.voiceChecking;
+    $('pVoiceTest').textContent = '🔊 ' + P.voiceTest;
+    $('pVoiceTest').classList.toggle('hidden', st !== 'ok');
+    if (st === 'none') VoiceWarn.shown = true;     // already said here, no need to repeat it in the game
+  },
+  test() {
+    Sfx.unlock();
+    const S = GAME_CONTENT.parent.voiceSample;
+    let i = 0;
+    const next = () => { if (i < S.length && game.mode === 'parent') { const s = S[i++]; sayThen(s[1], s[0], next); } };
+    next();
   },
   start() {
     $('parent').classList.add('hidden');
@@ -3682,7 +3723,7 @@ const Creator = {
     $('title').classList.add('hidden'); $('creator').classList.remove('hidden');
     setMode('creator');
     this.build();
-    sayThen(T.name, 1.1, () => { if (game.mode === 'creator') Speech.speak(T.look, { pitch: 1.1 }); });
+    sayThen(T.name, 'narrator', () => { if (game.mode === 'creator') Speech.speak(T.look, { who: 'narrator' }); });
   },
   build() {
     const l = state.look;
@@ -3741,7 +3782,7 @@ const Wardrobe = {
       b.addEventListener('click', () => {
         if (!has) { Sfx.play('no'); return; }
         wearAccessory(a.id, !on); Save.save(); Sfx.play('pop');
-        if (!on) Speech.speak(a.name, { pitch: VOICE.player });
+        if (!on) Speech.speak(a.name, { who: 'player' });
         this.render();
       });
       box.appendChild(b);
@@ -3765,7 +3806,7 @@ const Cert = {
     drawFamilyPhoto($('certPhoto'), state.family || {}, C8.members);
     $('cert').classList.remove('hidden'); $('certCard').scrollTop = 0;
     Fx.confetti(); Sfx.play('star');
-    Speech.speak(fmt(F.say), { pitch: 1.15 });
+    Speech.speak(fmt(F.say), { who: 'narrator' });
   },
   close() { $('cert').classList.add('hidden'); setMode('play'); Hud.cardKey = ''; Hud.refresh(); },
 };
@@ -3835,29 +3876,94 @@ function drawTapMark(c, t) {
 }
 
 /* ============================== SES ============================== */
+/* Voices. The browser's own English voices are used, never a voice of another language: a Turkish
+   voice reading English teaches the wrong sounds, so with no English voice the game stays silent
+   (text and highlighting still work) and tells the parent to open it in Chrome or Edge.
+   Each character gets a voice of their own kind (child, woman, man) when the device has several. */
+const VOICE_KIND = {
+  narrator: 'female', sparky: 'child', player: 'child',
+  milo: 'child', leo: 'child', pip: 'child', pop: 'child', nomi: 'child',
+  mom: 'female', rosa: 'female', lily: 'female',
+  dad: 'male', bob: 'male', max: 'male', owl: 'male',
+};
+// who gets the best voice of each kind first
+const VOICE_ORDER = {
+  female: ['narrator', 'mom', 'rosa', 'lily'],
+  male: ['dad', 'bob', 'max', 'owl'],
+  child: ['milo', 'pip', 'nomi', 'leo', 'pop', 'sparky', 'player'],
+};
+const VOICE_NAMES = {
+  child: /\b(Ana|Maisie)\b/i,
+  male: /\b(Male|Guy|Andrew|Brian|Christopher|Eric|Roger|Steffan|Ryan|Thomas|William|Liam|Connor|Mitchell|Wayne|Prabhat|Abeo|Chilemba|Elimu|Sam|James|Daniel|Alex|Fred|Tom|David|Mark|George|Oliver|Arthur|Aaron|Gordon|Lee|Rishi|Matthew|Joey|Justin|Kevin|Russell|Evan|Nathan|Tony|Jacob|Davis|Jason|Ralph)\b/i,
+  female: /\b(Female|Jenny|Aria|Ava|Emma|Michelle|Sonia|Libby|Natasha|Clara|Emily|Molly|Luna|Rosa|Neerja|Asilia|Ezinne|Imani|Yan|Samantha|Karen|Moira|Tessa|Fiona|Victoria|Allison|Susan|Zira|Hazel|Catherine|Serena|Kate|Nicky|Joanna|Salli|Kimberly|Ivy|Kendra|Amy|Olivia|Veena|Martha|Kathy|Princess|Vicki|Agnes|Nora|Sara|Jane|Nancy|Amber|Ashley|Cora|Elizabeth|Monica)\b|Google US English/i,
+};
+// Apple's joke and retro voices: English, but no good for teaching
+const VOICE_NOVELTY = /\b(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Deranged|Hysterical|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i;
+function voiceKind(v) {
+  if (VOICE_NAMES.child.test(v.name)) return 'child';
+  if (VOICE_NAMES.male.test(v.name)) return 'male';
+  if (VOICE_NAMES.female.test(v.name)) return 'female';
+  return 'other';
+}
+function voiceScore(v) {
+  const n = v.name, l = String(v.lang).replace('_', '-');
+  let s = 0;
+  if (/Natural|Neural/i.test(n)) s += 60;
+  if (/Enhanced|Premium|Siri/i.test(n)) s += 45;
+  if (/^Google/i.test(n)) s += 35;
+  if (/Multilingual/i.test(n)) s -= 8;
+  if (/^en-US/i.test(l)) s += 12; else if (/^en-GB/i.test(l)) s += 10; else if (/^en-(AU|CA|IE|NZ)/i.test(l)) s += 4;
+  if (v.localService) s += 4;
+  if (VOICE_NOVELTY.test(n)) s -= 200;
+  return s;
+}
 const Speech = {
   ok: typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined',
-  voice: null, cur: null, bad: {},
+  status: 'unknown',      // 'unknown' while the list loads, then 'ok' or 'none'
+  english: [], cast: {}, cur: null, bad: {}, fails: {}, waited: false, onChange: null,
   rate() { return state.settings.slow ? SETTINGS.rateSlow : SETTINGS.rateNormal; },
-  pick() {
-    if (!this.ok) return;
+  build() {
     let vs = [];
-    try { vs = window.speechSynthesis.getVoices() || []; } catch (e) { vs = []; }
-    const en = vs.filter((v) => /^en[-_](US|GB)/i.test(v.lang) && !this.bad[v.name]);
-    const pool = en.length ? en : vs.filter((v) => /^en/i.test(v.lang) && !this.bad[v.name]);
-    const pref = ['Samantha', 'Google US English', 'Aria', 'Jenny', 'Ava', 'Allison', 'Zira', 'Karen', 'Google UK English Female', 'Serena', 'Moira', 'Daniel'];
-    let v = null;
-    for (const p of pref) { v = pool.find((x) => x.name.indexOf(p) >= 0); if (v) break; }
-    this.voice = v || pool.find((x) => x.localService) || pool[0] || null;
+    if (this.ok) { try { vs = window.speechSynthesis.getVoices() || []; } catch (e) { vs = []; } }
+    // online voices are useless without internet; a voice that failed is left out for a minute, then tried again
+    const online = navigator.onLine !== false, now = Date.now();
+    const en = vs.filter((v) => /^en([-_]|$)/i.test(v.lang) && !VOICE_NOVELTY.test(v.name)
+      && (online || v.localService) && !(this.bad[v.name] && now - this.bad[v.name] < 60000));
+    en.sort((a, b) => voiceScore(b) - voiceScore(a));
+    this.english = en;
+    const before = this.status;
+    this.status = !this.ok ? 'none' : en.length ? 'ok' : (vs.length || this.waited) ? 'none' : 'unknown';
+    const pools = { child: [], male: [], female: [], other: [] };
+    for (const v of en) pools[voiceKind(v)].push(v);
+    const fallback = { child: ['child', 'female', 'other', 'male'], female: ['female', 'other', 'child', 'male'], male: ['male', 'other', 'female', 'child'] };
+    this.cast = {};
+    for (const kind of ['female', 'male', 'child']) {
+      VOICE_ORDER[kind].forEach((who, i) => {
+        for (const k of fallback[kind]) {
+          const p = pools[k];
+          if (p.length) { this.cast[who] = { v: p[i % p.length], real: k === kind }; break; }
+        }
+      });
+    }
+    if (before !== this.status && this.onChange) this.onChange(this.status);
   },
+  // A child voice already sounds young and a man's voice already sounds deep, so they only get a nudge.
+  // A borrowed voice (a woman's voice for a boy, say) gets the full pitch change to tell characters apart.
+  pitchFor(who, entry) {
+    const p = VOICE[who] || 1;
+    return entry && entry.real ? 1 + (p - 1) * 0.35 : p;
+  },
+  describe() { return this.english.slice(0, 6).map((v) => v.name.replace(/^Microsoft |^Google | Online \(Natural\).*| - English.*/g, '')).join(', '); },
   speak(text, o = {}) {
-    if (!this.ok || !state.settings.sound) return false;
-    const synth = window.speechSynthesis;
+    if (!this.ok || !state.settings.sound || !text) return false;
+    if (this.status !== 'ok' || Object.keys(this.bad).length) this.build();
+    if (this.status === 'none') { VoiceWarn.show(); return false; }
+    const synth = window.speechSynthesis, who = o.who || 'narrator';
     try {
-      if (!this.voice) this.pick();
+      const entry = this.cast[VOICE_KIND[who] ? who : 'narrator'];
       const u = new SpeechSynthesisUtterance(text);
-      if (this.voice) { u.voice = this.voice; u.lang = this.voice.lang; } else u.lang = 'en-US';
-      u.rate = this.rate(); u.pitch = clamp(o.pitch || 1, 0.1, 2); u.volume = 1;
+      if (entry) { u.voice = entry.v; u.lang = entry.v.lang; } else u.lang = 'en-US';   // list still loading: ask for English
+      u.rate = this.rate(); u.pitch = clamp(this.pitchFor(who, entry), 0.1, 2); u.volume = 1;
       u.onstart = () => { if (this.cur === u && o.onStart) o.onStart(); };
       u.onboundary = (e) => { if (this.cur === u && o.onBoundary && (!e.name || e.name === 'word')) o.onBoundary(e.charIndex); };
       u.onend = () => { if (this.cur === u) { this.cur = null; if (o.onEnd) o.onEnd(); } };
@@ -3865,8 +3971,12 @@ const Speech = {
         if (this.cur !== u) return;
         this.cur = null;
         const err = e && e.error;
-        if (err !== 'interrupted' && err !== 'canceled' && this.voice && !this.voice.localService && !o.retried) {
-          this.bad[this.voice.name] = 1; this.voice = null; this.pick(); o.retried = true; this.speak(text, o); return;
+        if (err !== 'interrupted' && err !== 'canceled' && entry) {
+          // online voices fail for good without internet; a local voice gets a second chance
+          const n = entry.v.name;
+          this.fails[n] = (this.fails[n] || 0) + 1;
+          if (!entry.v.localService || this.fails[n] >= 2) { this.fails[n] = 0; this.bad[n] = Date.now(); this.build(); }
+          if (!o.retried) { o.retried = true; if (this.speak(text, o)) return; }
         }
         if (o.onEnd) o.onEnd();
       };
@@ -3878,11 +3988,35 @@ const Speech = {
     } catch (e) { return false; }
   },
   stop() { this.cur = null; if (this.ok) { try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ } } },
+  init() {
+    if (!this.ok) { this.build(); return; }
+    this.build();
+    window.addEventListener('online', () => this.build());
+    window.addEventListener('offline', () => this.build());
+    try { window.speechSynthesis.addEventListener('voiceschanged', () => this.build()); } catch (e) { window.speechSynthesis.onvoiceschanged = () => this.build(); }
+    // some browsers never fire voiceschanged: look again for a few seconds, then decide
+    let n = 0;
+    const poll = setInterval(() => {
+      n++;
+      if (this.status === 'unknown') this.build();
+      if (this.status !== 'unknown' || n >= 12) { clearInterval(poll); this.waited = true; if (this.status === 'unknown') this.build(); }
+    }, 250);
+  },
 };
-if (Speech.ok) {
-  Speech.pick();
-  try { window.speechSynthesis.addEventListener('voiceschanged', () => Speech.pick()); } catch (e) { window.speechSynthesis.onvoiceschanged = () => Speech.pick(); }
-}
+Speech.init();
+/* The parent-facing notice when this browser has no English voice (shown once per visit). */
+const VoiceWarn = {
+  shown: false,
+  show() {
+    if (this.shown || !state.settings.sound) return;
+    this.shown = true;
+    const P = GAME_CONTENT.parent;
+    $('vwText').textContent = '⚠️ ' + (Speech.ok ? P.voiceNone : P.voiceNoApi);
+    $('vwOk').textContent = P.voiceClose;
+    $('voiceWarn').classList.remove('hidden');
+  },
+  hide() { $('voiceWarn').classList.add('hidden'); },
+};
 const Sfx = {
   ctx: null,
   unlock() {
@@ -4071,7 +4205,7 @@ function update(dt) {
   game.ev += (eveningTarget() - game.ev) * Math.min(1, dt * 1.2);
   if (game.sleepT > 0 && game.mode === 'play' && (game.sleepT -= dt) <= 0) {   // morning: the twins wake up
     game.sleepT = 0; NPC.pip.sleeping = NPC.pop.sleeping = false;
-    Toast.show('☀️ ' + GAME_CONTENT.ui.morning); Speech.speak(GAME_CONTENT.ui.morning, { pitch: 1.1 });
+    Toast.show('☀️ ' + GAME_CONTENT.ui.morning); Speech.speak(GAME_CONTENT.ui.morning, { who: 'narrator' });
   }
   updateCamera(dt, false);
 }
@@ -4099,6 +4233,7 @@ function snapCamera() { updateCamera(0, true); }
 function showEntry() {
   if (!state.parentSeen) { Parent.open(false); return; }
   $('titleHi').textContent = state.created ? fmt(GAME_CONTENT.ui.hi) : '';
+  if (Speech.status === 'none') VoiceWarn.show();
   $('title').classList.remove('hidden'); setMode('title');
 }
 function startGame() {
@@ -4151,7 +4286,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  VoiceWarn, MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
