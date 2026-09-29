@@ -97,7 +97,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 .flyStar{position:fixed;z-index:45;font-size:64px;pointer-events:none;transition:transform .9s cubic-bezier(.5,-0.3,.7,1),opacity .9s}
 
 /* ---------- overlays (title, menu) ---------- */
-.overlay{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(40,28,18,.45);overflow:auto}
+.overlay{position:fixed;inset:0;z-index:30;display:flex;align-items:flex-start;justify-content:flex-start;padding:16px;background:rgba(40,28,18,.45);overflow:auto;-webkit-overflow-scrolling:touch}
+.overlay>*{margin:auto}
 .panel{width:min(420px,100%);padding:20px;display:flex;flex-direction:column;gap:12px;align-items:stretch;text-align:center}
 .panel h2{margin:0 0 4px;font-size:30px}
 .panel p{margin:0;font-size:22px}
@@ -112,6 +113,159 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 .sunBall{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff3a0,#ffc93c 60%,#ffa928);
   border:5px solid var(--ink);box-shadow:0 0 0 14px rgba(255,220,90,.45),0 0 0 28px rgba(255,220,90,.2)}
 #startBtn{font-size:34px;min-height:78px;padding:0 44px;border-radius:28px}
+#titleHi{font-size:28px;font-weight:bold;min-height:1.2em}
+#ask{z-index:55}
+
+/* ---------- toast (short feedback) ---------- */
+#toast{position:fixed;z-index:42;left:50%;top:calc(84px + env(safe-area-inset-top));transform:translateX(-50%);max-width:calc(100vw - 20px);
+  padding:8px 22px;background:#fff;border:4px solid var(--green);border-radius:24px;box-shadow:var(--shadow);font-size:26px;font-weight:bold;
+  text-align:center;white-space:nowrap;pointer-events:none;animation:toastIn .3s cubic-bezier(.2,1.5,.4,1)}
+#toast.bad{border-color:var(--pink)}
+@keyframes toastIn{from{opacity:0;margin-top:-16px}to{opacity:1;margin-top:0}}
+@media (max-width:640px){#toast{top:calc(126px + env(safe-area-inset-top));font-size:22px}}
+
+/* ---------- mini games ---------- */
+#mg{z-index:25}
+#mgCard{width:min(840px,100%);max-height:100%;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+#mgHead{display:flex;align-items:center;gap:10px}
+#mgPortrait{width:64px;height:64px;border-radius:50%;flex:0 0 auto;border:3px solid #fff;box-shadow:var(--shadow)}
+#mgPrompt{flex:1 1 auto;min-width:0;font-size:clamp(24px,3.4vw,34px);font-weight:bold;line-height:1.2}
+#mgQuit{flex:0 0 auto;font-size:22px}
+#mgBody{display:flex;flex-direction:column;gap:12px}
+#mgFoot{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;position:sticky;bottom:0;background:var(--cream)}
+#mgDots{display:flex;gap:8px;flex-wrap:wrap}
+#mgDots span{width:18px;height:18px;border-radius:50%;background:#e8dccb;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+#mgDots span.on{background:var(--sun)}
+#mgDots span.cur{background:var(--orange)}
+#mgNext{font-size:24px;min-width:140px}
+.pick{background:#fff;border:4px solid #fff;border-radius:22px;box-shadow:0 4px 0 rgba(0,0,0,.12),var(--shadow);cursor:pointer;padding:6px;margin:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;font-family:var(--font);font-weight:bold;font-size:22px;color:var(--ink);
+  touch-action:manipulation;transition:transform .08s;min-width:56px;min-height:56px;position:relative;-webkit-appearance:none;appearance:none;outline:none}
+.pick:active{transform:scale(.94)}
+.pick canvas{display:block;width:100%;height:auto;pointer-events:none}
+.pick.ok{border-color:var(--green);background:#e6ffe6}
+.pick.sel{border-color:var(--orange);background:#fff3e0}
+.pick.lock{opacity:.6;cursor:default}
+.hint{animation:glow 1s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 4px #ffd23c,0 0 0 8px rgba(255,210,60,.35)}50%{box-shadow:0 0 0 5px #ffd23c,0 0 22px 12px rgba(255,200,40,.95)}}
+.shake{animation:shake .42s}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.photo{background:linear-gradient(#bfeaff 0%,#e3f6ff 58%,#b4ea86 58.1%,#9ddc6e 100%);border:10px solid #c98552;border-radius:16px;
+  box-shadow:inset 0 0 0 3px #a8693a,var(--shadow);padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photo .pick{background:rgba(255,255,255,.35);border-color:rgba(255,255,255,.7);box-shadow:none}
+.photo .pick.ok{background:rgba(220,255,220,.85);border-color:var(--green)}
+.whereWrap{display:flex;gap:12px;align-items:stretch}
+.whereWho{flex:0 0 150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:22px;font-weight:bold;text-align:center}
+.whereWho canvas{width:130px;height:130px;border-radius:50%;border:4px solid #fff;box-shadow:var(--shadow)}
+.whereRow{flex:1 1 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.seqSlots,.seqCards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.seqCards{min-height:150px}
+.slot{min-height:150px;border:4px dashed #d9c3a0;border-radius:22px;display:flex;align-items:stretch;justify-content:center;position:relative;padding:4px}
+.slot b{position:absolute;left:10px;top:4px;font-size:28px;color:#c9a878}
+.slot .pick{width:100%}
+.tfRow{display:flex;gap:20px;justify-content:center}
+.tfBtn{font-size:72px;min-width:150px;min-height:120px;border-radius:30px}
+.tfBtn.up{background:var(--green)} .tfBtn.down{background:#ff8a5c}
+.tfBtn.ok{box-shadow:0 0 0 5px #fff,0 0 0 10px var(--green)}
+.say{font-size:clamp(22px,3vw,30px);font-weight:bold;background:#fff7d6;border-radius:18px;padding:10px 14px;text-align:center}
+.famPhoto{width:auto;height:auto;max-width:100%;max-height:36vh;margin:0 auto;display:block;border:10px solid #c98552;border-radius:16px;box-shadow:inset 0 0 0 3px #a8693a,var(--shadow)}
+.famGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;align-items:start}
+.famGrid .pick canvas{width:auto;height:84px}
+.badge{position:absolute;top:-8px;right:-8px;min-width:32px;height:32px;border-radius:16px;background:var(--orange);color:#fff;font-size:20px;
+  display:flex;align-items:center;justify-content:center;border:3px solid #fff;padding:0 4px}
+.undoRow{display:flex;justify-content:flex-end}
+.ageRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ageRow .pick{font-size:48px;min-height:100px;justify-content:center}
+.flagGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.flagGrid .pick{font-size:20px;line-height:1.1}
+.lines div{font-size:clamp(22px,3vw,30px);font-weight:bold;padding:4px 10px;border-radius:12px;transition:background .15s}
+.lines div.now{background:#ffe066}
+@media (max-width:620px){
+  #mgCard{padding:10px;gap:10px}
+  #mgPortrait{width:48px;height:48px}
+  #mgPrompt{font-size:22px}
+  .photo{padding:6px;border-width:7px;gap:5px}
+  .whereWrap{flex-direction:column}
+  .whereWho{flex:0 0 auto;flex-direction:row}
+  .whereWho canvas{width:84px;height:84px}
+  .tfBtn{min-width:120px;min-height:100px;font-size:60px}
+  .slot,.seqCards{min-height:118px}
+  .pick{font-size:20px;border-radius:18px}
+  .ageRow .pick{min-height:80px;font-size:40px}
+  .famGrid .pick canvas{height:64px}
+}
+@media (max-height:480px) and (orientation:landscape){
+  #mgPortrait{width:44px;height:44px}
+  #mgPrompt{font-size:22px}
+  .photo{grid-template-columns:repeat(6,1fr)}
+  .whereWho canvas{width:90px;height:90px}
+  .flagGrid{grid-template-columns:repeat(8,1fr)}
+  #mgCard{padding:8px;gap:6px}
+  #mgHead{gap:6px}
+  .slot{min-height:92px}
+  .seqCards{min-height:0}
+  .slot .pick canvas,.seqCards .pick canvas{width:auto;height:58px}
+  .famGrid{grid-template-columns:repeat(5,1fr);gap:6px}
+  .famGrid .pick canvas{height:44px}
+  .famPhoto{max-height:30vh}
+  .tfBtn{min-height:88px}
+  .whereRow .pick canvas{width:auto;height:88px}
+}
+
+/* ---------- parent screen, character creator, wardrobe, certificate ---------- */
+.sky{background:linear-gradient(#7fd3ff,#bdeaff 55%,#9ddc6e 55.1%,#86cf5c)!important}
+.parentCard{width:min(580px,100%);text-align:left}
+.parentCard h2{text-align:center;font-size:clamp(24px,5vw,32px);line-height:1.2}
+.parentCard ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.parentCard li{font-size:20px;line-height:1.3}
+#pControls{font-size:20px;background:#eaf6ff;border-radius:14px;padding:8px 12px;margin:0}
+#pCredit{text-align:center;font-size:20px;color:#8a6a50}
+.lbl{background:none;border:0;padding:4px 0;font-family:var(--font);font-weight:bold;font-size:24px;color:var(--ink);cursor:pointer;text-align:left;min-height:56px;touch-action:manipulation}
+.crCard{width:min(540px,100%);gap:10px}
+.crTop{display:flex;gap:12px;align-items:center}
+#crPreview{width:130px;height:auto;flex:0 0 auto;background:radial-gradient(circle at 50% 60%,#fff,#bfeaff);border-radius:22px}
+.crName{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
+#crName{font-family:var(--font);font-size:26px;font-weight:bold;padding:10px 14px;border-radius:16px;border:3px solid #e0cdb0;width:100%;color:var(--ink);
+  background:#fff;min-height:56px;-webkit-user-select:text;user-select:text}
+#crName:focus{outline:none;border-color:var(--orange)}
+.swRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.swRow .ico{font-size:30px;width:42px;text-align:center}
+.sw{width:56px;height:56px;border-radius:50%;border:4px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.15);cursor:pointer;touch-action:manipulation;padding:0;-webkit-appearance:none;appearance:none}
+.sw.sel{box-shadow:0 0 0 4px var(--ink)}
+.bodyBtn{width:96px}
+#wardrobe{z-index:34}
+.wardCard{width:min(560px,100%)}
+.wardTop{display:flex;gap:12px;align-items:center}
+#wdPreview{width:140px;height:auto;flex:0 0 auto;background:radial-gradient(circle at 50% 60%,#fff,#ffe7a8);border-radius:22px}
+#wdItems{flex:1 1 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+#cert{z-index:32}
+#certCard{width:min(720px,100%);max-height:100%;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border:8px solid #ffd23c}
+#certTitle{font-size:clamp(30px,6vw,46px);font-weight:bold;color:#fff;background:linear-gradient(#ffc23c,#ff8c42);border-radius:20px;padding:6px 22px;text-shadow:0 3px 0 rgba(0,0,0,.18)}
+#certPics{display:flex;gap:10px;align-items:flex-end;justify-content:center;width:100%}
+#certPlayer{width:100px;height:auto;flex:0 0 auto}
+#certPhoto{flex:0 1 auto;min-width:0;max-width:min(440px,calc(100% - 80px));max-height:34vh;width:auto;height:auto;border:8px solid #c98552;border-radius:14px}
+#certName{font-size:clamp(30px,6vw,44px);font-weight:bold;line-height:1.1}
+#certStars{font-size:clamp(24px,5vw,34px);letter-spacing:2px}
+#certDate{font-size:20px;color:#8a6a50}
+#certNote{font-size:20px;background:#eaf6ff;border-radius:14px;padding:6px 12px}
+#certCard .row{width:100%}
+@media (max-width:520px){
+  #certPlayer{width:64px}
+  #certTitle{font-size:26px;padding:4px 14px}
+  #certName{font-size:30px}
+  #certCard{padding:12px;gap:6px}
+  #certCard .row{flex-direction:column;gap:8px}
+  .crCard{padding:14px}
+  .swRow{gap:8px}
+  .swRow .ico{width:32px;font-size:26px}
+}
+@media (max-height:480px) and (orientation:landscape){
+  #certTitle{font-size:26px;padding:2px 14px}
+  #certPlayer{width:60px}
+  #certPhoto{max-height:30vh}
+  #certName{font-size:28px}
+  #certCard{padding:10px;gap:4px}
+}
 </style>
 </head>
 <body>
@@ -140,17 +294,76 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 
 <div id="banner" class="hidden"></div>
 
+<div id="toast" class="hidden"></div>
+
+<div id="mg" class="overlay hidden">
+  <div id="mgCard" class="card">
+    <div id="mgHead">
+      <canvas id="mgPortrait" width="128" height="128"></canvas>
+      <div id="mgPrompt"></div>
+      <button id="mgSpeak" class="btn round blue" aria-label="Listen again">🔊</button>
+      <button id="mgQuit" class="btn round white" aria-label="Close">✖</button>
+    </div>
+    <div id="mgBody"></div>
+    <div id="mgFoot"><div id="mgDots"></div><button id="mgNext" class="btn green hidden"></button></div>
+  </div>
+</div>
+
 <div id="menu" class="overlay hidden">
-  <div id="menuMain" class="panel card">
+  <div class="panel card">
     <h2 id="mTitle">Menu</h2>
     <button id="mSound" class="btn blue wide"></button>
     <div class="row"><button id="mSlow" class="btn wide"></button><button id="mNormal" class="btn wide"></button></div>
+    <button id="mLook" class="btn yellow wide"></button>
+    <button id="mInfo" class="btn white wide"></button>
     <button id="mRestart" class="btn pink wide"></button>
     <button id="mClose" class="btn green wide"></button>
   </div>
-  <div id="menuAsk" class="panel card hidden">
-    <p id="askText"></p>
-    <div class="row"><button id="askYes" class="btn pink wide"></button><button id="askNo" class="btn green wide"></button></div>
+</div>
+
+<div id="wardrobe" class="overlay hidden">
+  <div class="panel card wardCard">
+    <div class="wardTop"><canvas id="wdPreview" width="200" height="240"></canvas><div id="wdItems"></div></div>
+    <button id="wdOk" class="btn green wide"></button>
+  </div>
+</div>
+
+<div id="cert" class="overlay hidden">
+  <div id="certCard" class="card">
+    <div id="certTitle"></div>
+    <div id="certPics"><canvas id="certPlayer" width="200" height="240"></canvas><canvas id="certPhoto" width="560" height="300"></canvas></div>
+    <div id="certName"></div>
+    <div id="certStars"></div>
+    <div id="certDate"></div>
+    <div id="certNote"></div>
+    <div class="row"><button id="certAgain" class="btn pink wide"></button><button id="certWalk" class="btn green wide"></button></div>
+  </div>
+</div>
+
+<div id="parent" class="overlay sky hidden">
+  <div class="panel card parentCard">
+    <h2 id="pTitle"></h2>
+    <ul id="pList"></ul>
+    <p id="pControls"></p>
+    <button id="pStart" class="btn yellow wide"></button>
+    <div id="pCredit"></div>
+  </div>
+</div>
+
+<div id="creator" class="overlay sky hidden">
+  <div class="panel card crCard">
+    <div class="crTop">
+      <canvas id="crPreview" width="220" height="264"></canvas>
+      <div class="crName">
+        <button id="crNameLbl" class="lbl"></button>
+        <input id="crName" type="text" maxlength="14" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="done">
+      </div>
+    </div>
+    <button id="crLookLbl" class="lbl"></button>
+    <div class="swRow" id="crBody"></div>
+    <div class="swRow" id="crHair"></div>
+    <div class="swRow" id="crOutfit"></div>
+    <button id="crOk" class="btn green wide"></button>
   </div>
 </div>
 
@@ -158,7 +371,15 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
   <div id="titleBox">
     <div class="sunBall"></div>
     <h1 id="titleText">Sunny Hill</h1>
+    <div id="titleHi"></div>
     <button id="startBtn" class="btn yellow">Start ▶</button>
+  </div>
+</div>
+
+<div id="ask" class="overlay hidden">
+  <div class="panel card">
+    <p id="askText"></p>
+    <div class="row"><button id="askYes" class="btn pink wide"></button><button id="askNo" class="btn green wide"></button></div>
   </div>
 </div>
 
@@ -198,12 +419,50 @@ const GAME_CONTENT = {
   defaultName: 'Explorer',
 
   ui: {
-    start: 'Start', talk: 'Talk', next: 'Next', ok: 'OK',
-    greatJob: 'Great job!', tryAgain: 'Try again!',
+    start: 'Start', talk: 'Talk', next: 'Next', ok: 'OK', done: 'Done',
+    take: 'Take', put: 'Put', give: 'Give', open: 'Open', look: 'Look',
+    greatJob: 'Great job!', tryAgain: 'Try again!', thankYou: 'Thank you!',
     menu: 'Menu', sound: 'Sound', on: 'On', off: 'Off',
-    slow: 'Slow', normal: 'Normal', restart: 'Restart game', close: 'Close',
+    slow: 'Slow', normal: 'Normal', myLook: 'My look', info: 'Info / Bilgi',
+    restart: 'Restart game', close: 'Close',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
+    hi: 'Hi, {name}!',
     freeWalk: 'Walk around Sunny Hill!',
+    hero: 'You are a Sunny Hill Hero!',
+    morning: 'Good morning!',
+  },
+
+  // Veli bilgilendirme ekranı (ilk açılışta gösterilir, Türkçe)
+  parent: {
+    title: 'Sunny Hill — Hafta Sonu İngilizce Oyunu',
+    points: [
+      'Oyun, kitaptaki “What is a family?” ünitesini tekrar eder.',
+      'Yaklaşık 25–30 dakika sürer; parça parça oynanabilir.',
+      'Lütfen sesi açın: karakterler İngilizce konuşur.',
+      'İlerleme bu cihazda, bu tarayıcıda kaydedilir.',
+    ],
+    controls: 'Bilgisayarda ok tuşları veya WASD, telefon/tablette gitmek istediğiniz yere dokunun.',
+    credit: 'ELT / Batuhan Özçönke',
+    start: 'Başla / Start',
+  },
+
+  // Karakter oluşturma ekranı
+  creator: { name: "What's your name?", look: 'Choose your look!', ok: 'OK', hello: 'Hello, {name}!' },
+
+  // Süsler: her 2 yıldızda bir tanesi açılır (2, 4, 6, 8 yıldız)
+  accessories: [
+    { id: 'hat', name: 'hat', got: 'You have a new hat!' },
+    { id: 'glasses', name: 'glasses', got: 'You have new glasses!' },
+    { id: 'cape', name: 'cape', got: 'You have a new cape!' },
+    { id: 'crown', name: 'crown', got: 'You have a new crown!' },
+  ],
+
+  // Final ekranı (sertifika)
+  final: {
+    title: 'Sunny Hill Hero',
+    say: 'You are a Sunny Hill Hero, {name}!',
+    note: 'Bu ekranın fotoğrafını çekip öğretmeninize gönderebilirsiniz.',
+    again: 'Play again', walk: 'Walk around',
   },
 
   // Oyunun başında Sparky'nin söyledikleri
@@ -268,6 +527,166 @@ const GAME_CONTENT = {
         ['leo', 'Milo is my brother. I love my family!'],
         ['milo', 'Granny Rosa is my grandmother!'],
       ],
+    },
+
+    { // ---------------- Görev 2 ----------------
+      id: 'family',
+      title: 'Meet my family',
+      cardStart: "Talk to Milo's mom and dad!",
+      card: 'Find the people in the photo!',
+      intro: [
+        ['mom', "Hello! I'm Milo's mother."],
+        ['dad', "And I'm Milo's father."],
+        ['milo', 'Look! This is my family photo.'],
+        ['dad', 'Can you find the people?'],
+      ],
+      again: [['milo', 'Look at my family photo!']],
+      // Fotoğraftaki kişiler ve sorulma sırası
+      photo: ['grandfather', 'grandmother', 'father', 'mother', 'brother', 'sister'],
+      order: ['grandmother', 'father', 'sister', 'grandfather', 'mother', 'brother'],
+      prompt: 'Where is the {word}?',
+      right: 'Yes! This is my {word}!',
+      hintAfter: 1,   // kaç yanlıştan sonra doğru kişi parlasın
+      finish: [['mom', 'Great job! This is our family.'], ['milo', 'I love my family!']],
+    },
+
+    { // ---------------- Görev 3 ----------------
+      id: 'chores',
+      title: 'Help me with the chores',
+      cardStart: 'Talk to Granny Rosa!',
+      card: 'Help Granny Rosa!',
+      cardDone: 'Talk to Granny Rosa!',
+      intro: [
+        ['rosa', "Hello, dear! I'm Milo's grandmother."],
+        ['rosa', 'I live in an apartment.'],
+        ['rosa', 'Can you help me with the chores?'],
+        ['sparky', 'Woof! Put the things in the right places!'],
+      ],
+      reminder: [['rosa', 'Can you help me with the chores?']],
+      hintAfter: 2,
+      finish: [['rosa', 'Thank you! You are a great helper!']],
+    },
+
+    { // ---------------- Görev 4 ----------------
+      id: 'animals',
+      title: 'My animals ran away!',
+      cardStart: 'Talk to Nomi!',
+      card: 'Bring the animals home!',
+      cardDone: 'Talk to Nomi!',
+      intro: [
+        ['nomi', "Hi! I'm Nomi. I live in a tent."],
+        ['nomi', 'My animals ran away!'],
+        ['nomi', 'Please bring them back.'],
+        ['sparky', 'Woof! Walk to the animals!'],
+      ],
+      reminder: [['nomi', 'Please bring my animals back.']],
+      sounds: { goat: 'Meh-eh-eh!', lamb: 'Baa!', horse: 'Neigh!' },
+      finish: [
+        ['nomi', 'Thank you! My animals are home.'],
+        ['nomi', 'My grandfather is Captain Bob.'],
+        ['nomi', 'Go and say hello!'],
+      ],
+    },
+
+    { // ---------------- Görev 5 ----------------
+      id: 'where',
+      title: 'Where do they live?',
+      cardStart: 'Talk to Captain Bob!',
+      card: 'Where do they live?',
+      intro: [
+        ['bob', 'Ahoy! I live in a houseboat.'],
+        ['bob', "I'm Nomi's grandfather."],
+        ['bob', "Where do they live? Let's play!"],
+      ],
+      again: [['bob', 'Where do they live?']],
+      // Resimlerin altındaki kelimeler
+      places: { house: 'house', apartment: 'apartment', tent: 'tent', farm: 'farm', cottage: 'cottage', houseboat: 'houseboat' },
+      questions: [
+        { who: 'bob',  ask: 'Where does Captain Bob live?', answer: 'houseboat', say: 'He lives in a houseboat.' },
+        { who: 'nomi', ask: 'Where does Nomi live?',        answer: 'tent',      say: 'She lives in a tent.' },
+        { who: 'rosa', ask: 'Where does Granny Rosa live?', answer: 'apartment', say: 'She lives in an apartment.' },
+        { who: 'max',  ask: 'Where does Uncle Max live?',   answer: 'farm',      say: 'He lives on a farm.' },
+        { who: 'owl',  ask: 'Where does Mr. Owl live?',     answer: 'cottage',   say: 'He lives in a cottage.' },
+      ],
+      hintAfter: 2,
+      finish: [['bob', 'Great job, sailor!'], ['bob', 'Now go and see Aunt Lily at the farm.']],
+    },
+
+    { // ---------------- Görev 6 ----------------
+      id: 'bedtime',
+      title: "It's bedtime!",
+      cardStart: 'Talk to Aunt Lily!',
+      card: 'Find the pajamas!',
+      cardDone: 'Talk to Aunt Lily!',
+      intro: [
+        ['lily', "It's evening."],
+        ['lily', "It's bedtime for Pip and Pop!"],
+        ['lily', 'But where are their pajamas?'],
+        ['sparky', "Woof! Let's find the pajamas!"],
+      ],
+      reminder: 'Where are the pajamas?',
+      sortIntro: [['lily', 'Thank you! Now help Pip and Pop.'], ['lily', 'Put the cards in order.']],
+      sortPrompts: ['What comes first?', 'What comes next?', 'What comes last?'],
+      steps: [
+        { text: 'Put on pajamas', icon: 'pajamas' },
+        { text: 'Bedtime story', icon: 'story' },
+        { text: 'Sleep', icon: 'sleep' },
+      ],
+      hintAfter: 2,
+      finish: [
+        ['pip', 'Good night!'],
+        ['max', 'Pip and Pop are my children.'],
+        ['max', "They are Milo's cousins!"],
+      ],
+    },
+
+    { // ---------------- Görev 7 ----------------
+      id: 'truefalse',
+      title: 'True or false?',
+      cardStart: 'Talk to Mr. Owl!',
+      card: 'Thumbs up or thumbs down?',
+      intro: [['owl', 'Hoo hoo! I have some questions for you.'], ['owl', 'Thumbs up or thumbs down?']],
+      again: [['owl', 'Thumbs up or thumbs down?']],
+      // answer: true = 👍, false = 👎 · say: cevaptan sonra okunan doğru cümle
+      statements: [
+        { text: 'Nomi lives in a tent.', answer: true, say: 'Yes! Nomi lives in a tent.' },
+        { text: "Captain Bob isn't Nomi's grandfather.", answer: false, say: "No! Captain Bob is Nomi's grandfather." },
+        { text: 'Pip and Pop are from Japan.', answer: false, say: "No! They aren't from Japan. They're from Sunny Hill!" },
+        { text: "Leo is Milo's brother.", answer: true, say: "Yes! Leo is Milo's brother." },
+        { text: 'Granny Rosa lives on a houseboat.', answer: false, say: 'No! She lives in an apartment.' },
+        { text: "Aunt Lily is Pip's mother.", answer: true, say: "Yes! Aunt Lily is Pip's mother." },
+      ],
+      hintAfter: 1,
+      finish: [['owl', 'Hoo hoo! You are a star!']],
+    },
+
+    { // ---------------- Görev 8 (final) ----------------
+      id: 'final',
+      title: 'My Family',
+      cardStart: "Let's go home!",
+      unlock: [['sparky', 'Woof! Look! Our house is open!'], ['sparky', "Let's go home!"]],
+      familyPrompt: 'Who is in your family?',
+      agePrompt: 'How old are you?',
+      countryPrompt: 'Where are you from?',
+      resultPrompt: 'This is my family!',
+      members: ['mother', 'father', 'brother', 'sister', 'grandmother', 'grandfather', 'aunt', 'uncle', 'cousin'],
+      plurals: {},   // özel çoğul gerekirse buraya: { child: 'children' }
+      // Bu kişilerden bir tane varsa "a mother" denir; diğerlerinde "one sister, two cousins"
+      useA: ['mother', 'father', 'grandmother', 'grandfather'],
+      numbers: ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'],
+      ages: [6, 7, 8, 9],
+      countries: [
+        { id: 'turkey', name: 'Turkey', label: 'Turkey' },
+        { id: 'japan', name: 'Japan', label: 'Japan' },
+        { id: 'brazil', name: 'Brazil', label: 'Brazil' },
+        { id: 'colombia', name: 'Colombia', label: 'Colombia' },
+        { id: 'mongolia', name: 'Mongolia', label: 'Mongolia' },
+        { id: 'canada', name: 'Canada', label: 'Canada' },
+        { id: 'china', name: 'China', label: 'China' },
+        { id: 'usa', name: 'the United States', label: 'the USA' },
+      ],
+      sentences: { family: 'This is my family.', have: 'I have {list}.', age: "I'm {age} years old.", from: "I'm from {country}." },
+      and: 'and',
     },
   ],
 };
@@ -492,10 +911,11 @@ function faceP(c, L, hr, hy, side, t, o) {
     }
   }
   if (L.glasses) {
-    c.lineWidth = 2; c.strokeStyle = '#7a4ab0';
+    const gc = L.glassesColor || '#7a4ab0';
+    c.lineWidth = L.glassesColor ? 2.4 : 2; c.strokeStyle = gc;
     c.beginPath(); c.arc(lx, ey, 5.8, 0, TAU); c.stroke();
     c.beginPath(); c.arc(rx, ey, 5.8, 0, TAU); c.stroke();
-    seg(c, lx + 5.8, ey - 1, rx - 5.8, ey - 1, '#7a4ab0', 2);
+    seg(c, lx + 5.8, ey - 1, rx - 5.8, ey - 1, gc, 2);
   }
   const my = hy + hr * 0.46;
   if (L.beard) {
@@ -541,12 +961,31 @@ function hatP(c, L, hr, hy, side, back) {
     c.bezierCurveTo(-hr * 0.82, hy - hr * 1.6, hr * 0.82, hy - hr * 1.6, hr * 0.82, hy - hr * 0.55);
     c.closePath(); paint(c, '#f6d77e', 3);
     rrect(c, -hr * 0.82, hy - hr * 0.86, hr * 1.64, 5, 2, '#e8503a', 2);
+  } else if (h === 'bucket') {          // unlocked accessory: hat
+    const col = '#4aa3ff';
+    ell(c, 0, hy - hr * 0.5, hr * 1.4, hr * 0.42, shade(col, -0.12), 3);
+    c.beginPath(); c.moveTo(-hr * 0.86, hy - hr * 0.5);
+    c.bezierCurveTo(-hr * 0.8, hy - hr * 1.6, hr * 0.8, hy - hr * 1.6, hr * 0.86, hy - hr * 0.5);
+    c.closePath(); paint(c, col, 3);
+    if (!back) { starPath(c, side ? hr * 0.3 : 0, hy - hr * 0.95, 5.5, 0); paint(c, '#ffd23c', 1.8); }
+  } else if (h === 'crown') {           // unlocked accessory: crown
+    const y0 = hy - hr + 3, w = hr * 0.78;
+    poly(c, [-w, y0, -w - 2, y0 - 16, -w * 0.45, y0 - 8, 0, y0 - 20, w * 0.45, y0 - 8, w + 2, y0 - 16, w, y0], '#ffd23c', 3);
+    circ(c, 0, y0 - 20, 3, '#ff5a8a', 1.6); circ(c, -w - 2, y0 - 16, 2.5, '#4aa3ff', 1.5); circ(c, w + 2, y0 - 16, 2.5, '#4cc36a', 1.5);
+    if (!back) circ(c, 0, y0 - 6, 2.8, '#ff5a5a', 1.5);
   }
   if (L.flower && !back) {
     const fx = side ? -hr * 0.4 : hr * 0.62, fy = hy - hr * 0.62;
     for (let k = 0; k < 5; k++) { const a = k * TAU / 5; circ(c, fx + Math.cos(a) * 3.6, fy + Math.sin(a) * 3.6, 2.8, L.flower, 1.5); }
     circ(c, fx, fy, 2, '#ff8c42', 0);
   }
+}
+function capeP(c, col, bw, shY, hipY, side, back) {
+  const dx = side ? -5 : 0, w0 = bw + 1, w1 = bw + (back ? 9 : 11);
+  c.beginPath(); c.moveTo(dx - w0, shY + 1); c.lineTo(dx + w0, shY + 1);
+  c.lineTo(dx + w1, hipY + 8); c.quadraticCurveTo(dx, hipY + 13, dx - w1, hipY + 8); c.closePath();
+  paint(c, col, 3);
+  if (back) seg(c, 0, shY + 6, 0, hipY + 6, shade(col, -0.2), 2);
 }
 /* o: {x, y, dir, t, moving, phase, seed, talk, wave, sleep, noShadow} */
 function drawPerson(c, L, o) {
@@ -568,6 +1007,7 @@ function drawPerson(c, L, o) {
   const shoe = L.shoes || '#6b4430', topCol = L.shorts ? L.pants : null;
   const hr = d.hr;
 
+  if (L.cape && !back) capeP(c, L.cape, bw, shY, hipY, side, false);
   if (!back) hairBack(c, L, hr, hy, shY, side);
   if (side) {
     legP(c, -sw * 5, hipY, legCol, shoe, 0, true, topCol);
@@ -584,6 +1024,7 @@ function drawPerson(c, L, o) {
     const wave = o.wave && !back ? -2.55 + Math.sin(t * 9) * 0.35 : -(0.14 - sw * 0.2);
     armP(c, bw + 0.5, shY + 4, wave, armLen, sleeve, L.skin);
   }
+  if (L.cape && back) capeP(c, L.cape, bw, shY, hipY, false, true);
   if (back) {
     circ(c, 0, hy, hr, L.skin, 3);
     if (L.hairStyle && L.hairStyle !== 'none') {
@@ -711,6 +1152,292 @@ function drawChicken(c, o) {
   poly(c, [hx + 4, hy - 1, hx + 9, hy + 1, hx + 4, hy + 3], '#ffc93c', 1.6);
   circ(c, hx + 1.5, hy - 1, 1.3, INK, 0);
   c.restore();
+}
+
+/* ---- Nomi's animals ---- */
+function hoofLeg(c, x, top, len, col, hoof) {
+  rrect(c, x - 2.8, top, 5.6, len, 2.8, col, 2.2);
+  rrect(c, x - 2.8, top + len - 4.5, 5.6, 4.5, 1.5, hoof, 2);
+}
+function drawGoat(c, o) {
+  const t = o.t || 0, ph = o.phase || 0, sw = o.moving ? Math.sin(ph) * 4 : 0, bob = o.moving ? -Math.abs(Math.cos(ph)) * 1.5 : 0;
+  c.save(); c.translate(o.x, o.y); shadowE(c, 0, 1, 21, 5); c.scale(o.face < 0 ? -1 : 1, 1);
+  const body = '#f4f1ea', far = '#dcd6ca', hoof = '#6b5a50';
+  poly(c, [-17, -30 + bob, -23, -40 + bob + Math.sin(t * 8) * 1.5, -13, -34 + bob], body, 2.2);
+  hoofLeg(c, -11 - sw, -20 + bob, 20 - bob, far, hoof); hoofLeg(c, 10 + sw, -20 + bob, 20 - bob, far, hoof);
+  ell(c, 0, -27 + bob, 19, 11, body, 3);
+  hoofLeg(c, -13 + sw, -20 + bob, 20 - bob, body, hoof); hoofLeg(c, 8 - sw, -20 + bob, 20 - bob, body, hoof);
+  const hx = 21, hy = -40 + bob;
+  c.beginPath(); c.moveTo(hx - 3, hy - 6); c.quadraticCurveTo(hx - 9, hy - 21, hx - 16, hy - 14);
+  c.lineWidth = 6; c.strokeStyle = INK; c.stroke(); c.lineWidth = 3; c.strokeStyle = '#d9c28e'; c.stroke();
+  ell(c, hx - 8, hy - 1, 6, 3, body, 2.2, 0.5);
+  ell(c, hx + 2, hy, 9, 8, body, 3);
+  ell(c, hx + 8, hy + 3, 5.5, 4.8, '#fbe3dc', 2.2);
+  poly(c, [hx + 1, hy + 6, hx + 6, hy + 6, hx + 3, hy + 15], body, 2);
+  circ(c, hx + 2, hy - 2, 1.9, INK, 0);
+  c.restore();
+}
+function drawLamb(c, o) {
+  const ph = o.phase || 0, sw = o.moving ? Math.sin(ph) * 3.5 : 0, bob = o.moving ? -Math.abs(Math.cos(ph)) * 1.5 : 0;
+  c.save(); c.translate(o.x, o.y); shadowE(c, 0, 1, 18, 5); c.scale(o.face < 0 ? -1 : 1, 1);
+  const leg = '#3a3030';
+  hoofLeg(c, -9 - sw, -14 + bob, 14 - bob, '#5a5050', leg); hoofLeg(c, 8 + sw, -14 + bob, 14 - bob, '#5a5050', leg);
+  blobs(c, [[-11, -22 + bob, 9], [0, -26 + bob, 10], [10, -22 + bob, 9], [-5, -17 + bob, 9], [6, -17 + bob, 9]], '#fffdf5', 2.5);
+  hoofLeg(c, -11 + sw, -14 + bob, 14 - bob, leg, leg); hoofLeg(c, 6 - sw, -14 + bob, 14 - bob, leg, leg);
+  const hx = 17, hy = -28 + bob;
+  ell(c, hx - 5, hy - 1, 5.5, 2.6, '#3a3030', 2, -0.3);
+  ell(c, hx + 1, hy + 1, 6.5, 7.5, '#3a3030', 2.5);
+  circ(c, hx - 1, hy - 6, 4.5, '#fffdf5', 2);
+  circ(c, hx + 3, hy - 0.5, 1.5, '#fff', 0);
+  c.restore();
+}
+function drawHorse(c, o) {
+  const t = o.t || 0, ph = o.phase || 0, sw = o.moving ? Math.sin(ph) * 5 : 0, bob = o.moving ? -Math.abs(Math.cos(ph)) * 2 : 0;
+  c.save(); c.translate(o.x, o.y); shadowE(c, 0, 1, 32, 6); c.scale(o.face < 0 ? -1 : 1, 1);
+  const body = '#c98a52', far = '#b0733f', mane = '#5a3620', hoof = '#3a2a20';
+  c.save(); c.translate(-27, -48 + bob); c.rotate(0.35 + Math.sin(t * 2.5) * 0.15); ell(c, -3, 12, 6, 15, mane, 2.5); c.restore();
+  hoofLeg(c, -18 - sw, -30 + bob, 30 - bob, far, hoof); hoofLeg(c, 16 + sw, -30 + bob, 30 - bob, far, hoof);
+  rrect(c, -30, -56 + bob, 60, 28, 14, body, 3);
+  hoofLeg(c, -21 + sw, -30 + bob, 30 - bob, body, hoof); hoofLeg(c, 13 - sw, -30 + bob, 30 - bob, body, hoof);
+  poly(c, [14, -52 + bob, 24, -80 + bob, 37, -76 + bob, 30, -46 + bob], body, 3);
+  blobs(c, [[22, -76 + bob, 5], [19, -68 + bob, 5], [17, -60 + bob, 4.5], [16, -53 + bob, 4]], mane, 1.5);
+  poly(c, [27, -86 + bob, 29, -96 + bob, 34, -86 + bob], body, 2.2);
+  ell(c, 38, -74 + bob, 8, 14, body, 3, -1.0);
+  ell(c, 46, -67 + bob, 5.5, 4.5, '#e6b081', 2, -1.0);
+  circ(c, 34, -78 + bob, 2, INK, 0);
+  circ(c, 48, -66 + bob, 1.2, INK, 0);
+  c.restore();
+}
+
+/* ---- things to carry, and the places they go ---- */
+function drawThing(c, kind, x, y, s) {
+  c.save(); c.translate(x, y); if (s) c.scale(s, s);
+  if (kind === 'shirt' || kind === 'pjY' || kind === 'pjG') {
+    const col = kind === 'shirt' ? '#ff7aa2' : kind === 'pjY' ? '#ffd23c' : '#6cd06a';
+    poly(c, [-13, -7, -6, -12, -3, -9, 3, -9, 6, -12, 13, -7, 10, -1, 7, -3, 7, 12, -7, 12, -7, -3, -10, -1], col, 2.5);
+    if (kind === 'shirt') circ(c, 0, -2, 2.2, '#fff', 0);
+    else {
+      c.fillStyle = '#ffffff';
+      starPath(c, -2, 2, 3.2, 0); c.fill(); starPath(c, 3, -4, 2.2, 0); c.fill();
+      c.beginPath(); c.arc(3, 7, 2.4, 0, TAU); c.fill();
+    }
+  } else if (kind === 'can') {
+    seg(c, 6, -2, 15, -11, INK, 6.5); seg(c, 6, -2, 15, -11, '#3fae5c', 3.2);
+    ell(c, 16, -12, 3.6, 2.5, '#3fae5c', 2, -0.7);
+    c.beginPath(); c.arc(-1, -8, 6, Math.PI, 0); c.lineWidth = 5.5; c.strokeStyle = INK; c.stroke(); c.lineWidth = 2.5; c.strokeStyle = '#3fae5c'; c.stroke();
+    rrect(c, -10, -8, 18, 18, 4, '#4cc36a', 2.5);
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.fillRect(-7, -5, 3, 12);
+  } else if (kind === 'ball') {
+    circ(c, 0, 0, 11, '#ffffff', 0);
+    c.save(); c.beginPath(); c.arc(0, 0, 11, 0, TAU); c.clip();
+    const wedge = (a0, a1, col) => { c.fillStyle = col; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 12, a0, a1); c.fill(); };
+    wedge(-2.4, -1.2, '#ff5a5a'); wedge(-0.3, 0.9, '#4aa3ff'); wedge(1.8, 3.0, '#ffd23c');
+    c.restore();
+    circ(c, 0, 0, 11, null, 2.5); circ(c, 0, 0, 2.6, '#fff', 1.5);
+  } else if (kind === 'book') {
+    rrect(c, -12, -9, 24, 18, 3, '#4a7bd0', 2.5);
+    rrect(c, 7, -7, 4, 14, 1, '#fffdf5', 0);
+    rrect(c, -8, -5, 11, 4, 1.5, '#ffd23c', 0);
+  }
+  c.restore();
+}
+function drawBasket(c, x, y, full) {
+  shadowE(c, x, y + 1, 22, 6);
+  if (full) drawThing(c, 'shirt', x + 2, y - 22, 1.1);
+  c.beginPath(); c.moveTo(x - 20, y - 20); c.lineTo(x + 20, y - 20); c.lineTo(x + 16, y); c.lineTo(x - 16, y); c.closePath(); paint(c, '#e0b46a', 3);
+  c.strokeStyle = '#b98a45'; c.lineWidth = 2;
+  for (let k = -12; k <= 12; k += 6) { c.beginPath(); c.moveTo(x + k, y - 19); c.lineTo(x + k * 0.8, y - 1); c.stroke(); }
+  c.beginPath(); c.moveTo(x - 18, y - 10); c.lineTo(x + 18, y - 10); c.stroke();
+  rrect(c, x - 22, y - 23, 44, 6, 3, '#c9974f', 2.5);
+}
+function drawFlowerBed(c, x, y, watered, t) {
+  shadowE(c, x, y + 1, 28, 6);
+  const cols = ['#ff7aa2', '#ffd23c', '#ff5a5a', '#b58cff'];
+  for (let k = 0; k < 4; k++) {
+    const fx = x - 16 + k * 10.6, tipX = fx + (watered ? 0 : 6), tipY = y - (watered ? 32 : 20) + (watered ? Math.sin(t * 2 + k) : 0);
+    c.beginPath(); c.moveTo(fx, y - 10); c.quadraticCurveTo(fx, tipY + 4, tipX, tipY); c.lineWidth = 2.6; c.strokeStyle = '#3f9f4a'; c.stroke();
+    if (watered) {
+      for (let p = 0; p < 5; p++) { const a = p * TAU / 5; circ(c, tipX + Math.cos(a) * 3.6, tipY + Math.sin(a) * 3.6, 2.9, cols[k], 1.2); }
+      circ(c, tipX, tipY, 2, '#ff9f2b', 0);
+    } else circ(c, tipX, tipY, 3.2, '#b0a080', 1.5);
+  }
+  rrect(c, x - 26, y - 12, 52, 14, 5, '#c98552', 3);
+  rrect(c, x - 22, y - 12, 44, 4, 2, '#8a5a30', 0);
+  if (watered) drawThing(c, 'can', x + 34, y - 10, 0.8);
+}
+function drawShelf(c, x, y, full) {
+  shadowE(c, x, y + 1, 24, 6);
+  rrect(c, x - 20, y - 50, 40, 50, 3, '#b77a45', 3);
+  rrect(c, x - 16, y - 46, 32, 19, 1, '#8a5a30', 0);
+  rrect(c, x - 16, y - 23, 32, 19, 1, '#8a5a30', 0);
+  const books = ['#ff5a5a', '#ffd23c', '#4cc36a', '#b58cff'];
+  for (let k = 0; k < 4; k++) rrect(c, x - 15 + k * 6.5, y - 21, 5.5, 17, 1, books[k], 1.2);
+  for (let k = 0; k < 2; k++) rrect(c, x - 15 + k * 6.5, y - 44, 5.5, 17, 1, books[k + 2], 1.2);
+  if (full) rrect(c, x + 3, y - 44, 9, 17, 1.5, '#4a7bd0', 1.5);
+}
+function drawToyBox(c, x, y, full) {
+  shadowE(c, x, y + 1, 24, 6);
+  if (full) drawThing(c, 'ball', x + 4, y - 26, 1);
+  rrect(c, x - 20, y - 24, 40, 24, 4, '#ff9f43', 3);
+  rrect(c, x - 22, y - 27, 44, 7, 3, '#e8803a', 2.5);
+  starPath(c, x, y - 11, 6.5, 0); paint(c, '#ffd23c', 2);
+}
+function drawSleeper(c, L, x, y) {       // a head on a pillow, eyes closed
+  circ(c, x, y, 9, L.skin, 2.5);
+  c.beginPath(); c.arc(x, y, 10, Math.PI * 0.95, Math.PI * 2.05); c.closePath(); paint(c, L.hair, 2.5);
+  c.strokeStyle = INK; c.lineWidth = 1.8;
+  for (const ex of [-3.5, 3.5]) { c.beginPath(); c.arc(x + ex, y + 2, 2, 0.15 * Math.PI, 0.85 * Math.PI); c.stroke(); }
+}
+function drawBed(c, x, y, L) {
+  shadowE(c, x, y + 1, 32, 7);
+  rrect(c, x - 30, y - 22, 60, 22, 6, '#b77a45', 3);
+  rrect(c, x - 27, y - 20, 54, 12, 5, '#ffffff', 2);
+  rrect(c, x - 27, y - 28, 18, 11, 5, '#fffdf5', 2.5);
+  if (L) drawSleeper(c, L, x - 18, y - 25);
+  rrect(c, x - 10, y - 26, 38, 18, 6, L ? (L.shirt || L.dress) : '#9fd8ff', 3);
+  c.fillStyle = 'rgba(255,255,255,.6)';
+  for (let k = 0; k < 3; k++) { c.beginPath(); c.arc(x - 2 + k * 11, y - 18, 2, 0, TAU); c.fill(); }
+}
+
+/* ---- flags for "Where are you from?" ---- */
+const MAPLE = [0, -1, 0.12, -0.72, 0.3, -0.8, 0.25, -0.35, 0.55, -0.55, 0.5, -0.4, 0.8, -0.45, 0.65, -0.2, 0.75, -0.1, 0.35, 0.12, 0.4, 0.3, 0.06, 0.25,
+  0.06, 0.7, -0.06, 0.7, -0.06, 0.25, -0.4, 0.3, -0.35, 0.12, -0.75, -0.1, -0.65, -0.2, -0.8, -0.45, -0.5, -0.4, -0.55, -0.55, -0.25, -0.35, -0.3, -0.8, -0.12, -0.72];
+function drawFlag(g, id, w, h) {
+  g.save();
+  const R = (x, y, ww, hh, col) => { g.fillStyle = col; g.fillRect(x, y, ww, hh); };
+  const star = (x, y, r, col, rot) => { starPath(g, x, y, r, rot || 0); g.fillStyle = col; g.fill(); };
+  if (id === 'turkey') {
+    R(0, 0, w, h, '#e30a17');
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(w * 0.36, h / 2, h * 0.25, 0, TAU); g.fill();
+    g.fillStyle = '#e30a17'; g.beginPath(); g.arc(w * 0.41, h / 2, h * 0.2, 0, TAU); g.fill();
+    star(w * 0.585, h / 2, h * 0.125, '#fff', -Math.PI / 2);
+  } else if (id === 'japan') {
+    R(0, 0, w, h, '#ffffff');
+    g.fillStyle = '#bc002d'; g.beginPath(); g.arc(w / 2, h / 2, h * 0.3, 0, TAU); g.fill();
+  } else if (id === 'brazil') {
+    R(0, 0, w, h, '#009c3b');
+    g.fillStyle = '#ffdf00'; g.beginPath(); g.moveTo(w * 0.08, h / 2); g.lineTo(w / 2, h * 0.1); g.lineTo(w * 0.92, h / 2); g.lineTo(w / 2, h * 0.9); g.closePath(); g.fill();
+    g.fillStyle = '#002776'; g.beginPath(); g.arc(w / 2, h / 2, h * 0.23, 0, TAU); g.fill();
+    g.save(); g.beginPath(); g.arc(w / 2, h / 2, h * 0.23, 0, TAU); g.clip();
+    g.strokeStyle = '#fff'; g.lineWidth = h * 0.05; g.beginPath(); g.arc(w / 2 - h * 0.05, h * 1.05, h * 0.62, Math.PI * 1.2, Math.PI * 1.9); g.stroke(); g.restore();
+  } else if (id === 'colombia') {
+    R(0, 0, w, h / 2, '#fcd116'); R(0, h / 2, w, h / 4, '#003893'); R(0, h * 0.75, w, h / 4 + 1, '#ce1126');
+  } else if (id === 'mongolia') {
+    R(0, 0, w / 3, h, '#c4272f'); R(w / 3, 0, w / 3, h, '#015197'); R(w * 2 / 3, 0, w / 3 + 1, h, '#c4272f');
+    const cx = w / 6, y = gy => h * gy, col = '#f9cf02';
+    g.fillStyle = col;
+    g.beginPath(); g.moveTo(cx, y(0.12)); g.lineTo(cx + w * 0.03, y(0.24)); g.lineTo(cx - w * 0.03, y(0.24)); g.fill();
+    g.beginPath(); g.arc(cx, y(0.31), h * 0.06, 0, TAU); g.fill();
+    g.beginPath(); g.arc(cx, y(0.39), h * 0.07, 0, Math.PI); g.fill();
+    R(cx - w * 0.07, y(0.47), w * 0.14, y(0.04), col);
+    g.beginPath(); g.arc(cx, y(0.62), h * 0.08, 0, TAU); g.fill();
+    R(cx - w * 0.07, y(0.74), w * 0.14, y(0.04), col);
+    R(cx - w * 0.1, y(0.47), w * 0.025, y(0.31), col); R(cx + w * 0.075, y(0.47), w * 0.025, y(0.31), col);
+  } else if (id === 'canada') {
+    R(0, 0, w, h, '#ffffff'); R(0, 0, w / 4, h, '#d52b1e'); R(w * 0.75, 0, w / 4 + 1, h, '#d52b1e');
+    g.fillStyle = '#d52b1e'; g.beginPath();
+    for (let i = 0; i < MAPLE.length; i += 2) g.lineTo(w / 2 + MAPLE[i] * h * 0.36, h * 0.5 + MAPLE[i + 1] * h * 0.36);
+    g.closePath(); g.fill();
+  } else if (id === 'china') {
+    R(0, 0, w, h, '#de2910');
+    star(w * 0.17, h * 0.3, h * 0.17, '#ffde00');
+    for (const p of [[0.33, 0.12], [0.4, 0.24], [0.4, 0.4], [0.33, 0.52]]) star(w * p[0], h * p[1], h * 0.055, '#ffde00', 0.4);
+  } else if (id === 'usa') {
+    for (let i = 0; i < 13; i++) R(0, i * h / 13, w, h / 13 + 1, i % 2 ? '#ffffff' : '#b22234');
+    R(0, 0, w * 0.42, h * 7 / 13, '#3c3b6e');
+    g.fillStyle = '#fff';
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(w * 0.05 + k * w * 0.08, h * 0.07 + r * h * 0.12, h * 0.025, 0, TAU); g.fill(); }
+  }
+  g.lineWidth = 3; g.strokeStyle = INK; g.strokeRect(1.5, 1.5, w - 3, h - 3);
+  g.restore();
+}
+
+/* ---- pictures inside buttons and cards ---- */
+function prepCanvas(cv) {
+  const g = cv.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+  g.lineJoin = 'round'; g.lineCap = 'round';
+  return g;
+}
+function drawFigure(cv, L, o) {                // one full-body person standing on the bottom edge
+  o = o || {};
+  const g = prepCanvas(cv), k = o.k || cv.height / 108;
+  g.save(); g.translate(cv.width / 2, cv.height - 7 * k); g.scale(k, k);
+  drawPerson(g, L, { dir: o.dir || 'down', t: o.t || 0.3, seed: o.seed || 1.5, noShadow: !!o.noShadow });
+  g.restore();
+}
+function drawBust(cv, L) {                     // head and shoulders, big (accessory buttons)
+  const g = prepCanvas(cv), L2 = Object.assign({}, L, { size: 1 }), k = cv.height / 80;
+  g.save(); g.translate(cv.width / 2, cv.height * 0.58 - personHeadY(L2) * k); g.scale(k, k);
+  drawPerson(g, L2, { dir: 'down', t: 0.3, seed: 1.5, noShadow: true });
+  g.restore();
+}
+function drawSpriteFit(cv, key, water) {        // a building sprite on a little piece of ground
+  const g = prepCanvas(cv), d = SPRITES[key], b = d.b, W2 = cv.width, H2 = cv.height;
+  g.fillStyle = '#dff4ff'; g.fillRect(0, 0, W2, H2);
+  g.fillStyle = water ? '#5fd8e6' : '#9ddc6e'; g.fillRect(0, H2 * 0.72, W2, H2 * 0.28);
+  const pad = 8, k = Math.min((W2 - pad * 2) / (b[2] - b[0]), (H2 * 0.86) / (b[3] - b[1]));
+  g.save(); g.translate(W2 / 2 - (b[0] + b[2]) / 2 * k, H2 * 0.9 - b[3] * k); g.scale(k, k); d.fn(g); g.restore();
+}
+function drawStepIcon(cv, icon) {
+  const g = prepCanvas(cv), k = cv.height / 100;
+  g.fillStyle = icon === 'sleep' ? '#d9d4ff' : icon === 'story' ? '#fff3c9' : '#dff4ff';
+  g.fillRect(0, 0, cv.width, cv.height);
+  g.save(); g.translate(cv.width / 2, cv.height / 2); g.scale(k, k);
+  if (icon === 'pajamas') {
+    rrect(g, -15, 14, 13, 30, 5, '#ffd23c', 2.5); rrect(g, 2, 14, 13, 30, 5, '#ffd23c', 2.5);
+    drawThing(g, 'pjY', 0, -8, 2.3);
+  } else if (icon === 'story') {
+    g.beginPath(); g.moveTo(0, 30); g.quadraticCurveTo(-22, 20, -42, 26); g.lineTo(-42, -12); g.quadraticCurveTo(-22, -18, 0, -8); g.closePath(); paint(g, '#ffffff', 3);
+    g.beginPath(); g.moveTo(0, 30); g.quadraticCurveTo(22, 20, 42, 26); g.lineTo(42, -12); g.quadraticCurveTo(22, -18, 0, -8); g.closePath(); paint(g, '#ffffff', 3);
+    for (let r = 0; r < 3; r++) { seg(g, -34, -2 + r * 8, -8, r * 8, '#c9b8a0', 2.5); seg(g, 8, r * 8, 34, -2 + r * 8, '#c9b8a0', 2.5); }
+    g.beginPath(); g.arc(-18, -32, 11, 0.6, TAU - 0.6); g.arc(-12, -34, 9, TAU - 0.9, 0.9, true); g.closePath(); paint(g, '#ffd23c', 2.5);
+    starPath(g, 16, -34, 6, 0); paint(g, '#ffd23c', 2); starPath(g, 32, -24, 4, 0); paint(g, '#ffd23c', 1.8);
+  } else if (icon === 'sleep') {
+    g.scale(1.25, 1.25); drawBed(g, -4, 26, LOOKS.pip); g.setTransform(1, 0, 0, 1, 0, 0);
+    g.font = 'bold ' + Math.round(22 * k) + 'px ' + FONT; g.fillStyle = '#6a5acd';
+    g.fillText('Z', cv.width * 0.66, cv.height * 0.34); g.font = 'bold ' + Math.round(16 * k) + 'px ' + FONT; g.fillText('z', cv.width * 0.78, cv.height * 0.2);
+  }
+  g.restore();
+}
+const KID_ROLES = ['brother', 'sister', 'cousin'];
+function roleLook(role, i) {
+  const skin = '#f3c6a5';
+  const hairs = ['#5a3620', '#2d2330', '#9a5530', '#7a4a2a', '#d9622b', '#f2c14e'];
+  const cloth = ['#ff7aa2', '#4aa3ff', '#4cc36a', '#a77bd8', '#ffb238', '#ff5a5a', '#2ec4b6'];
+  const h = (n) => hairs[(n + i) % hairs.length], cl = (n) => cloth[(n + i * 3) % cloth.length];
+  switch (role) {
+    case 'mother': return { age: 'adult', skin, hair: h(2), hairStyle: 'long', dress: cl(0), lashes: true };
+    case 'father': return { age: 'adult', skin, hair: h(0), hairStyle: 'short', shirt: cl(1), pants: '#3b4f7a', mustache: i % 2 === 1 };
+    case 'grandmother': return { age: 'adult', skin, hair: '#eceaf4', hairStyle: 'bun', dress: cl(3), shawl: '#ffc4dc', glasses: true, lashes: true };
+    case 'grandfather': return { age: 'adult', skin, hair: '#e6e6ee', hairStyle: 'short', shirt: cl(4), pants: '#6b5a50', mustache: true, glasses: i % 2 === 0, glassesColor: INK };
+    case 'aunt': return { age: 'adult', skin, hair: h(4), hairStyle: i % 2 ? 'bun' : 'long', dress: cl(5), lashes: true, flower: '#ffd23c' };
+    case 'uncle': return { age: 'adult', skin, hair: h(1), hairStyle: 'short', shirt: cl(6), pants: '#4a5a8a', hat: i % 2 ? 'cap' : undefined, hatColor: '#ff8c42' };
+    case 'brother': return { age: 'kid', skin, hair: h(3), hairStyle: 'short', shirt: cl(2), pants: '#4a7bd0', shorts: true };
+    case 'sister': return { age: 'kid', skin, hair: h(5), hairStyle: 'pigtails', ties: '#ff7aa2', dress: cl(0), lashes: true };
+    default: return i % 2
+      ? { age: 'kid', skin, hair: h(4), hairStyle: 'long', dress: cl(3), lashes: true, freckles: true }
+      : { age: 'kid', skin, hair: h(0), hairStyle: 'short', shirt: cl(4), pants: '#3b5a8c', shorts: true, freckles: true };
+  }
+}
+function drawFamilyPhoto(cv, counts, members) {
+  const g = prepCanvas(cv), W2 = cv.width, H2 = cv.height;
+  const grd = g.createLinearGradient(0, 0, 0, H2);
+  grd.addColorStop(0, '#bfeaff'); grd.addColorStop(0.6, '#e3f6ff'); grd.addColorStop(0.601, '#b4ea86'); grd.addColorStop(1, '#9ddc6e');
+  g.fillStyle = grd; g.fillRect(0, 0, W2, H2);
+  circ(g, W2 - 40, 38, 22, '#ffd23c', 3);
+  const back = [], front = [];
+  for (const m of members) for (let i = 0; i < (counts[m] || 0); i++) (KID_ROLES.indexOf(m) >= 0 ? front : back).push(roleLook(m, i));
+  const half = Math.ceil(front.length / 2);
+  const kids = front.slice(0, half).concat([PLAYER_LOOK], front.slice(half));
+  const n = Math.max(back.length, kids.length, 3);
+  const k = Math.min(H2 / 128, W2 / (n * 38 + 24));
+  const row = (list, y) => {
+    const sp = 38 * k, x0 = W2 / 2 - (list.length - 1) * sp / 2;
+    list.forEach((L, i) => { g.save(); g.translate(x0 + i * sp, y); g.scale(k, k); drawPerson(g, L, { dir: 'down', t: 0.3 + i * 0.13, seed: 1.2 + i * 0.07 }); g.restore(); });
+  };
+  row(back, H2 * 0.74);
+  row(kids, H2 * 0.97);
 }
 
 /* ---- markers above heads ---- */
@@ -1023,6 +1750,22 @@ function defineSprites() {
       circ(g, m[0] - 4 * m[2], -15 * m[2] + m[1], 2 * m[2], '#fff', 0); circ(g, m[0] + 3 * m[2], -17 * m[2] + m[1], 1.6 * m[2], '#fff', 0);
     }
   });
+  defSprite('haystack', [-50, -66, 50, 8], (g) => {
+    g.beginPath(); g.moveTo(-44, 0); g.bezierCurveTo(-46, -40, -24, -62, 0, -62); g.bezierCurveTo(24, -62, 46, -40, 44, 0); g.closePath();
+    paint(g, '#f2cf6b', 3);
+    g.strokeStyle = '#d9a93f'; g.lineWidth = 2.2;
+    const R = rng(8);
+    for (let k = 0; k < 26; k++) { const x = -36 + R() * 72, y = -52 + R() * 48; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 5 - R() * 10, y + 8); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(-14, -44, 12, 6, -0.5, 0, TAU); g.fill();
+  });
+  defSprite('mirror', [-22, -84, 22, 6], (g) => {
+    seg(g, -12, -2, -8, -20, INK, 4); seg(g, 12, -2, 8, -20, INK, 4);
+    ell(g, 0, -48, 17, 30, '#c98552', 3);
+    ell(g, 0, -48, 12, 25, '#bfe8ff', 2);
+    g.fillStyle = 'rgba(255,255,255,.8)';
+    g.beginPath(); g.moveTo(-6, -62); g.lineTo(-2, -66); g.lineTo(-8, -36); g.lineTo(-11, -40); g.closePath(); g.fill();
+    circ(g, 0, -80, 4, '#ffd23c', 2);
+  });
 }
 function treeRound(g, s, p, apples) {
   g.beginPath(); g.moveTo(-9 * s, 0); g.quadraticCurveTo(-6 * s, -22 * s, -7 * s, -48 * s);
@@ -1059,11 +1802,24 @@ function defSign(key, text, big) {
 const HAIR_COLORS = ['#2d2330', '#7a4a2a', '#f2c14e', '#d9622b'];
 const OUTFIT_COLORS = ['#ff5a5a', '#4aa3ff', '#4cc36a', '#a77bd8'];
 let PLAYER_LOOK = null;
-function refreshPlayerLook() {
-  const l = state.look, hair = HAIR_COLORS[l.hair] || HAIR_COLORS[1], col = OUTFIT_COLORS[l.outfit] || OUTFIT_COLORS[0];
-  PLAYER_LOOK = l.body === 1
+function playerBaseLook(l) {        // the look chosen in the creator, without accessories
+  l = l || state.look;
+  const hair = HAIR_COLORS[l.hair] || HAIR_COLORS[1], col = OUTFIT_COLORS[l.outfit] || OUTFIT_COLORS[0];
+  return l.body === 1
     ? { age: 'kid', skin: '#f7cfa6', hair, hairStyle: 'pigtails', ties: '#ffffff', dress: col, lashes: true, shoes: '#ff5a8a' }
     : { age: 'kid', skin: '#f7cfa6', hair, hairStyle: 'short', shirt: col, pants: '#35507a', shorts: true, shoes: '#6b4430' };
+}
+function withAccessory(L, id) {
+  if (id === 'crown') L.hat = 'crown';
+  else if (id === 'hat') L.hat = 'bucket';
+  else if (id === 'glasses') { L.glasses = true; L.glassesColor = '#2b1d16'; }
+  else if (id === 'cape') L.cape = '#e8503a';
+  return L;
+}
+function refreshPlayerLook() {
+  const L = playerBaseLook(), w = state.wear || {};
+  for (const id of ['cape', 'glasses', 'hat', 'crown']) if (w[id] && state.unlocked.indexOf(id) >= 0) withAccessory(L, id);
+  PLAYER_LOOK = L;
 }
 const PR_FEET = 13;   // feet collision radius (ellipse rx; ry is 60% of it)
 const player = {
@@ -1321,8 +2077,20 @@ function initMap() {
   // ---- farm
   KEEP.push(R_(MAP.field.x0, MAP.field.y0, MAP.field.x1, MAP.field.y1));
   spriteAt('hay', 1210, 300); SOLIDS.push(E_(1210, 288, 22, 14));
-  spriteAt('hay', 1500, 340); SOLIDS.push(E_(1500, 328, 22, 14));
+  spriteAt('haystack', 1495, 374); SOLIDS.push(E_(1495, 362, 40, 16)); KEEP.push(C_(1495, 350, 70));
   spriteAt('apple', 1528, 240); SOLIDS.push(C_(1528, 236, 12));
+  addTree('tree1', 1150, 340); KEEP.push(C_(1150, 340, 50));          // the pajama tree
+  for (const b of BEDS) addStatic({ x: b.x, y: b.y, b: [-34, -40, 34, 8], bed: b, draw(c) { drawBedSpot(c, this.bed); } });
+  // ---- Granny Rosa's chores: the places things go, and the things
+  for (const tg of CHORE_TARGETS) {
+    addStatic({ x: tg.x, y: tg.y, b: [-40, -56, 50, 8], tg, draw(c, t) { drawChoreTarget(c, this.tg, t); } });
+    SOLIDS.push(E_(tg.x, tg.y - 6, 20, 8));
+  }
+  for (const it of CHORE_ITEMS) addStatic({ x: it.x, y: it.y, b: [-20, -44, 20, 6], it, draw(c, t) { drawGroundItem(c, this.it, t); } });
+  KEEP.push(R_(650, 330, 1010, 510));
+  for (const p of PAJAMAS) addStatic({ x: p.x, y: p.y, b: [-20, -40, 20, 6], it: p, draw(c, t) { drawGroundItem(c, this.it, t); } });
+  // ---- mirror in front of my house (change accessories)
+  LANDMARK.mirror = spriteAt('mirror', 968, 612); SOLIDS.push(E_(968, 606, 12, 6)); KEEP.push(C_(968, 612, 40));
   // ---- lake & dock
   for (const e of MAP.lake) { SOLIDS.push(E_(e.x, e.y, e.rx - 6, e.ry - 6)); KEEP.push(E_(e.x, e.y, e.rx + 24, e.ry + 24)); }
   WALKS.push(R_(MAP.dock.x0, MAP.dock.y0, MAP.dock.x1, MAP.dock.y1));
@@ -1333,7 +2101,7 @@ function initMap() {
   spriteAt('mushrooms', 630, 1052); spriteAt('mushrooms', 752, 1060);
   // ---- signs
   const signs = [
-    ['village', S.village, 985, 812, true], ['milo', S.milo, 718, 548], ['apartment', S.apartment, 752, 392],
+    ['village', S.village, 985, 812, true], ['milo', S.milo, 718, 548], ['apartment', S.apartment, 1012, 322],
     ['farm', S.farm, 1100, 505], ['myHouse', S.myHouse, 1205, 676], ['tent', S.tent, 530, 850],
     ['houseboat', S.houseboat, 1128, 845], ['cottage', S.cottage, 585, 1100],
   ];
@@ -1713,7 +2481,11 @@ const LOOKS = {
   lily: { age: 'adult', skin: '#b87a52', hair: '#2d2330', hairStyle: 'long', dress: '#5cc86a', apron: '#fff7e0', flower: '#ffd23c', lashes: true },
   pip:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'pigtails', ties: '#ff7aa2', shirt: '#ffd23c', pants: '#ff7aa2', shorts: true, freckles: true, lashes: true },
   pop:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'short', shirt: '#4cc36a', pants: '#4a7bd0', shorts: true, freckles: true },
+  // only in Milo's family photo (Quest 2)
+  grandpa: { age: 'adult', skin: '#f3c6a5', hair: '#e6e6ee', hairStyle: 'short', mustache: true, glasses: true, glassesColor: '#4a3222', shirt: '#ffb238', pants: '#6b5a50' },
+  mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, shoes: '#ff5a8a' },
 };
+const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
 const VOICE = { sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3 };
 const NPC_DEFS = [
   { id: 'milo', x: 604, y: 432 },
@@ -1776,7 +2548,16 @@ function followPath(n, dt, speed) {
   moveBody(n, dx / d * s, dy / d * s, PR_FEET);
   const moved = Math.hypot(n.x - ox, n.y - oy);
   n.moving = moved > 0.1; n.phase += moved * 0.09; n.dir = faceDir(dx, dy, n.dir);
-  if (moved < s * 0.2) { if ((n.stuck += dt) > 0.8) { n.stuck = 0; n.path = null; n.moving = false; } } else n.stuck = 0;
+  if (n.face !== undefined && Math.abs(dx) > 0.5) n.face = dx < 0 ? -1 : 1;
+  if (moved < s * 0.2) {
+    if ((n.stuck += dt) > 0.8) {
+      n.stuck = 0; n.path = null; n.moving = false;
+      if (!circleFree(n.x, n.y, PR_FEET)) {        // wedged into something: hop to the nearest open spot
+        const i = nearestFree(n.x, n.y);
+        if (i >= 0) { n.x = (i % NAV.cols + 0.5) * NAV.cs; n.y = (((i / NAV.cols) | 0) + 0.5) * NAV.cs; }
+      }
+    }
+  } else n.stuck = 0;
 }
 function sendHome(n, instant) {
   n.wander = null; n.follow = 0;
@@ -1787,10 +2568,17 @@ function sendHome(n, instant) {
 function updateNPCs(dt) {
   const play = game.mode === 'play';
   for (const n of NPCS) {
-    if (n.hidden || n.kind !== 'person') continue;
+    if (n.hidden || n.sleeping || n.kind !== 'person') continue;
     const dp = Math.hypot(player.x - n.x, player.y - n.y);
     n.waving = play && Quests.marker(n.id) === '!' && dp < 260 && dp > 50;
     if (n.follow) { updateFollower(n, n.follow, dt); continue; }
+    if (!n.wander && !n.path && Math.abs(n.x - n.home.x) + Math.abs(n.y - n.home.y) > 30) {   // lost on the way home
+      if ((n.homeT = (n.homeT || 0) - dt) <= 0) {
+        n.homeT = 2; n.tries = (n.tries || 0) + 1;
+        if (n.tries > 3) { n.x = n.home.x; n.y = n.home.y; n.tries = 0; n.dir = 'down'; }
+        else { n.path = findPath(n.x, n.y, n.home.x, n.home.y); n.pathI = 0; }
+      }
+    } else if (!n.path) n.tries = 0;
     const near = dp < SETTINGS.talkRange + 40;
     if (Dialog.open && Dialog.partner === n) { n.moving = false; continue; }
     if (n.path && (play || !n.wander) && !(n.wander && near)) { followPath(n, dt, n.wander ? n.speed : 90); continue; }
@@ -1802,6 +2590,124 @@ function updateNPCs(dt) {
       if (p) { n.path = findPath(n.x, n.y, p.x, p.y); n.pathI = 0; }
     }
   }
+}
+
+/* ---- Nomi's animals (Quest 4): they wander, follow you, and walk into the pen ---- */
+const PEN_GATE = { x: 322, y: 940 };
+const HERD_DEFS = [
+  { id: 'goat', area: { x0: 1080, y0: 600, x1: 1300, y1: 720 }, pen: { x: 168, y: 915 } },
+  { id: 'lamb', area: { x0: 860, y0: 860, x1: 1030, y1: 960 }, pen: { x: 212, y: 990 } },
+  { id: 'horse', area: { x0: 440, y0: 570, x1: 610, y1: 700 }, pen: { x: 248, y: 918 } },
+];
+const HERD = [];
+function initHerd() {
+  for (const d of HERD_DEFS) {
+    const a = {
+      id: d.id, kind: d.id, x: d.pen.x, y: d.pen.y, face: 1, phase: 0, moving: false, st: 'pen', area: d.area, pen: d.pen,
+      path: null, pathI: 0, wait: 1, stuck: 0, R: rng(d.pen.x * 13 + d.pen.y), t0: d.pen.x * 0.01,
+      b: d.id === 'horse' ? [-50, -104, 60, 8] : [-32, -58, 36, 8],
+    };
+    a.draw = function (c, t) {
+      const o = { x: this.x, y: this.y, face: this.face, moving: this.moving, phase: this.phase, t: t + this.t0 };
+      if (this.kind === 'goat') drawGoat(c, o); else if (this.kind === 'lamb') drawLamb(c, o); else drawHorse(c, o);
+    };
+    HERD.push(a);
+  }
+}
+function placeHerd() {
+  const C = Quests.content(), out = C && C.id === 'animals';
+  for (const a of HERD) {
+    a.path = null; a.moving = false;
+    if (!out || (state.q.home && state.q.home.indexOf(a.id) >= 0)) { a.st = 'pen'; a.x = a.pen.x; a.y = a.pen.y; a.face = 1; }
+    else { a.st = 'wander'; const p = randomFreePoint(a.area, a.R); if (p) { a.x = p.x; a.y = p.y; } }
+  }
+}
+function updateHerd(dt) {
+  const C = Quests.content(), active = C && C.id === 'animals' && state.stage === 'active' && game.mode === 'play';
+  let fi = 0;
+  for (const a of HERD) {
+    if (a.st === 'pen') { a.moving = false; continue; }
+    if (a.st === 'going') {
+      if (a.path) followPath(a, dt, 80);
+      if (!a.path) { a.st = 'pen'; a.moving = false; if (Math.hypot(a.x - a.pen.x, a.y - a.pen.y) > 30) { a.x = a.pen.x; a.y = a.pen.y; } }
+      continue;
+    }
+    if (a.st === 'follow') {
+      updateFollower(a, 80 + fi * 40, dt); fi++;
+      // in they go once you reach the pen with them (the last one may still be a few steps behind)
+      if (Math.hypot(a.x - PEN_GATE.x, a.y - PEN_GATE.y) < 110 || Math.hypot(player.x - PEN_GATE.x, player.y - PEN_GATE.y) < 120) {
+        a.st = 'going'; a.path = findPath(a.x, a.y, a.pen.x, a.pen.y); a.pathI = 0;
+        if (state.q.home.indexOf(a.id) < 0) state.q.home.push(a.id);
+        Sfx.play('ok'); Toast.show('🏠 ' + (C.sounds[a.kind] || '')); Speech.speak(C.sounds[a.kind] || '', { pitch: 1.3 });
+        saveAndRefresh();
+      }
+      continue;
+    }
+    if (game.mode !== 'play') { a.moving = false; continue; }
+    if (a.path) followPath(a, dt, 34);
+    else {
+      a.moving = false;
+      if ((a.wait -= dt) < 0) { a.wait = 2 + a.R() * 3; const p = randomFreePoint(a.area, a.R); if (p) { a.path = findPath(a.x, a.y, p.x, p.y); a.pathI = 0; } }
+    }
+    if (active && Math.hypot(player.x - a.x, player.y - a.y) < 72) {
+      a.st = 'follow'; a.path = null; Sfx.play('pop');
+      Toast.show(C.sounds[a.kind] || ''); Speech.speak(C.sounds[a.kind] || '', { pitch: 1.3 });
+    }
+  }
+}
+
+/* ---- things in the world for Quests 3 and 6 ---- */
+const CHORE_TARGETS = [
+  { id: 'basket', x: 716, y: 364 }, { id: 'flowers', x: 774, y: 368 },
+  { id: 'shelf', x: 890, y: 362 }, { id: 'toybox', x: 950, y: 366 },
+];
+const CHORE_ITEMS = [
+  { id: 'shirt', kind: 'shirt', x: 690, y: 454, target: 'basket' },
+  { id: 'can', kind: 'can', x: 752, y: 484, target: 'flowers' },
+  { id: 'book', kind: 'book', x: 894, y: 480, target: 'shelf' },
+  { id: 'ball', kind: 'ball', x: 964, y: 450, target: 'toybox' },
+];
+const PAJAMAS = [
+  { id: 'pjPip', kind: 'pjY', x: 1553, y: 340 },   // behind the haystack
+  { id: 'pjPop', kind: 'pjG', x: 1130, y: 348 },   // at the bottom of a tree
+];
+const BEDS = [{ id: 'pip', x: 1300, y: 404 }, { id: 'pop', x: 1366, y: 408 }];
+function itemVisible(it) {
+  const C = Quests.content(), q = state.q;
+  if (!C || q.carry === it.id) return false;
+  if (CHORE_ITEMS.indexOf(it) >= 0) return C.id === 'chores' && !(q.placed && q.placed.indexOf(it.id) >= 0);
+  return C.id === 'bedtime' && state.stage === 'find' && !(q.given && q.given.indexOf(it.id) >= 0);
+}
+function sparkle(c, x, y, r, t) {
+  const a = 0.5 + 0.5 * Math.sin(t * 5 + x);
+  c.globalAlpha = a;
+  c.beginPath();
+  for (let k = 0; k < 8; k++) { const rr = k % 2 ? r * 0.3 : r, an = k * Math.PI / 4 + t; c.lineTo(x + Math.cos(an) * rr, y + Math.sin(an) * rr); }
+  c.closePath(); c.fillStyle = '#fff38a'; c.fill(); c.lineWidth = 1.5; c.strokeStyle = '#e0a020'; c.stroke();
+  c.globalAlpha = 1;
+}
+function drawGroundItem(c, it, t) {
+  if (!itemVisible(it)) return;
+  shadowE(c, it.x, it.y + 1, 12, 4);
+  drawThing(c, it.kind, it.x, it.y - 14 + Math.sin(t * 3 + it.x) * 1.5, 1);
+  sparkle(c, it.x + 13, it.y - 30, 6, t);
+}
+function drawChoreTarget(c, tg, t) {
+  const item = CHORE_ITEMS.find((i) => i.target === tg.id), q = state.q;
+  const full = state.done.indexOf('chores') >= 0 || (q.placed && q.placed.indexOf(item.id) >= 0 && Quests.content() && Quests.content().id === 'chores');
+  if (Quests.hintId() === tg.id) {
+    const r = 30 + Math.sin(t * 6) * 4;
+    c.beginPath(); c.ellipse(tg.x, tg.y - 4, r, r * 0.45, 0, 0, TAU); c.fillStyle = 'rgba(255,220,80,.55)'; c.fill();
+  }
+  if (tg.id === 'basket') drawBasket(c, tg.x, tg.y, full);
+  else if (tg.id === 'flowers') drawFlowerBed(c, tg.x, tg.y, full, t);
+  else if (tg.id === 'shelf') drawShelf(c, tg.x, tg.y, full);
+  else drawToyBox(c, tg.x, tg.y, full);
+}
+function drawBedSpot(c, b) {
+  const n = NPC[b.id];
+  if (!n || !n.sleeping) return;
+  drawBed(c, b.x, b.y, LOOKS[b.id]);
 }
 
 /* ============================== GÖREVLER ============================== */
@@ -1870,9 +2776,182 @@ QUEST_LOGIC.brother = {          // Görev 1 — Find my brother!
   },
 };
 
+QUEST_LOGIC.brother.markers = function () {
+  const th = LANDMARK.treehouse;
+  return state.stage === 'search' && state.q.hinted ? [{ id: 'treehouse', x: th.x, y: th.y - 200, type: '?' }] : [];
+};
+
+QUEST_LOGIC.family = {           // Görev 2 — Meet my family (photo game)
+  givers: ['mom', 'dad'],
+  talk(id, C) {
+    if (id !== 'mom' && id !== 'dad' && !(id === 'milo' && state.stage === 'active')) return false;
+    Dialog.show(state.stage === 'available' ? C.intro : C.again, () => {
+      state.stage = 'active'; saveAndRefresh();
+      MINI.pickPerson(C, () => Dialog.show(C.finish, () => Quests.complete()));
+    });
+    return true;
+  },
+  card(C) { return state.stage === 'available' ? ['mom', C.cardStart] : ['milo', C.card]; },
+};
+
+QUEST_LOGIC.chores = {           // Görev 3 — Help me with the chores (carry things)
+  givers: ['rosa'],
+  talk(id, C) {
+    if (id !== 'rosa') return false;
+    const q = state.q;
+    if (state.stage === 'available') Dialog.show(C.intro, () => { state.stage = 'active'; state.q = { placed: [], wrong: {}, carry: null }; saveAndRefresh(); });
+    else if (q.placed.length >= CHORE_ITEMS.length) Dialog.show(C.finish, () => Quests.complete());
+    else Dialog.show(C.reminder);
+    return true;
+  },
+  interactables(list) {
+    if (state.stage !== 'active') return;
+    const q = state.q;
+    if (!q.carry) {
+      for (const it of CHORE_ITEMS) if (q.placed.indexOf(it.id) < 0) list.push({ id: it.id, x: it.x, y: it.y, topY: it.y - 46, label: 'take', act: () => carryTake(it) });
+    } else for (const tg of CHORE_TARGETS) list.push({ id: tg.id, x: tg.x, y: tg.y, topY: tg.y - 60, label: 'put', act: () => this.put(tg) });
+  },
+  put(tg) {
+    const q = state.q, item = CHORE_ITEMS.find((i) => i.id === q.carry), U = GAME_CONTENT.ui;
+    if (!item) return;
+    if (item.target === tg.id) {
+      q.placed.push(item.id); q.carry = null; Sfx.play('ok');
+      Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { pitch: VOICE.rosa });
+      saveAndRefresh();
+    } else {
+      q.wrong[item.id] = (q.wrong[item.id] || 0) + 1;
+      Sfx.play('no'); Toast.show(U.tryAgain, true); Speech.speak(U.tryAgain, { pitch: VOICE.rosa });
+    }
+  },
+  hintId() {            // after two wrong places the right one starts to glow
+    const C = Quests.content(), q = state.q;
+    if (state.stage !== 'active' || !q.carry || (q.wrong[q.carry] || 0) < (C.hintAfter || 2)) return null;
+    return CHORE_ITEMS.find((i) => i.id === q.carry).target;
+  },
+  target() {
+    const q = state.q;
+    if (state.stage !== 'active' || q.placed.length >= CHORE_ITEMS.length) return NPC.rosa;
+    if (q.carry) { const h = this.hintId(); return h ? CHORE_TARGETS.find((t) => t.id === h) : { x: 832, y: 370 }; }
+    return nearestOf(CHORE_ITEMS.filter((i) => q.placed.indexOf(i.id) < 0));
+  },
+  card(C) {
+    if (state.stage === 'available') return ['rosa', C.cardStart];
+    const n = state.q.placed.length;
+    return n >= CHORE_ITEMS.length ? ['rosa', C.cardDone] : ['rosa', C.card + ' ' + n + '/' + CHORE_ITEMS.length];
+  },
+  restore() { if (state.stage === 'active') { const q = state.q; q.carry = null; q.wrong = q.wrong || {}; q.placed = q.placed || []; } },
+};
+
+QUEST_LOGIC.animals = {          // Görev 4 — My animals ran away! (animals follow you)
+  givers: ['nomi'],
+  talk(id, C) {
+    if (id !== 'nomi') return false;
+    if (state.stage === 'available') Dialog.show(C.intro, () => { state.stage = 'active'; state.q = { home: [] }; saveAndRefresh(); });
+    else if (state.q.home.length >= HERD.length) Dialog.show(C.finish, () => Quests.complete());
+    else Dialog.show(C.reminder);
+    return true;
+  },
+  target() {
+    if (state.stage !== 'active' || state.q.home.length >= HERD.length) return NPC.nomi;
+    if (HERD.some((a) => a.st === 'follow')) return PEN_GATE;
+    return nearestOf(HERD.filter((a) => a.st === 'wander')) || NPC.nomi;
+  },
+  card(C) {
+    if (state.stage === 'available') return ['nomi', C.cardStart];
+    const n = state.q.home.length;
+    return n >= HERD.length ? ['nomi', C.cardDone] : ['nomi', C.card + ' ' + n + '/' + HERD.length];
+  },
+  restore() { if (state.stage === 'active') state.q.home = state.q.home || []; },
+};
+
+QUEST_LOGIC.where = {            // Görev 5 — Where do they live? (picture choice)
+  givers: ['bob'],
+  talk(id, C) {
+    if (id !== 'bob') return false;
+    Dialog.show(state.stage === 'available' ? C.intro : C.again, () => {
+      state.stage = 'active'; saveAndRefresh();
+      MINI.pickPlace(C, () => Dialog.show(C.finish, () => Quests.complete()));
+    });
+    return true;
+  },
+  card(C) { return ['bob', state.stage === 'available' ? C.cardStart : C.card]; },
+};
+
+QUEST_LOGIC.bedtime = {          // Görev 6 — It's bedtime! (find pajamas, then order the cards)
+  givers: ['lily', 'max'],
+  talk(id, C) {
+    if (id !== 'lily' && id !== 'max') return false;
+    const q = state.q, U = GAME_CONTENT.ui;
+    if (state.stage === 'available') { Dialog.show(C.intro, () => { state.stage = 'find'; state.q = { given: [], carry: null }; saveAndRefresh(); }); return true; }
+    if (q.carry && id === 'lily') {
+      q.given.push(q.carry); q.carry = null; Sfx.play('ok'); saveAndRefresh();
+      if (q.given.length >= PAJAMAS.length) this.sort(C);
+      else { Toast.show('👍 ' + U.thankYou); Speech.speak(U.thankYou, { pitch: VOICE.lily }); }
+      return true;
+    }
+    if (q.given.length >= PAJAMAS.length) { this.sort(C); return true; }
+    Dialog.show([[id, C.reminder]]);
+    return true;
+  },
+  sort(C) {
+    Dialog.show(C.sortIntro, () => MINI.sequence(C, () => {
+      NPC.pip.sleeping = NPC.pop.sleeping = true; game.sleepT = 22;
+      Dialog.show(C.finish, () => Quests.complete());
+    }));
+  },
+  interactables(list) {
+    if (state.stage !== 'find') return;
+    const q = state.q;
+    if (q.carry) { const l = list.find((i) => i.id === 'lily'); if (l) l.label = 'give'; return; }
+    for (const p of PAJAMAS) if (q.given.indexOf(p.id) < 0) list.push({ id: p.id, x: p.x, y: p.y, topY: p.y - 46, label: 'take', act: () => carryTake(p) });
+  },
+  target() {
+    const q = state.q;
+    if (state.stage !== 'find' || q.carry || q.given.length >= PAJAMAS.length) return NPC.lily;
+    return nearestOf(PAJAMAS.filter((p) => q.given.indexOf(p.id) < 0));
+  },
+  card(C) {
+    if (state.stage === 'available') return ['lily', C.cardStart];
+    const q = state.q;
+    if (q.carry || q.given.length >= PAJAMAS.length) return ['lily', C.cardDone];
+    return ['lily', C.card + ' ' + q.given.length + '/' + PAJAMAS.length];
+  },
+  restore() { if (state.stage === 'find') { state.q.carry = null; state.q.given = state.q.given || []; } },
+};
+
+QUEST_LOGIC.truefalse = {        // Görev 7 — True or false? (thumbs up / down)
+  givers: ['owl'],
+  talk(id, C) {
+    if (id !== 'owl') return false;
+    Dialog.show(state.stage === 'available' ? C.intro : C.again, () => {
+      state.stage = 'active'; saveAndRefresh();
+      MINI.trueFalse(C, () => Dialog.show(C.finish, () => Quests.complete()));
+    });
+    return true;
+  },
+  card(C) { return ['owl', state.stage === 'available' ? C.cardStart : C.card]; },
+};
+
+const DOOR = { x: 1085, y: 646 };
+QUEST_LOGIC.final = {            // Görev 8 — My Family (at my house)
+  givers: [],
+  talk() { return false; },
+  target() { return DOOR; },
+  markers() { return [{ id: 'door', x: DOOR.x, y: DOOR.y - 104, type: '!' }]; },
+  card(C) { return ['sparky', C.cardStart]; },
+  open(C) {
+    MINI.familyBuilder(C, () => MINI.aboutMe(C, () => MINI.familyResult(C, () => {
+      state.finished = true; state.finishedAt = new Date().toLocaleDateString('tr-TR');
+      Quests.complete();
+      setTimeout(() => Cert.open(), 2300);
+    })));
+  },
+};
+
 const Quests = {
   content(i = state.quest) { return GAME_CONTENT.quests[i] || null; },
   logic(i = state.quest) { const c = this.content(i); return c ? QUEST_LOGIC[c.id] || null : null; },
+  index(id) { for (let i = 0; i < GAME_CONTENT.quests.length; i++) if (GAME_CONTENT.quests[i].id === id) return i; return -1; },
   talk(id) { const L = this.logic(); return !!(L && L.talk(id, this.content())); },
   marker(id) {
     const L = this.logic();
@@ -1884,6 +2963,7 @@ const Quests = {
     for (let i = 0; i < state.quest; i++) { const Li = this.logic(i); if (Li && Li.givers.indexOf(id) >= 0) return 'star'; }
     return null;
   },
+  markers() { const L = this.logic(); return L && L.markers ? L.markers() : []; },
   target() {
     const L = this.logic();
     if (!L) return null;
@@ -1891,21 +2971,42 @@ const Quests = {
   },
   card() {
     const L = this.logic(), C = this.content();
-    if (!L) return ['sparky', GAME_CONTENT.ui.freeWalk];
+    if (!L) return ['sparky', state.finished ? GAME_CONTENT.ui.hero : GAME_CONTENT.ui.freeWalk];
     return L.card(C);
   },
+  hintId() { const L = this.logic(); return L && L.hintId ? L.hintId() : null; },
   leoHiding() { const C = this.content(); return !!C && C.id === 'brother' && state.stage !== 'return'; },
   complete() {
     const C = this.content();
     if (state.done.indexOf(C.id) < 0) state.done.push(C.id);
     state.stars = Math.min(SETTINGS.totalStars, state.stars + 1);
     state.quest++; state.stage = 'available'; state.q = {};
+    const acc = state.stars % 2 === 0 ? GAME_CONTENT.accessories[state.stars / 2 - 1] : null;
+    if (acc && state.unlocked.indexOf(acc.id) < 0) {     // every second star opens an accessory
+      state.unlocked.push(acc.id); wearAccessory(acc.id, true);
+      if (!state.finished) setTimeout(() => { Toast.show('🎁 ' + acc.got); Speech.speak(acc.got, { pitch: 1.1 }); }, 2600);
+    }
     Save.save();
     applyWorldState(false);
     UI.celebrate();
+    const next = this.content();
+    if (next && next.id === 'final') setTimeout(() => { if (game.mode === 'play') Dialog.show(next.unlock); }, 2800);
   },
 };
 function saveAndRefresh() { Save.save(); Hud.refresh(); }
+function carryTake(it) { state.q.carry = it.id; Sfx.play('pick'); Hud.refresh(); }
+function nearestOf(list) {
+  let best = null, bd = 1e9;
+  for (const o of list) { const d = Math.hypot(o.x - player.x, o.y - player.y); if (d < bd) { bd = d; best = o; } }
+  return best;
+}
+function wearAccessory(id, on) {
+  state.wear = state.wear || {};
+  state.wear[id] = !!on;
+  if (on && id === 'crown') state.wear.hat = false;
+  if (on && id === 'hat') state.wear.crown = false;
+  refreshPlayerLook();
+}
 
 /* Places everyone according to the saved progress. instant = on load. */
 function applyWorldState(instant) {
@@ -1923,15 +3024,309 @@ function applyWorldState(instant) {
       if (instant) { const p = randomFreePoint(MAP.wander, R); if (p) { n.x = p.x; n.y = p.y; } }
     } else sendHome(n, instant);
   }
-  LANDMARK.myHouse.unlocked = state.quest >= GAME_CONTENT.quests.length && GAME_CONTENT.quests.length >= 8;
+  const L = Quests.logic(), C = Quests.content();
+  if (instant) {
+    if (L && L.restore) L.restore();
+    NPC.pip.sleeping = NPC.pop.sleeping = false; game.sleepT = 0;
+  }
+  if (instant || (C && C.id === 'animals')) placeHerd();
+  LANDMARK.myHouse.unlocked = state.quest >= Quests.index('final');
 }
 
 /* ============================== MİNİ OYUNLAR ============================== */
-/* Görev 2, 3, 5, 6, 7 ve 8'in mini oyunları bir sonraki adımda buraya eklenecek.
-   Her biri ayrı bir nesne olacak: { open(onDone), close() }. */
+/* Her mini oyun ayrı bir fonksiyon: MINI.<ad>(C, bitince). C = görevin GAME_CONTENT kaydı.
+   Yeni bir ünite için mini oyunu olduğu gibi bırakıp yalnızca GAME_CONTENT'i değiştirmek yeterli.
+   Ortak parçalar: MG (açılır pencere), pickBtn (resimli buton), sayThen (konuş, bitince devam et). */
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function cnv(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function fmt(s, vars) { return fillName(String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m))); }
+function speechMs(text) { const r = Speech.rate(); return String(text).split(' ').reduce((a, w) => a + (0.12 + w.length * 0.065) / r, 0.3) * 1000; }
+/* Speak, then run cb once when the voice finishes, or after a safe timeout if it never reports back. */
+function sayThen(text, pitch, cb) {
+  const h = { dead: false, t: 0, cancel() { this.dead = true; clearTimeout(this.t); } };
+  const fin = () => { if (h.dead) return; h.dead = true; clearTimeout(h.t); if (cb) cb(); };
+  const est = speechMs(text);
+  const ok = Speech.speak(text, { pitch, onEnd: fin });
+  h.t = setTimeout(fin, ok ? est * 1.8 + 1500 : 600 + est * 0.5);
+  return h;
+}
+function pickBtn(draw, label, cw, ch, cls) {
+  const b = el('button', 'pick' + (cls ? ' ' + cls : ''));
+  if (draw) { const c = cnv(cw || 180, ch || 200); draw(c); b.appendChild(c); }
+  if (label) b.appendChild(el('span', null, String(label).replace(/^grand(?=\w)/, 'grand​')));   // "grand|mother" may wrap
+  return b;
+}
+const MG = {                      // the mini game window
+  token: 0, who: 'sparky', speech: null, onQuit: null, onReplay: null, text: '',
+  open(who, onQuit) {
+    this.token++; this.who = who; this.onQuit = onQuit || null; this.onReplay = null;
+    if (this.speech) this.speech.cancel();
+    drawPortrait($('mgPortrait'), who);
+    $('mgBody').innerHTML = ''; $('mgDots').innerHTML = ''; $('mgPrompt').textContent = '';
+    this.next(null);
+    $('mg').classList.remove('hidden'); $('mgCard').scrollTop = 0;
+    setMode('minigame'); Talk.hide();
+    return this.token;
+  },
+  alive(tok) { return tok === this.token && game.mode === 'minigame'; },
+  prompt(text, speak) { this.text = text; $('mgPrompt').textContent = text; if (speak !== false) this.say(text); },
+  say(text, cb) { if (this.speech) this.speech.cancel(); this.speech = sayThen(text, VOICE[this.who] || 1, cb); },
+  replay() { if (this.onReplay) this.onReplay(); else if (this.text) this.say(this.text); },
+  dots(i, n) { const d = $('mgDots'); d.innerHTML = ''; for (let k = 0; k < n; k++) d.appendChild(el('span', k < i ? 'on' : k === i ? 'cur' : '')); },
+  next(label, fn) {
+    const b = $('mgNext');
+    if (!label) { b.classList.add('hidden'); b.onclick = null; return; }
+    b.textContent = label; b.classList.remove('hidden');
+    b.onclick = (e) => { e.stopPropagation(); b.blur(); Sfx.play('tap'); fn(); };
+  },
+  close() {
+    this.token++; if (this.speech) this.speech.cancel(); this.speech = null; this.onReplay = null;
+    Speech.stop(); $('mg').classList.add('hidden'); setMode('play'); Hud.refresh();
+  },
+  quit() { const f = this.onQuit; this.close(); if (f) f(); },
+  wrong(btn, correct, count, hintAfter) {       // gentle sound, "Try again!", then a glowing hint
+    Sfx.play('no');
+    btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+    Toast.show(GAME_CONTENT.ui.tryAgain, true);
+    this.say(GAME_CONTENT.ui.tryAgain);
+    if (correct && count >= (hintAfter || 2)) correct.classList.add('hint');
+  },
+};
+const MINI = {};
+
+MINI.pickPerson = function (C, done) {     // Görev 2: "Where is the grandmother?" → tap the person in the photo
+  const tok = MG.open('milo');
+  const photo = el('div', 'photo'), btns = {};
+  for (const r of C.photo) {
+    const b = pickBtn((cv) => drawFigure(cv, LOOKS[PHOTO_LOOKS[r]] || roleLook(r, 0), { k: cv.height / 102 }), null, 180, 220);
+    b.dataset.v = r; btns[r] = b; photo.appendChild(b);
+  }
+  $('mgBody').appendChild(photo);
+  let i = 0, wrongs = 0, busy = false;
+  const ask = () => {
+    if (!MG.alive(tok)) return;
+    if (i >= C.order.length) { MG.close(); done(); return; }
+    wrongs = 0; busy = false;
+    for (const r in btns) btns[r].classList.remove('hint', 'ok');
+    MG.dots(i, C.order.length);
+    MG.prompt(fmt(C.prompt, { word: C.order[i] }));
+  };
+  for (const r of C.photo) btns[r].addEventListener('click', () => {
+    if (busy || !MG.alive(tok)) return;
+    const want = C.order[i];
+    if (r === want) {
+      busy = true; Sfx.play('ok'); btns[r].classList.remove('hint'); btns[r].classList.add('ok');
+      const s = fmt(C.right, { word: want }); $('mgPrompt').textContent = s; MG.text = s;
+      MG.say(s, () => { i++; ask(); });
+    } else { wrongs++; MG.wrong(btns[r], btns[want], wrongs, C.hintAfter); }
+  });
+  ask();
+};
+
+const PLACE_SPRITES = { house: 'houseMilo', apartment: 'apartment', tent: 'tent', farm: 'barn', cottage: 'cottage', houseboat: 'houseboat' };
+MINI.pickPlace = function (C, done) {      // Görev 5: "Where does Nomi live?" → choose one of three places
+  const tok = MG.open('bob');
+  const wrap = el('div', 'whereWrap'), who = el('div', 'whereWho'), pic = cnv(200, 200), name = el('div');
+  who.append(pic, name);
+  const row = el('div', 'whereRow');
+  wrap.append(who, row); $('mgBody').appendChild(wrap);
+  let i = 0, wrongs = 0, busy = false;
+  const ask = () => {
+    if (!MG.alive(tok)) return;
+    if (i >= C.questions.length) { MG.close(); done(); return; }
+    const q = C.questions[i]; wrongs = 0; busy = false;
+    drawPortrait(pic, q.who); name.textContent = charName(q.who);
+    const others = shuffle(Object.keys(PLACE_SPRITES).filter((p) => p !== q.answer)).slice(0, 2);
+    const bs = {};
+    row.innerHTML = '';
+    for (const p of shuffle([q.answer].concat(others))) {
+      const b = pickBtn((cv) => drawSpriteFit(cv, PLACE_SPRITES[p], p === 'houseboat'), (C.places && C.places[p]) || p, 220, 180);
+      b.dataset.v = p; bs[p] = b; row.appendChild(b);
+      b.addEventListener('click', () => {
+        if (busy || !MG.alive(tok)) return;
+        if (p === q.answer) {
+          busy = true; Sfx.play('ok'); b.classList.remove('hint'); b.classList.add('ok');
+          $('mgPrompt').textContent = q.say; MG.text = q.say;
+          MG.say(q.say, () => { i++; ask(); });
+        } else { wrongs++; MG.wrong(b, bs[q.answer], wrongs, C.hintAfter); }
+      });
+    }
+    MG.dots(i, C.questions.length);
+    MG.prompt(q.ask);
+  };
+  ask();
+};
+
+MINI.sequence = function (C, done) {       // Görev 6: put the bedtime cards in order
+  const tok = MG.open('lily');
+  const slots = el('div', 'seqSlots'), cards = el('div', 'seqCards'), sl = [], bs = [];
+  for (let k = 0; k < C.steps.length; k++) { const s = el('div', 'slot'); s.appendChild(el('b', null, String(k + 1))); slots.appendChild(s); sl.push(s); }
+  $('mgBody').append(slots, cards);
+  C.steps.forEach((st, idx) => { const b = pickBtn((cv) => drawStepIcon(cv, st.icon), st.text, 200, 140); b._idx = idx; b.dataset.v = idx; bs.push(b); });
+  for (const b of shuffle(bs)) cards.appendChild(b);
+  let next = 0, wrongs = 0, busy = false;
+  const ask = () => { MG.dots(next, C.steps.length); MG.prompt(C.sortPrompts[Math.min(next, C.sortPrompts.length - 1)]); };
+  for (const b of bs) b.addEventListener('click', () => {
+    if (busy || b._placed || !MG.alive(tok)) return;
+    if (b._idx === next) {
+      busy = true; b._placed = true; Sfx.play('ok'); b.classList.remove('hint', 'shake'); b.classList.add('ok');
+      sl[next].appendChild(b); next++; wrongs = 0;
+      MG.say(C.steps[b._idx].text, () => {
+        if (!MG.alive(tok)) return;
+        if (next < C.steps.length) { busy = false; ask(); return; }
+        MG.dots(next, C.steps.length);
+        const all = C.steps.map((s) => s.text).join('. ') + '.';
+        $('mgPrompt').textContent = all; MG.text = all;
+        MG.say(all, () => { if (MG.alive(tok)) { MG.close(); done(); } });
+      });
+    } else { wrongs++; MG.wrong(b, bs[next], wrongs, C.hintAfter); }
+  });
+  ask();
+};
+
+MINI.trueFalse = function (C, done) {      // Görev 7: thumbs up or thumbs down
+  const tok = MG.open('owl');
+  const row = el('div', 'tfRow'), up = el('button', 'btn tfBtn up', '👍'), down = el('button', 'btn tfBtn down', '👎');
+  up.dataset.v = 'up'; down.dataset.v = 'down';
+  up.setAttribute('aria-label', 'Yes'); down.setAttribute('aria-label', 'No');
+  row.append(up, down);
+  const fb = el('div', 'say hidden');
+  $('mgBody').append(row, fb);
+  let i = 0, wrongs = 0, busy = false;
+  const ask = () => {
+    if (!MG.alive(tok)) return;
+    if (i >= C.statements.length) { MG.close(); done(); return; }
+    wrongs = 0; busy = false; fb.classList.add('hidden'); MG.next(null);
+    for (const b of [up, down]) b.classList.remove('hint', 'ok');
+    MG.dots(i, C.statements.length);
+    MG.prompt(C.statements[i].text);
+  };
+  const answer = (val, btn, other) => {
+    if (busy || !MG.alive(tok)) return;
+    const s = C.statements[i];
+    if (val === s.answer) {
+      busy = true; Sfx.play('ok'); btn.classList.remove('hint'); btn.classList.add('ok');
+      fb.textContent = s.say; fb.classList.remove('hidden'); MG.text = s.say;
+      MG.say(s.say);            // the correct sentence is always read aloud
+      setTimeout(() => { if (MG.alive(tok)) MG.next(GAME_CONTENT.ui.next + ' ▶', () => { i++; ask(); }); }, 900);
+    } else { wrongs++; MG.wrong(btn, other, wrongs, C.hintAfter); }
+  };
+  up.addEventListener('click', (e) => { e.currentTarget.blur(); answer(true, up, down); });
+  down.addEventListener('click', (e) => { e.currentTarget.blur(); answer(false, down, up); });
+  ask();
+};
+
+MINI.familyBuilder = function (C, done) {  // Görev 8a: who is in your family? (add people to the photo)
+  const tok = MG.open('player');
+  const counts = {}, hist = [], badges = {};
+  for (const m of C.members) counts[m] = (state.family && state.family[m]) || 0;
+  for (const m of C.members) for (let k = 0; k < counts[m]; k++) hist.push(m);
+  const photo = cnv(640, 300); photo.className = 'famPhoto';
+  const grid = el('div', 'famGrid'), undoRow = el('div', 'undoRow'), undo = el('button', 'btn white', '↩️');
+  undo.setAttribute('aria-label', 'Undo');
+  undoRow.appendChild(undo);
+  $('mgBody').append(photo, grid, undoRow);
+  const redraw = () => {
+    drawFamilyPhoto(photo, counts, C.members);
+    for (const m of C.members) { badges[m].textContent = counts[m]; badges[m].classList.toggle('hidden', !counts[m]); }
+    MG.next(hist.length ? GAME_CONTENT.ui.next + ' ▶' : null, () => { state.family = Object.assign({}, counts); Save.save(); done(); });
+  };
+  for (const m of C.members) {
+    const b = pickBtn((cv) => drawFigure(cv, roleLook(m, 0), { k: cv.height / 100 }), m, 120, 130);
+    const bd = el('span', 'badge hidden'); b.appendChild(bd); badges[m] = bd; b.dataset.v = m;
+    b.addEventListener('click', () => {
+      if (!MG.alive(tok)) return;
+      if (counts[m] >= 6 || hist.length >= 16) { Sfx.play('no'); return; }
+      counts[m]++; hist.push(m); Sfx.play('pop'); MG.say(m); redraw();
+    });
+    grid.appendChild(b);
+  }
+  undo.addEventListener('click', () => { if (!MG.alive(tok) || !hist.length) return; counts[hist.pop()]--; Sfx.play('tap'); redraw(); });
+  MG.dots(0, 3);
+  MG.prompt(C.familyPrompt);
+  redraw();
+};
+
+MINI.aboutMe = function (C, done) {        // Görev 8b: how old are you? where are you from?
+  const tok = MG.open('player');
+  const ages = el('div', 'ageRow'), flags = el('div', 'flagGrid'), ab = {}, fb = {};
+  if (C.ages.indexOf(state.age) < 0) state.age = C.ages[1] || C.ages[0];
+  if (!C.countries.some((x) => x.id === state.country)) state.country = C.countries[0].id;
+  for (const n of C.ages) {
+    const b = el('button', 'pick' + (state.age === n ? ' sel' : ''), String(n)); ab[n] = b; b.dataset.v = n;
+    b.addEventListener('click', () => {
+      if (!MG.alive(tok)) return;
+      state.age = n; for (const k in ab) ab[k].classList.toggle('sel', +k === n);
+      Sfx.play('tap'); MG.say(fmt(C.sentences.age, { age: C.numbers[n] || n }));
+    });
+    ages.appendChild(b);
+  }
+  for (const co of C.countries) {
+    const b = pickBtn((cv) => drawFlag(prepCanvas(cv), co.id, cv.width, cv.height), co.label, 150, 100);
+    b.classList.toggle('sel', state.country === co.id); fb[co.id] = b; b.dataset.v = co.id;
+    b.addEventListener('click', () => {
+      if (!MG.alive(tok)) return;
+      state.country = co.id; for (const k in fb) fb[k].classList.toggle('sel', k === co.id);
+      Sfx.play('tap'); MG.say(fmt(C.sentences.from, { country: co.name }));
+    });
+    flags.appendChild(b);
+  }
+  const showFlags = () => {
+    $('mgBody').innerHTML = ''; $('mgBody').appendChild(flags);
+    MG.dots(2, 3); MG.prompt(C.countryPrompt);
+    MG.next(GAME_CONTENT.ui.next + ' ▶', () => { Save.save(); done(); });
+  };
+  $('mgBody').appendChild(ages);
+  MG.dots(1, 3); MG.prompt(C.agePrompt);
+  MG.next(GAME_CONTENT.ui.next + ' ▶', showFlags);
+};
+
+function familySentences(C) {              // "This is my family. I have a mother, one sister and two cousins. ..."
+  const S = C.sentences, out = [S.family], parts = [];
+  for (const m of C.members) {
+    const n = (state.family && state.family[m]) || 0;
+    if (!n) continue;
+    const word = n === 1 ? m : (C.plurals[m] || m + 's');
+    const num = n === 1 && C.useA.indexOf(m) >= 0 ? (/^[aeiou]/i.test(word) ? 'an' : 'a') : (C.numbers[n] || String(n));
+    parts.push(num + ' ' + word);
+  }
+  if (parts.length) {
+    const list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' ' + C.and + ' ' + parts[parts.length - 1] : parts[0];
+    out.push(fmt(S.have, { list }));
+  }
+  out.push(fmt(S.age, { age: C.numbers[state.age] || state.age }));
+  const co = C.countries.find((x) => x.id === state.country) || C.countries[0];
+  out.push(fmt(S.from, { country: co.name }));
+  return out;
+}
+MINI.familyResult = function (C, done) {   // Görev 8c: the game reads the child's family aloud
+  const tok = MG.open('player');
+  const photo = cnv(640, 300); photo.className = 'famPhoto';
+  drawFamilyPhoto(photo, state.family || {}, C.members);
+  const lines = el('div', 'lines'), sents = familySentences(C), divs = sents.map((s) => el('div', null, s));
+  for (const d of divs) lines.appendChild(d);
+  $('mgBody').append(photo, lines);
+  MG.dots(3, 3);
+  MG.prompt(C.resultPrompt, false);
+  const read = () => {
+    let k = 0;
+    const step = () => {
+      if (!MG.alive(tok)) return;
+      divs.forEach((d, j) => d.classList.toggle('now', j === k));
+      if (k < divs.length) MG.say(sents[k], () => { k++; step(); });
+    };
+    step();
+  };
+  MG.onReplay = read;
+  MG.next(GAME_CONTENT.ui.done + ' ✔', () => { MG.close(); done(); });
+  read();
+};
 
 /* ============================== ARAYÜZ ============================== */
-const game = { mode: 'title', t: 0, paused: false };
+const game = { mode: 'title', t: 0, paused: false, sleepT: 0, ev: 0 };
+// While one of these full-screen windows is open the village is not updated or redrawn.
+const FROZEN = { title: 1, parent: 1, creator: 1, minigame: 1, menu: 1, wardrobe: 1, cert: 1, ask: 1 };
 function setMode(m) { game.mode = m; }
 function fillName(s) { return String(s).replace(/\{name\}/g, state.name || GAME_CONTENT.defaultName); }
 function charName(id) { const c = GAME_CONTENT.characters[id]; return c ? fillName(c.name) : id; }
@@ -1940,12 +3335,21 @@ function charName(id) { const c = GAME_CONTENT.characters[id]; return c ? fillNa
 function interactables() {
   const list = [];
   for (const n of NPCS) {
-    if (n.hidden || n.follow) continue;
-    list.push({ id: n.id, x: n.x, y: n.y, npc: n, topY: n.y + n.top });
+    if (n.hidden || n.follow || n.sleeping) continue;
+    list.push({ id: n.id, x: n.x, y: n.y, npc: n, topY: n.y + n.top, label: 'talk' });
   }
   if (Quests.content() && Quests.content().id === 'brother' && state.stage === 'search') {
     const th = LANDMARK.treehouse;
-    list.push({ id: 'treehouse', x: th.x + 34, y: th.y + 14, topY: th.y - 190 });
+    list.push({ id: 'treehouse', x: th.x + 34, y: th.y + 14, topY: th.y - 190, label: 'talk' });
+  }
+  const L = Quests.logic();
+  if (L && L.interactables) L.interactables(list);
+  const mr = LANDMARK.mirror;
+  list.push({ id: 'mirror', x: mr.x, y: mr.y + 8, topY: mr.y - 90, label: 'look', act: () => Wardrobe.open() });
+  if (LANDMARK.myHouse.unlocked) {
+    list.push({ id: 'door', x: DOOR.x, y: DOOR.y, topY: DOOR.y - 84, label: 'open', act: () => {
+      if (state.finished) Cert.open(); else if (Quests.content() && Quests.content().id === 'final') QUEST_LOGIC.final.open(Quests.content());
+    } });
   }
   return list;
 }
@@ -1960,6 +3364,7 @@ function nearestInteractable() {
 function interact(it) {
   if (!it || game.mode !== 'play') return;
   player.path = null; player.goal = null; player.moving = false;
+  if (it.act) { player.dir = faceDir(it.x - player.x, it.y - player.y, player.dir); Talk.hide(); it.act(); return; }
   const n = it.npc || NPC[it.id];
   player.dir = faceDir(it.x - player.x, it.y - player.y, player.dir);
   if (n && n.kind === 'person') n.dir = faceDir(player.x - n.x, (player.y - n.y) * 1.4, n.dir);
@@ -2090,12 +3495,16 @@ const Hud = {
   },
   speakCard() { const [, text] = Quests.card(); Speech.speak(fillName(text), { pitch: 1.1 }); },
 };
+const TALK_ICON = { talk: '💬', take: '✋', put: '👇', give: '🎁', open: '🔑', look: '👀' };
 const Talk = {
-  el: null, wrap: null, it: null, lx: -1, ly: -1,
+  el: null, wrap: null, it: null, lx: -1, ly: -1, label: 'talk',
+  hide() { this.it = null; if (this.wrap) this.wrap.classList.add('hidden'); },
   update() {
     const it = game.mode === 'play' ? nearestInteractable() : null;
     this.it = it;
     if (!it) { if (!this.wrap.classList.contains('hidden')) this.wrap.classList.add('hidden'); return; }
+    const lb = it.label || 'talk';
+    if (lb !== this.label) { this.label = lb; this.el.textContent = (GAME_CONTENT.ui[lb] || lb) + ' ' + (TALK_ICON[lb] || ''); }
     this.wrap.classList.remove('hidden');
     const sx = (it.x - cam.x) * view.scale, sy = (it.topY - cam.y) * view.scale;
     const w = this.el.offsetWidth || 130, h = this.el.offsetHeight || 60;
@@ -2140,12 +3549,14 @@ const Fx = {
 };
 const UI = {
   init() {
-    $('startBtn').textContent = GAME_CONTENT.ui.start + ' ▶';
+    const U = GAME_CONTENT.ui;
+    $('startBtn').textContent = U.start + ' ▶';
     $('titleText').textContent = GAME_CONTENT.title;
     document.title = GAME_CONTENT.title;
     Talk.el = $('talkBtn'); Talk.wrap = $('talkWrap');
-    $('talkBtn').textContent = GAME_CONTENT.ui.talk + ' 💬';
+    $('talkBtn').textContent = U.talk + ' ' + TALK_ICON.talk;
     const tap = (id, fn) => $(id).addEventListener('click', (e) => { e.stopPropagation(); e.currentTarget.blur && e.currentTarget.blur(); fn(e); });
+    const restart = () => Confirm.ask(U.restartAsk, () => { Save.clear(); location.reload(); });
     tap('startBtn', startGame);
     tap('talkBtn', () => { if (Talk.it) interact(Talk.it); });
     tap('dlgNext', () => Dialog.next());
@@ -2156,9 +3567,21 @@ const UI = {
     tap('mSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Menu.render(); });
     tap('mSlow', () => { state.settings.slow = true; Save.save(); Menu.render(); Speech.speak('Hello!'); });
     tap('mNormal', () => { state.settings.slow = false; Save.save(); Menu.render(); Speech.speak('Hello!'); });
-    tap('mRestart', () => { $('menuMain').classList.add('hidden'); $('menuAsk').classList.remove('hidden'); });
-    tap('askNo', () => { $('menuAsk').classList.add('hidden'); $('menuMain').classList.remove('hidden'); });
-    tap('askYes', () => { Save.clear(); location.reload(); });
+    tap('mLook', () => { Menu.close(); Wardrobe.open(); });
+    tap('mInfo', () => { Menu.close(); Parent.open(true); });
+    tap('mRestart', restart);
+    tap('askNo', () => Confirm.no());
+    tap('askYes', () => Confirm.yes());
+    tap('mgSpeak', () => MG.replay());
+    tap('mgQuit', () => MG.quit());
+    tap('wdOk', () => Wardrobe.close());
+    tap('certAgain', restart);
+    tap('certWalk', () => Cert.close());
+    tap('pStart', () => Parent.start());
+    tap('crOk', () => Creator.done());
+    tap('crNameLbl', () => Speech.speak(GAME_CONTENT.creator.name, { pitch: 1.1 }));
+    tap('crLookLbl', () => Speech.speak(GAME_CONTENT.creator.look, { pitch: 1.1 }));
+    $('crName').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
     Fx.cv = $('fx'); Fx.g = Fx.cv.getContext('2d');
   },
   celebrate() {
@@ -2184,9 +3607,8 @@ const UI = {
 const Menu = {
   prev: 'play',
   open() {
-    if (game.mode === 'menu' || game.mode === 'title') return;
-    this.prev = game.mode; setMode('menu');
-    $('menuMain').classList.remove('hidden'); $('menuAsk').classList.add('hidden');
+    if (game.mode !== 'play' && game.mode !== 'dialog') return;
+    this.prev = game.mode; setMode('menu'); Talk.hide();
     $('menu').classList.remove('hidden'); this.render();
   },
   close() { $('menu').classList.add('hidden'); setMode(this.prev); },
@@ -2197,11 +3619,155 @@ const Menu = {
     $('mSlow').textContent = '🐢 ' + U.slow; $('mNormal').textContent = '🐇 ' + U.normal;
     $('mSlow').className = 'btn wide ' + (s.slow ? 'sel' : 'unsel');
     $('mNormal').className = 'btn wide ' + (s.slow ? 'unsel' : 'sel');
+    $('mLook').textContent = '👕 ' + U.myLook;
+    $('mInfo').textContent = 'ℹ️ ' + U.info;
     $('mRestart').textContent = '🔄 ' + U.restart;
     $('mClose').textContent = '✖ ' + U.close;
-    $('askText').textContent = U.restartAsk;
-    $('askYes').textContent = U.yes; $('askNo').textContent = U.no;
   },
+};
+const Confirm = {                 // "Are you sure?" box used by Restart and Play again
+  prev: 'play', fn: null,
+  ask(text, fn) {
+    this.fn = fn; this.prev = game.mode;
+    $('askText').textContent = text; $('askYes').textContent = GAME_CONTENT.ui.yes; $('askNo').textContent = GAME_CONTENT.ui.no;
+    $('ask').classList.remove('hidden'); setMode('ask');
+  },
+  yes() { $('ask').classList.add('hidden'); setMode(this.prev); const f = this.fn; this.fn = null; if (f) f(); },
+  no() { $('ask').classList.add('hidden'); setMode(this.prev); this.fn = null; },
+};
+const Toast = {                   // short feedback under the HUD: "Thank you!", "Try again!"
+  t: 0,
+  show(text, bad) {
+    const e = $('toast');
+    e.textContent = text; e.classList.toggle('bad', !!bad);
+    e.classList.remove('hidden'); e.style.animation = 'none'; void e.offsetWidth; e.style.animation = '';
+    clearTimeout(this.t); this.t = setTimeout(() => e.classList.add('hidden'), 1900);
+  },
+};
+
+/* ---- parent info screen (Turkish), shown on the very first start ---- */
+const Parent = {
+  readOnly: false, prev: 'play',
+  open(readOnly) {
+    const P = GAME_CONTENT.parent;
+    this.readOnly = !!readOnly; this.prev = game.mode;
+    $('pTitle').textContent = P.title;
+    const ul = $('pList'); ul.innerHTML = '';
+    for (const p of P.points) ul.appendChild(el('li', null, p));
+    $('pControls').textContent = '🎮 ' + P.controls;
+    $('pCredit').textContent = P.credit;
+    $('pStart').textContent = readOnly ? '✖ ' + GAME_CONTENT.ui.close : P.start + ' ▶';
+    $('title').classList.add('hidden'); $('parent').classList.remove('hidden');
+    setMode('parent');
+  },
+  start() {
+    $('parent').classList.add('hidden');
+    if (this.readOnly) { setMode(this.prev); return; }
+    Sfx.unlock();                  // this tap also unlocks sound on phones and tablets
+    state.parentSeen = true; Save.save();
+    Creator.open();
+  },
+};
+
+/* ---- character creator ---- */
+const Creator = {
+  open() {
+    const T = GAME_CONTENT.creator;
+    $('crNameLbl').textContent = '🔊 ' + T.name;
+    $('crLookLbl').textContent = '🔊 ' + T.look;
+    $('crOk').textContent = T.ok + ' ▶';
+    const inp = $('crName');
+    inp.value = state.name && state.name !== GAME_CONTENT.defaultName ? state.name : '';
+    inp.placeholder = GAME_CONTENT.defaultName;
+    $('title').classList.add('hidden'); $('creator').classList.remove('hidden');
+    setMode('creator');
+    this.build();
+    sayThen(T.name, 1.1, () => { if (game.mode === 'creator') Speech.speak(T.look, { pitch: 1.1 }); });
+  },
+  build() {
+    const l = state.look;
+    const body = $('crBody'); body.innerHTML = '';
+    for (let v = 0; v < 2; v++) {
+      const L = playerBaseLook({ body: v, hair: l.hair, outfit: l.outfit });
+      const b = pickBtn((cv) => drawFigure(cv, L, { k: cv.height / 96 }), null, 120, 140, 'bodyBtn' + (l.body === v ? ' sel' : ''));
+      b.setAttribute('aria-label', 'Body ' + (v + 1));
+      b.addEventListener('click', () => this.pick('body', v));
+      body.appendChild(b);
+    }
+    const swatches = (box, icon, cols, key) => {
+      box.innerHTML = ''; box.appendChild(el('span', 'ico', icon));
+      cols.forEach((col, v) => {
+        const b = el('button', 'sw' + (l[key] === v ? ' sel' : ''));
+        b.style.background = col; b.setAttribute('aria-label', key + ' ' + (v + 1));
+        b.addEventListener('click', () => this.pick(key, v));
+        box.appendChild(b);
+      });
+    };
+    swatches($('crHair'), '💇', HAIR_COLORS, 'hair');
+    swatches($('crOutfit'), '👕', OUTFIT_COLORS, 'outfit');
+    drawFigure($('crPreview'), PLAYER_LOOK, { k: 264 / 96 });
+  },
+  pick(key, v) { state.look[key] = v; refreshPlayerLook(); Sfx.play('tap'); this.build(); },
+  done() {
+    const v = $('crName').value.replace(/\s+/g, ' ').trim().slice(0, 14);
+    state.name = v || GAME_CONTENT.defaultName;
+    state.created = true; Save.save();
+    $('crName').blur(); $('creator').classList.add('hidden');
+    enterWorld(true);
+  },
+};
+
+/* ---- wardrobe: wear the accessories you unlocked (mirror or menu) ---- */
+const Wardrobe = {
+  prev: 'play',
+  open() {
+    this.prev = game.mode === 'dialog' ? 'dialog' : 'play';
+    setMode('wardrobe'); Talk.hide();
+    $('wdOk').textContent = GAME_CONTENT.ui.ok + ' 👍';
+    this.render();
+    $('wardrobe').classList.remove('hidden');
+  },
+  close() { $('wardrobe').classList.add('hidden'); setMode(this.prev); Hud.cardKey = ''; Hud.refresh(); },
+  render() {
+    drawFigure($('wdPreview'), PLAYER_LOOK, { k: 240 / 96 });
+    const box = $('wdItems'); box.innerHTML = '';
+    GAME_CONTENT.accessories.forEach((a, i) => {
+      const has = state.unlocked.indexOf(a.id) >= 0, on = !!(state.wear && state.wear[a.id]), need = (i + 1) * 2;
+      const L = withAccessory(playerBaseLook(), a.id);
+      const b = pickBtn((cv) => {
+        if (has) { if (a.id === 'cape') drawFigure(cv, L, { dir: 'up' }); else drawBust(cv, L); }
+        else { const g = prepCanvas(cv); g.font = Math.round(cv.height * 0.5) + 'px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🔒', cv.width / 2, cv.height / 2); }
+      }, has ? a.name : '⭐ ' + need, 140, 110, has ? (on ? 'sel' : '') : 'lock');
+      b.addEventListener('click', () => {
+        if (!has) { Sfx.play('no'); return; }
+        wearAccessory(a.id, !on); Save.save(); Sfx.play('pop');
+        if (!on) Speech.speak(a.name, { pitch: VOICE.player });
+        this.render();
+      });
+      box.appendChild(b);
+    });
+  },
+};
+
+/* ---- final screen: the Sunny Hill Hero certificate ---- */
+const Cert = {
+  open() {
+    const F = GAME_CONTENT.final, C8 = GAME_CONTENT.quests[Quests.index('final')];
+    setMode('cert'); Talk.hide();
+    $('certTitle').textContent = '🏆 ' + F.title + ' 🏆';
+    $('certName').textContent = state.name;
+    $('certStars').textContent = '⭐'.repeat(state.stars);
+    $('certDate').textContent = state.finishedAt || new Date().toLocaleDateString('tr-TR');
+    $('certNote').textContent = '📸 ' + F.note;
+    $('certAgain').textContent = '🔄 ' + F.again;
+    $('certWalk').textContent = '🚶 ' + F.walk;
+    drawFigure($('certPlayer'), PLAYER_LOOK, { k: 240 / 100 });
+    drawFamilyPhoto($('certPhoto'), state.family || {}, C8.members);
+    $('cert').classList.remove('hidden'); $('certCard').scrollTop = 0;
+    Fx.confetti(); Sfx.play('star');
+    Speech.speak(fmt(F.say), { pitch: 1.15 });
+  },
+  close() { $('cert').classList.add('hidden'); setMode('play'); Hud.cardKey = ''; Hud.refresh(); },
 };
 
 /* ---- input ---- */
@@ -2217,8 +3783,14 @@ function initInput() {
       if (game.mode === 'dialog') Dialog.next();
       else if (game.mode === 'play' && Talk.it) interact(Talk.it);
       else if (game.mode === 'title') startGame();
+      else if (game.mode === 'parent') Parent.start();
+      else if (game.mode === 'minigame' && !$('mgNext').classList.contains('hidden')) $('mgNext').click();
     }
-    if (e.code === 'Escape' && game.mode === 'menu') Menu.close();
+    if (e.code === 'Escape') {
+      if (game.mode === 'menu') Menu.close();
+      else if (game.mode === 'wardrobe') Wardrobe.close();
+      else if (game.mode === 'minigame') MG.quit();
+    }
   });
   window.addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) keys[k] = 0; });
   window.addEventListener('blur', () => { keys.up = keys.down = keys.left = keys.right = 0; });
@@ -2336,6 +3908,8 @@ const Sfx = {
       else if (n === 'ok') { this.tone(660, 0.12, 'triangle', 0.15); this.tone(990, 0.2, 'triangle', 0.15, 0.1); }
       else if (n === 'no') this.tone(330, 0.2, 'sine', 0.12, 0, 220);
       else if (n === 'star') [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.28, 'triangle', 0.14, i * 0.09));
+      else if (n === 'pop') this.tone(620, 0.09, 'sine', 0.12, 0, 980);
+      else if (n === 'pick') { this.tone(740, 0.07, 'triangle', 0.1); this.tone(1110, 0.1, 'triangle', 0.1, 0.06); }
     } catch (e) { /* audio is optional */ }
   },
 };
@@ -2343,9 +3917,10 @@ const Sfx = {
 /* ============================== KAYIT ============================== */
 function defaultState() {
   return {
-    v: 1, started: false, name: GAME_CONTENT.defaultName,
+    v: 1, parentSeen: false, created: false, started: false, name: GAME_CONTENT.defaultName,
     look: { body: 0, hair: 1, outfit: 0 },
-    stars: 0, quest: 0, stage: 'available', q: {}, done: [], unlocked: [], wear: null,
+    stars: 0, quest: 0, stage: 'available', q: {}, done: [], unlocked: [], wear: {},
+    family: {}, age: 7, country: 'turkey', finished: false, finishedAt: '',
     settings: { sound: true, slow: true },
   };
 }
@@ -2361,7 +3936,11 @@ const Save = {
       state = Object.assign(d, s);
       state.look = Object.assign(defaultState().look, s.look || {});
       state.settings = Object.assign(defaultState().settings, s.settings || {});
-      state.q = s.q || {};
+      state.q = s.q && typeof s.q === 'object' ? s.q : {};
+      if (!Array.isArray(state.done)) state.done = [];
+      if (!Array.isArray(state.unlocked)) state.unlocked = [];
+      if (!state.wear || typeof state.wear !== 'object') state.wear = {};
+      if (!state.family || typeof state.family !== 'object') state.family = {};
       if (state.quest === 0 && state.stage !== 'available' && !Array.isArray(state.q.met)) state.q.met = [];
     } catch (e) { this.ok = false; }
   },
@@ -2426,6 +4005,7 @@ function renderWorld(c, cx, cy, pr, vw, vh, t) {
   if (vis(sparky)) L.push(sparky);
   for (const n of NPCS) if (!n.hidden && vis(n)) L.push(n);
   for (const a of ANIMALS) if (vis(a)) L.push(a);
+  for (const a of HERD) if (vis(a)) L.push(a);
   L.sort((a, b) => a.y - b.y);
   let pi = -1;
   for (let i = 0; i < L.length; i++) { L[i].draw(c, t); if (L[i] === player) pi = i; }
@@ -2439,15 +4019,40 @@ function renderWorld(c, cx, cy, pr, vw, vh, t) {
     }
   }
   drawButterflies(c, t, cx, cy, vw, vh);
+  if (game.ev > 0.01) {    // evening light (Quest 6)
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalCompositeOperation = 'multiply';
+    c.fillStyle = 'rgba(78,66,168,' + (0.8 * game.ev).toFixed(3) + ')'; c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+    c.globalCompositeOperation = 'source-over';
+    c.fillStyle = 'rgba(255,140,60,' + (0.1 * game.ev).toFixed(3) + ')'; c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+    c.setTransform(pr, 0, 0, pr, -cx * pr, -cy * pr);
+  }
+  for (const b of BEDS) {  // Z z z over sleeping twins
+    if (!NPC[b.id].sleeping) continue;
+    c.font = 'bold 20px ' + FONT; c.textAlign = 'center'; c.fillStyle = '#ffffff'; c.strokeStyle = '#6a5acd'; c.lineWidth = 4;
+    for (let k = 0; k < 3; k++) {
+      const p = (t * 0.5 + k / 3) % 1, x = b.x - 14 + p * 26 + Math.sin(p * 6) * 4, y = b.y - 40 - p * 40;
+      c.globalAlpha = 1 - p; c.font = 'bold ' + (14 + p * 12) + 'px ' + FONT;
+      c.strokeText(k % 2 ? 'z' : 'Z', x, y); c.fillText(k % 2 ? 'z' : 'Z', x, y);
+    }
+    c.globalAlpha = 1;
+  }
+  if (state.q && state.q.carry) {   // the thing you carry floats above your head
+    const it = CHORE_ITEMS.concat(PAJAMAS).find((i) => i.id === state.q.carry);
+    if (it) {
+      const hx = player.x, hy = player.y + personTop(PLAYER_LOOK) - 24 + Math.sin(t * 4) * 2;
+      circ(c, hx, hy, 17, '#ffffff', 3);
+      drawThing(c, it.kind, hx, hy + (it.kind === 'can' ? 2 : 0), 0.95);
+    }
+  }
   // markers above heads
   const talkId = Talk.it ? Talk.it.id : Dialog.focus ? Dialog.focus.id : null;
   for (const n of NPCS) {
-    if (n.hidden || n.follow || n.id === talkId) continue;
+    if (n.hidden || n.follow || n.sleeping || n.id === talkId) continue;
     const mk = markerFor(n);
     if (mk && n.x > vx0 && n.x < vx1 && n.y + n.top > vy0 - 40 && n.y < vy1 + 80) drawMarker(c, n.x, n.y + n.top - 22, mk, t);
   }
-  const thm = Quests.logic() && Quests.logic().marker ? Quests.logic().marker('treehouse') : null;
-  if (thm && talkId !== 'treehouse') drawMarker(c, LANDMARK.treehouse.x, LANDMARK.treehouse.y - 200, thm, t);
+  for (const mk of Quests.markers()) if (mk.id !== talkId) drawMarker(c, mk.x, mk.y, mk.type, t);
   // Sparky points at the current goal
   const tg = game.mode === 'play' ? Quests.target() : null;
   if (tg) {
@@ -2462,7 +4067,18 @@ function update(dt) {
   if (!sparky.moving && game.mode === 'play' && !player.moving) sparky.face = player.x < sparky.x ? -1 : 1;
   updateNPCs(dt);
   updateAnimals(dt);
+  updateHerd(dt);
+  game.ev += (eveningTarget() - game.ev) * Math.min(1, dt * 1.2);
+  if (game.sleepT > 0 && game.mode === 'play' && (game.sleepT -= dt) <= 0) {   // morning: the twins wake up
+    game.sleepT = 0; NPC.pip.sleeping = NPC.pop.sleeping = false;
+    Toast.show('☀️ ' + GAME_CONTENT.ui.morning); Speech.speak(GAME_CONTENT.ui.morning, { pitch: 1.1 });
+  }
   updateCamera(dt, false);
+}
+function eveningTarget() {
+  if (game.sleepT > 0) return 1;
+  const C = Quests.content();
+  return C && C.id === 'bedtime' && state.stage !== 'available' ? 0.8 : 0;
 }
 let last = performance.now();
 function frame(now) {
@@ -2471,7 +4087,7 @@ function frame(now) {
   last = now;
   if (game.paused) return;
   Fx.update(dt);
-  if (game.mode === 'title') return;
+  if (FROZEN[game.mode]) return;
   update(dt);
   const pr = view.pr;
   const cx = Math.round(cam.x * pr) / pr, cy = Math.round(cam.y * pr) / pr;
@@ -2479,16 +4095,29 @@ function frame(now) {
   Talk.update();
 }
 function snapCamera() { updateCamera(0, true); }
+/* First visit: parent screen → character creator → village. Later visits: title → village. */
+function showEntry() {
+  if (!state.parentSeen) { Parent.open(false); return; }
+  $('titleHi').textContent = state.created ? fmt(GAME_CONTENT.ui.hi) : '';
+  $('title').classList.remove('hidden'); setMode('title');
+}
 function startGame() {
   if (game.mode !== 'title') return;
   Sfx.unlock();
+  if (!state.parentSeen) Parent.open(false);
+  else if (!state.created) Creator.open();
+  else enterWorld(false);
+}
+function enterWorld(first) {
   $('title').classList.add('hidden');
   $('questCard').classList.remove('hidden');
   $('topRight').classList.remove('hidden');
   setMode('play');
-  Hud.refresh();
-  if (!state.started) { state.started = true; Save.save(); Dialog.show(GAME_CONTENT.intro); }
-  else Dialog.show(GAME_CONTENT.welcomeBack);
+  refreshPlayerLook(); Hud.cardKey = ''; Hud.refresh();
+  if (first || !state.started) {
+    state.started = true; Save.save();
+    Dialog.show([['sparky', fmt(GAME_CONTENT.creator.hello)]].concat(GAME_CONTENT.intro));
+  } else Dialog.show(GAME_CONTENT.welcomeBack);
 }
 function boot() {
   canvas = $('game'); ctx = canvas.getContext('2d');
@@ -2501,6 +4130,7 @@ function boot() {
   initWaves();
   initButterflies();
   initEntities();
+  initHerd();
   player.x = MAP.start.x; player.y = MAP.start.y; player.dir = 'up';
   resetTrail(0.4, 1);
   sparky.x = player.x - 30; sparky.y = player.y + 14;
@@ -2513,6 +4143,7 @@ function boot() {
   window.addEventListener('orientationchange', () => { clearTimeout(rt); rt = setTimeout(resize, 250); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) Speech.stop(); last = performance.now(); });
   Hud.refresh();
+  showEntry();
   requestAnimationFrame(frame);
 }
 
@@ -2520,6 +4151,12 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
+  MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  quickStart(name) {     // skip the parent screen and the creator (tests only)
+    state.parentSeen = true; state.created = true; if (name) state.name = name;
+    $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
+    enterWorld(!state.started);
+  },
   step(dt, n = 1) { for (let i = 0; i < n; i++) { update(dt); Fx.update(dt); } this.render(); },
   render() { const pr = view.pr; renderWorld(ctx, cam.x, cam.y, pr, view.w, view.h, game.t); Talk.update(); },
   tp(x, y) { player.x = x; player.y = y; player.path = null; resetTrail(0, 1); sparky.x = x - 30; sparky.y = y + 14; snapCamera(); },

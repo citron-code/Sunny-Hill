@@ -2,7 +2,7 @@
 export default async function ({ evaluate, shot, savePng, sleep, viewport }) {
   console.log('SH?', await evaluate('typeof SH'));
   await shot('00-title');
-  await evaluate('SH.startGame()');
+  await evaluate('SH.quickStart()');
   await sleep(500);
   await shot('01-start-desktop');
   savePng('02-overview', await evaluate('SH.overview(0.75)'));

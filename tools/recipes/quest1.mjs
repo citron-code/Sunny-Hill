@@ -30,7 +30,7 @@ export default async function ({ evaluate, shot, savePng, sleep, navigate, URL }
     }
     log('  !! never reached', id); return false;
   }
-  await S('SH.startGame()');
+  await S('SH.quickStart()');
   await nextAll('intro');
   log('card:', await S(`document.getElementById('qcText').textContent`));
   await goTalk('milo'); await sleep(300);

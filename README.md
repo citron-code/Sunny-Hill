@@ -35,9 +35,12 @@ Değişiklikleri doğrulamak için headless Chrome ile çalışan bir test sür�
 `file://` üzerinden açar:
 
 ```bash
-node tools/drive.mjs tools/recipes/quest1.mjs     # Görev 1'i baştan sona oynar, yenileme sonrası kaydı kontrol eder
-node tools/drive.mjs tools/recipes/mobile.mjs     # 375x667 dikey / 667x375 yatay, gerçek dokunma, taşma ve buton boyutu
+node tools/drive.mjs tools/recipes/full.mjs       # 8 görevi baştan sona oynar, sertifikayı ve yenileme sonrası kaydı kontrol eder
+node tools/drive.mjs tools/recipes/mobile.mjs     # veli ekranı → karakter → oyun; her mini oyun 375x667 dikey / 667x375 yatay
+node tools/drive.mjs tools/recipes/nospeech.mjs   # sesli okuma desteği olmayan tarayıcıda oyunun takılmadığını kontrol eder
 node tools/drive.mjs tools/recipes/nostorage.mjs  # localStorage kapalıyken oyunun çökmediğini kontrol eder
+node tools/drive.mjs tools/recipes/quest1.mjs     # yalnızca Görev 1
+node tools/drive.mjs tools/recipes/perf.mjs       # kare başına çizim süresi (üst sınır; headless yazılımla çizer)
 node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi
 ```
 
