@@ -77,6 +77,8 @@ node tools/drive.mjs tools/recipes/switchview.mjs # menüden 3D ↔ 2D geçişi 
 node tools/drive.mjs tools/recipes/look3d.mjs     # köyün birkaç yerinden 3D ekran görüntüsü
 node tools/drive.mjs tools/recipes/scenes3d.mjs   # her görevin sahnesi 3D
 node tools/drive.mjs tools/recipes/gallery3d.mjs  # bütün karakter, hayvan ve bina modelleri yakından
+node tools/drive.mjs tools/recipes/restart.mjs    # Restart / Play again gerçek tıklamalarla: menüden, diyalog açıkken, sertifikadan, 3 ekran boyutunda
+node tools/drive.mjs tools/recipes/restart-inplace.mjs  # sayfa yenilenemeyen yerlerde oyunun kendini sıfırlaması; yatay telefonda bütün butonlara erişim
 node tools/drive.mjs tools/recipes/eggs.mjs       # 8 gizli sürprizi bir çocuk gibi bulur, sayacı kontrol eder
 node tools/drive.mjs tools/recipes/map3d.mjs      # köyün tamamı yukarıdan (3D; OVERVIEW2D=1 ile 2D harita da)
 node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi (2D harita)

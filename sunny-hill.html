@@ -117,6 +117,20 @@ body.g3 #gl{display:block}
 #startBtn{font-size:34px;min-height:78px;padding:0 44px;border-radius:28px}
 #titleHi{font-size:28px;font-weight:bold;min-height:1.2em}
 #ask{z-index:55}
+.menuCard{gap:10px}
+.menuHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.menuHead h2{margin:0}
+.menuGrid{display:flex;flex-direction:column;gap:10px}
+/* short screens (a phone held sideways, a laptop with toolbars): two columns so Restart stays on screen */
+@media (max-height:660px) and (min-width:560px){
+  .menuCard{width:min(660px,100%)}
+  .menuGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+}
+@media (max-height:480px){
+  .overlay{padding:8px}
+  .menuCard{padding:12px;gap:8px}
+  .secretsLine{padding:4px 10px}
+}
 
 /* ---------- toast (short feedback) ---------- */
 #toast{position:fixed;z-index:42;left:50%;top:calc(84px + env(safe-area-inset-top));transform:translateX(-50%);max-width:calc(100vw - 20px);
@@ -261,7 +275,9 @@ body.g3 #gl{display:block}
 #certSecrets,.secretsLine{font-size:22px;font-weight:bold}
 .secretsLine{background:#fff7d6;border-radius:14px;padding:8px 10px}
 #certNote{font-size:20px;background:#eaf6ff;border-radius:14px;padding:6px 12px}
-#certCard .row{width:100%}
+#certCard .row{width:100%;position:sticky;bottom:0;background:var(--cream);padding-top:8px}
+/* the main button of a tall window stays on screen while the rest scrolls */
+#pStart,#crOk,#wdOk{position:sticky;bottom:8px;z-index:2}
 @media (max-width:520px){
   #certPlayer{width:64px}
   #certTitle{font-size:26px;padding:4px 14px}
@@ -326,16 +342,17 @@ body.g3 #gl{display:block}
 </div>
 
 <div id="menu" class="overlay hidden">
-  <div class="panel card">
-    <h2 id="mTitle">Menu</h2>
-    <button id="mSound" class="btn blue wide"></button>
-    <div class="row"><button id="mSlow" class="btn wide"></button><button id="mNormal" class="btn wide"></button></div>
-    <button id="mLook" class="btn yellow wide"></button>
-    <button id="mView" class="btn white wide"></button>
-    <button id="mInfo" class="btn white wide"></button>
+  <div class="panel card menuCard">
+    <div class="menuHead"><h2 id="mTitle">Menu</h2><button id="mClose" class="btn round green" aria-label="Close">✖</button></div>
+    <div class="menuGrid">
+      <button id="mSound" class="btn blue wide"></button>
+      <div class="row"><button id="mSlow" class="btn wide"></button><button id="mNormal" class="btn wide"></button></div>
+      <button id="mLook" class="btn yellow wide"></button>
+      <button id="mView" class="btn white wide"></button>
+      <button id="mInfo" class="btn white wide"></button>
+      <button id="mRestart" class="btn pink wide"></button>
+    </div>
     <div id="mSecrets" class="secretsLine"></div>
-    <button id="mRestart" class="btn pink wide"></button>
-    <button id="mClose" class="btn green wide"></button>
   </div>
 </div>
 
@@ -5331,6 +5348,12 @@ const EGGS = {
     add(K.x, K.y, [-10, -30, 10, 4], (c) => { rrect(c, K.x - 2, K.y - 16, 4, 16, 2, '#8a5a30', 2); });
     add(mx, my + 1, [-80, -190, 80, 8], (c, t) => this.blades2D(c, t));
   },
+  reset() {                        // back to the start (used by Restart)
+    this.cat.awake = 0; this.fountain.rainbow = 0; this.scarecrow.wave = 0; this.treasure.open = 0;
+    const st = this.stones; st.glow.fill(0); st.on.fill(false); st.hit = {};
+    this.frog.pad = 0; this.frog.jump = 0;
+    Object.assign(this.rabbit, { hole: 0, up: 0, stay: 0, wait: 2 });
+  },
   found(id) {
     state.eggs = state.eggs || {};
     if (state.eggs[id]) return;
@@ -5787,7 +5810,7 @@ const UI = {
     Talk.el = $('talkBtn'); Talk.wrap = $('talkWrap');
     $('talkBtn').textContent = U.talk + ' ' + TALK_ICON.talk;
     const tap = (id, fn) => $(id).addEventListener('click', (e) => { e.stopPropagation(); e.currentTarget.blur && e.currentTarget.blur(); fn(e); });
-    const restart = () => Confirm.ask(U.restartAsk, () => { Save.clear(); location.reload(); });
+    const restart = () => Confirm.ask(U.restartAsk, restartGame);
     tap('startBtn', startGame);
     tap('talkBtn', () => { if (Talk.it) interact(Talk.it); });
     tap('dlgNext', () => Dialog.next());
@@ -5863,9 +5886,47 @@ const Menu = {
     $('mInfo').textContent = 'ℹ️ ' + U.info;
     $('mSecrets').textContent = '🔍 ' + GAME_CONTENT.secrets.label + ': ' + EGGS.count() + ' / ' + EGGS.ids.length;
     $('mRestart').textContent = '🔄 ' + U.restart;
-    $('mClose').textContent = '✖ ' + U.close;
+    $('mClose').setAttribute('aria-label', U.close);
   },
 };
+/* Restart: save a fresh start (keeping sound, speed and view), then reload. Some file viewers and
+   in-app browsers do not let a page reload itself; if the page is still here a moment later, the
+   game resets itself in place instead. */
+function restartGame() {
+  const keep = Object.assign({}, state.settings);
+  Speech.stop();
+  state = defaultState(); state.settings = keep;
+  Save.save();
+  let gone = false;
+  window.addEventListener('pagehide', () => { gone = true; }, { once: true });
+  try { location.reload(); } catch (e) { /* navigation blocked */ }
+  setTimeout(() => { if (!gone) resetInPlace(keep); }, 1200);
+}
+function resetInPlace(settings) {
+  Speech.stop();
+  clearTimeout(Dialog.fbTimer); clearTimeout(Dialog.mouthTimer);
+  Dialog.open = false; Dialog.done = null; Dialog.mouth = null; Dialog.partner = null; Dialog.focus = null;
+  MG.token++; MG.onQuit = null; MG.onReplay = null;
+  for (const id of ['dialog', 'mg', 'menu', 'ask', 'cert', 'wardrobe', 'creator', 'title', 'banner', 'toast', 'talkWrap', 'questCard', 'topRight']) $(id).classList.add('hidden');
+  Fx.parts.length = 0;
+  state = defaultState(); if (settings) state.settings = settings;
+  Save.save();
+  refreshPlayerLook(); PORTRAIT_CACHE.clear();
+  player.x = MAP.start.x; player.y = MAP.start.y; player.dir = 'up';
+  player.path = null; player.goal = null; player.moving = false; player.stuck = 0;
+  resetTrail(0.4, 1);
+  sparky.x = player.x - 30; sparky.y = player.y + 14; sparky.moving = false;
+  for (const n of NPCS) {
+    n.x = n.home.x; n.y = n.home.y; n.path = null; n.pathI = 0; n.onArrive = null;
+    n.follow = 0; n.wander = null; n.hidden = false; n.sleeping = false; n.moving = false; n.dir = 'down'; n.tries = 0;
+  }
+  game.ev = 0; game.sleepT = 0;
+  EGGS.reset();
+  applyWorldState(true);
+  Talk.hide(); Hud.cardKey = '';
+  snapCamera();
+  showEntry();
+}
 const Confirm = {                 // "Are you sure?" box used by Restart and Play again
   prev: 'play', fn: null,
   ask(text, fn) {
@@ -6537,7 +6598,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  VoiceWarn, EGGS, restartGame, resetInPlace, MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
