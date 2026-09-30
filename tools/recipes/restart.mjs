@@ -1,5 +1,5 @@
-// Restart from every place a parent might try it, with real mouse clicks, at several screen sizes:
-// the menu during play, the menu over an open dialog, and the certificate's "Play again".
+// Starting over from every place a parent might try it, with real mouse clicks, at several screen sizes:
+// Menu → Main menu → New Game during play, the same over an open dialog, and the certificate's "Play again".
 export default async function ({ evaluate, send, sleep, shot, navigate, URL, viewport }) {
   const S = (e) => evaluate(e);
   const log = (...a) => console.log(...a);
@@ -26,12 +26,12 @@ export default async function ({ evaluate, send, sleep, shot, navigate, URL, vie
     await viewport(w, h, { dpr: 1, mobile: w < 800 });
     // 1) menu during play
     await setup();
-    await click('#menuBtn'); const ok1 = await click('#mRestart'); if (ok1) await click('#askYes');
+    await click('#menuBtn'); await click('#mHome'); const ok1 = await click('#tNew'); if (ok1) await click('#askYes');
     await waitReload();
-    log(tag.padEnd(16), 'menu→Restart→Yes      : saved', await saved(), '| mode', await S('SH.game.mode'));
+    log(tag.padEnd(16), 'menu→Main menu→New    : saved', await saved(), '| mode', await S('SH.game.mode'));
     // 2) menu while a dialog is open
     await setup(`SH.interact(SH.interactables().find(o => o.id === 'milo'));`);
-    await click('#menuBtn'); const ok2 = await click('#mRestart'); if (ok2) await click('#askYes');
+    await click('#menuBtn'); await click('#mHome'); const ok2 = await click('#tNew'); if (ok2) await click('#askYes');
     await waitReload();
     log(tag.padEnd(16), 'over a dialog         : saved', await saved(), '| mode', await S('SH.game.mode'));
     // 3) the certificate's Play again

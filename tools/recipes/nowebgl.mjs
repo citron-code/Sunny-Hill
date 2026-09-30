@@ -11,5 +11,5 @@ export default async function (api) {
   await api.evaluate('SH.startGame()'); await api.sleep(300);
   for (let i = 0; i < 4 && await api.evaluate('SH.Dialog.open'); i++) { await api.sleep(300); await api.evaluate("document.getElementById('dlgNext').click()"); }
   await api.evaluate("document.getElementById('menuBtn').click()"); await api.sleep(150);
-  console.log('menu open:', await api.evaluate('SH.game.mode'), '| View button hidden:', await api.evaluate("document.getElementById('mView').classList.contains('hidden')"));
+  console.log('menu open:', await api.evaluate('SH.game.mode'), '| View switch hidden:', await api.evaluate("document.getElementById('mViewRow').classList.contains('hidden')"));
 }

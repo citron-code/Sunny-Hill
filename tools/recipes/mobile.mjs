@@ -1,5 +1,5 @@
 // Phone checks: 375x667 portrait and 667x375 landscape with real touch input. Walks the first-visit flow
-// (parent screen, creator, intro), then opens every mini game, the wardrobe and the certificate at phone size,
+// (main menu, New Game, parent screen, creator, intro), then opens every mini game, the wardrobe and the certificate at phone size,
 // and measures horizontal overflow, buttons under 56px and whether anything spills off the screen.
 export default async function ({ evaluate, shot, send, sleep, viewport, navigate, URL }) {
   const S = (e) => evaluate(e);
@@ -35,10 +35,13 @@ export default async function ({ evaluate, shot, send, sleep, viewport, navigate
   await phone(375, 667);
   await navigate(URL); await sleep(400);
   log('first screen mode:', await S('SH.game.mode'));
+  await shot('70-phone-title'); await checks('title');
+  await touchEl('#tNew'); await sleep(500);
+  log('after New Game:', await S('SH.game.mode'));
   await shot('70-phone-parent'); await checks('parent');
   await touchEl('#pStart'); await sleep(500);
   log('after parent:', await S('SH.game.mode'));
-  await touchEl('#crOutfit .sw:nth-of-type(3)'); await touchEl('#crHair .sw:nth-of-type(4)'); await touchEl('#crBody .pick:nth-child(2)');
+  await touchEl('#crStyles .pick:nth-child(6)'); await touchEl('#crColors .sw:nth-of-type(4)'); await touchEl('.crTab:nth-child(2)'); await touchEl('#crStyles .pick:nth-child(5)'); await touchEl('#crColors .sw:nth-of-type(2)');
   await S(`document.getElementById('crName').value = 'Deniz'`);
   await shot('71-phone-creator'); await checks('creator');
   await touchEl('#crOk'); await sleep(500);

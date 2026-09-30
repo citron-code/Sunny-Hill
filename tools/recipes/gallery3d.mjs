@@ -12,7 +12,7 @@ export default async function ({ evaluate, savePng }) {
   if (only !== 'b') {
     const people = ['milo', 'leo', 'mom', 'dad', 'rosa', 'nomi', 'bob', 'max', 'lily', 'pip', 'pop', 'grandpa', 'mia'];
     for (const [name, yaw] of [['front', 0], ['threeq', 0.7]]) {
-      const code = `const ids = ${JSON.stringify(people)}; ids.forEach((id, i) => drawPerson3(R, LOOKS[id], { x: (i - (ids.length - 1) / 2) * 44, z: 0, yaw: ${yaw}, t: 0.3, seed: 1.5 }));`;
+      const code = `const ids = ${JSON.stringify(people)}; ids.forEach((id, i) => drawPerson3(R, LOOKS[id], { x: (i - (ids.length - 1) / 2) * 44, z: 0, yaw: ${yaw}, t: 0.3, seed: 1.5, still: true }));`;
       savePng('g3-people-' + name, await shoot(code, 1600, 360, [0, 62, 460], [0, 40, 0]));
     }
     const kids = `refreshPlayerLook(); const looks = [PLAYER_LOOK];

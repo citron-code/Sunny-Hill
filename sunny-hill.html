@@ -59,6 +59,38 @@ body.g3 #gl{display:block}
 #talkWrap{position:fixed;left:0;top:0;z-index:12;will-change:transform}
 #talkBtn{position:relative;background:var(--sun);color:var(--ink);font-size:24px;border:4px solid #fff;white-space:nowrap;animation:bob 1.1s ease-in-out infinite}
 @keyframes bob{0%,100%{top:0}50%{top:-7px}}
+#talkWrap.mini{pointer-events:none}
+#talkWrap.mini #talkBtn{width:56px;padding:0;border-radius:50%;font-size:28px}
+
+/* ---------- phone / tablet controls: joystick bottom-left, action button bottom-right ---------- */
+:root{--joy:136px;--knob:62px;--act:112px}
+body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
+#joyZone{position:fixed;left:0;bottom:0;z-index:11;width:min(48vw,420px);height:min(60vh,440px);touch-action:none;-webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;padding-left:env(safe-area-inset-left);padding-bottom:env(safe-area-inset-bottom);box-sizing:border-box}
+#joyBase{position:absolute;left:0;top:0;width:var(--joy);height:var(--joy);margin:calc(var(--joy) / -2) 0 0 calc(var(--joy) / -2);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.18) 0 38%,rgba(255,255,255,.34) 39% 62%,rgba(255,255,255,.2) 63%);
+  border:4px solid rgba(255,255,255,.9);box-shadow:0 6px 18px rgba(0,0,0,.25),inset 0 0 0 3px rgba(74,50,34,.12);opacity:.8;transition:opacity .15s}
+#joyBase::before,#joyBase::after{content:'';position:absolute;left:50%;top:50%;width:0;height:0;border:9px solid transparent;opacity:.75}
+#joyBase::before{border-bottom:11px solid #fff;transform:translate(-50%,calc(var(--joy) / -2 + 2px))}
+#joyBase::after{border-top:11px solid #fff;transform:translate(-50%,calc(var(--joy) / 2 - 24px))}
+#joyZone.held #joyBase{opacity:1}
+#joyKnob{position:absolute;left:50%;top:50%;width:var(--knob);height:var(--knob);margin:calc(var(--knob) / -2) 0 0 calc(var(--knob) / -2);border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ffffff,#ffe9a8 38%,#ffc93c 75%);border:4px solid #fff;box-shadow:0 5px 0 #d9962b,0 9px 16px rgba(0,0,0,.3)}
+#joyZone.joyHint:not(.held) #joyKnob{animation:knobHint 2.2s ease-in-out infinite}
+@keyframes knobHint{0%,100%{transform:translate(0,0)}20%{transform:translate(-18px,0)}45%{transform:translate(18px,0)}70%{transform:translate(0,-18px)}}
+#actBtn{position:fixed;z-index:11;right:calc(20px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));width:var(--act);height:var(--act);
+  border-radius:50%;border:5px solid #fff;padding:0;background:radial-gradient(circle at 35% 28%,#fff6c4,#ffd23c 45%,#ffb300);
+  box-shadow:0 7px 0 #c98a12,0 12px 22px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  font-family:var(--font);font-weight:bold;color:var(--ink);cursor:pointer;touch-action:manipulation;-webkit-appearance:none;appearance:none;outline:none;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:filter .15s,opacity .15s}
+#actBtn .ai{font-size:calc(var(--act) * .36);line-height:1.05;pointer-events:none}
+#actBtn .al{font-size:20px;line-height:1.1;pointer-events:none}
+#actBtn.off{filter:saturate(.2) brightness(1.05);opacity:.62}
+#actBtn.ready{animation:actPulse 1.1s ease-in-out infinite}
+#actBtn:active,#actBtn.down{transform:translateY(5px) scale(.96);box-shadow:0 2px 0 #c98a12,0 5px 10px rgba(0,0,0,.25);animation:none}
+#actBtn.nope{animation:nope .35s}
+@keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes nope{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
 
 /* ---------- dialog ---------- */
 #dialog{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));
@@ -108,28 +140,131 @@ body.g3 #gl{display:block}
 .row .btn{flex:1}
 .btn.sel{background:var(--green);box-shadow:0 0 0 4px #fff inset,0 5px 0 rgba(0,0,0,.18)}
 .btn.unsel{background:#c9bfb4}
-#title{background:linear-gradient(#7fd3ff 0%,#bdeaff 55%,#9ddc6e 55.1%,#86cf5c 100%);z-index:35}
-#titleBox{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
-#titleBox h1{margin:0;font-size:clamp(52px,12vw,96px);color:#fff;letter-spacing:1px;
-  text-shadow:0 5px 0 #ff8c42,0 9px 0 rgba(0,0,0,.15);-webkit-text-stroke:3px var(--ink)}
-.sunBall{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff3a0,#ffc93c 60%,#ffa928);
-  border:5px solid var(--ink);box-shadow:0 0 0 14px rgba(255,220,90,.45),0 0 0 28px rgba(255,220,90,.2)}
-#startBtn{font-size:34px;min-height:78px;padding:0 44px;border-radius:28px}
-#titleHi{font-size:28px;font-weight:bold;min-height:1.2em}
 #ask{z-index:55}
-.menuCard{gap:10px}
-.menuHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.menuHead h2{margin:0}
-.menuGrid{display:flex;flex-direction:column;gap:10px}
-/* short screens (a phone held sideways, a laptop with toolbars): two columns so Restart stays on screen */
-@media (max-height:660px) and (min-width:560px){
-  .menuCard{width:min(660px,100%)}
-  .menuGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* ---------- chunky game buttons ---------- */
+.gbtn{position:relative;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:74px;padding:0 24px;border:4px solid #fff;border-radius:26px;
+  font-family:var(--font);font-weight:bold;font-size:30px;color:#fff;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;appearance:none;outline:none;
+  background:linear-gradient(#8be37f,#45b84f 58%,#35a241);box-shadow:0 7px 0 #24792f,0 16px 26px rgba(0,0,0,.3);text-shadow:0 2px 0 rgba(0,0,0,.28);
+  transition:transform .08s,box-shadow .08s}
+.gbtn::before{content:'';position:absolute;left:14px;right:14px;top:5px;height:40%;border-radius:18px 18px 40px 40px;
+  background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,.06));pointer-events:none}
+.gbtn:active{transform:translateY(5px);box-shadow:0 2px 0 #24792f,0 6px 12px rgba(0,0,0,.25)}
+.gbtn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+.gbtn.orange{background:linear-gradient(#ffc56e,#ff8c42 58%,#f0782a);box-shadow:0 7px 0 #b8541b,0 16px 26px rgba(0,0,0,.3)}
+.gbtn.orange:active{box-shadow:0 2px 0 #b8541b,0 6px 12px rgba(0,0,0,.25)}
+.gbtn .gi{font-size:34px;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
+/* ---------- main menu over the live village ---------- */
+#title{z-index:35;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 35%,rgba(20,40,30,.42) 100%),linear-gradient(rgba(140,210,255,.3),rgba(0,0,0,0) 35%)}
+#titleBox{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;width:min(600px,100%)}
+.titleL,.titleR{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
+.logo{position:relative;padding-top:18px}
+.logoSun{position:absolute;left:-34px;top:-10px;width:112px;height:112px;z-index:0;animation:sunBob 4s ease-in-out infinite}
+.sunRays{position:absolute;inset:0;border-radius:50%;animation:spin 24s linear infinite;
+  background:repeating-conic-gradient(from 0deg,rgba(255,206,64,.95) 0deg 11deg,rgba(255,206,64,0) 11deg 30deg);
+  -webkit-mask:radial-gradient(circle,transparent 38%,#000 39%,#000 70%,transparent 71%);mask:radial-gradient(circle,transparent 38%,#000 39%,#000 70%,transparent 71%)}
+.sunFace{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:58px;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18))}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sunBob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-6px) rotate(6deg)}}
+#titleText{position:relative;z-index:1;margin:0;font-size:clamp(54px,12.5vw,100px);line-height:1;font-weight:900;letter-spacing:2px;color:#ffe066;white-space:nowrap;
+  -webkit-text-stroke:5px #5a2f14;paint-order:stroke fill;
+  text-shadow:0 5px 0 #ff9f2b,0 9px 0 #d9731f,0 12px 0 #5a2f14,0 22px 26px rgba(0,0,0,.4)}
+#titleText span{display:inline-block;animation:letterBob 2.8s ease-in-out infinite}
+@keyframes letterBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.ribbon{position:relative;display:inline-block;padding:8px 30px;background:linear-gradient(#ff7a5c,#e8503a);color:#fff;font-weight:bold;font-size:22px;
+  border-radius:10px;box-shadow:0 5px 0 #a8321f,0 12px 18px rgba(0,0,0,.25);text-shadow:0 2px 0 rgba(0,0,0,.22);white-space:nowrap}
+.contBtn{min-height:104px;justify-content:flex-start;padding:0 18px 0 12px;text-align:left}
+#tMe{width:74px;height:74px;border-radius:50%;border:4px solid #fff;flex:0 0 auto;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.contText{display:flex;flex-direction:column;flex:1 1 auto;min-width:0;gap:2px}
+.contLbl{font-size:34px;line-height:1.05}
+.contInfo{display:flex;flex-wrap:wrap;column-gap:14px;font-size:20px;line-height:1.2;opacity:.95}
+.contInfo span{white-space:nowrap}
+.contInfo .ciName{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.tSmall{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pill{min-height:56px;min-width:56px;padding:0 18px;border:4px solid #fff;border-radius:28px;background:rgba(255,255,255,.9);cursor:pointer;
+  font-family:var(--font);font-weight:bold;font-size:22px;color:var(--ink);box-shadow:0 5px 0 rgba(0,0,0,.18),0 10px 18px rgba(0,0,0,.2);
+  touch-action:manipulation;transition:transform .08s}
+.pill:active{transform:translateY(3px) scale(.96)}
+#titleCredit{color:#fff;font-size:20px;font-weight:bold;text-shadow:0 2px 3px rgba(0,0,0,.6)}
+@media (max-height:560px) and (min-aspect-ratio:5/4){
+  #title.overlay{padding:8px 12px}
+  #titleBox{flex-direction:row;align-items:center;gap:20px;width:min(940px,100%)}
+  .titleL{flex:0 1 auto;width:auto;min-width:0;gap:12px}
+  .titleR{flex:1 1 0;min-width:0;gap:10px}
+  #titleText{font-size:clamp(42px,8vw,88px);letter-spacing:1px}
+  .logoSun{width:84px;height:84px;left:-24px;top:-6px}
+  .sunFace{font-size:44px}
+  .ribbon{font-size:20px;padding:6px 16px}
+  .gbtn{min-height:62px;font-size:26px;padding:0 16px}
+  .gbtn .gi{font-size:28px}
+  .contBtn{min-height:76px;padding:0 12px 0 8px}
+  #tMe{width:56px;height:56px;border-width:3px}
+  .contLbl{font-size:28px}
+  .tSmall{gap:8px}
+  .pill{padding:0 14px}
 }
-@media (max-height:480px){
+@media (max-height:400px) and (min-aspect-ratio:5/4){
+  .titleR{gap:8px}
+  .contBtn{min-height:66px}
+  .gbtn{min-height:58px}
+  #titleCredit{font-size:20px;line-height:1.1}
+}
+/* ---------- pause menu ---------- */
+#menu{background:rgba(25,35,30,.38);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.pause{width:min(740px,100%);display:flex;flex-direction:column;overflow:hidden;background:var(--cream);border:5px solid #fff;border-radius:32px;
+  box-shadow:0 22px 50px rgba(0,0,0,.4);animation:cardPop .2s ease-out}
+@keyframes cardPop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.pauseHead{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 22px;background:linear-gradient(#ffc94c,#ff9b3d);box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
+.pauseHead h2{margin:0;flex:1 1 auto;font-size:34px;color:#fff;-webkit-text-stroke:3px #7a3d12;paint-order:stroke fill;text-shadow:0 4px 0 #7a3d12}
+.headChips{display:flex;gap:8px}
+.chip{background:#fff;border-radius:16px;padding:6px 12px;font-size:20px;font-weight:bold;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.pauseBody{display:flex;gap:16px;padding:16px}
+.pauseMe{flex:0 0 190px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;border-radius:24px;padding:8px 8px 12px;
+  background:radial-gradient(ellipse at 50% 88%,#b9e98f 0 32%,rgba(185,233,143,0) 33%),radial-gradient(circle at 50% 35%,#ffffff,#d6f0ff 72%);border:3px solid #e2f1fa}
+#mMe{width:160px;height:auto}
+.meName{font-size:26px;font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pauseSet{flex:1 1 auto;display:flex;flex-direction:column;gap:10px;min-width:0}
+.setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border-radius:20px;padding:4px 4px 4px 16px;box-shadow:0 3px 0 rgba(0,0,0,.07)}
+.setLbl{font-size:22px;font-weight:bold;white-space:nowrap}
+.toggle{position:relative;flex:0 0 auto;width:104px;height:56px;border-radius:28px;border:0;padding:0;background:#cfc6bb;cursor:pointer;
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.2);transition:background .15s;touch-action:manipulation}
+.toggle .knob{position:absolute;top:6px;left:6px;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 3px 6px rgba(0,0,0,.25);transition:left .15s}
+.toggle.on{background:var(--green)}
+.toggle.on .knob{left:54px}
+.seg{display:flex;flex:0 0 auto;gap:4px;padding:4px;border-radius:20px;background:#efe6da}
+.seg button{min-height:56px;min-width:64px;padding:0 12px;border:0;border-radius:16px;background:transparent;cursor:pointer;touch-action:manipulation;
+  font-family:var(--font);font-weight:bold;font-size:20px;color:#8a6a50;white-space:nowrap}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.seg .si{margin-right:6px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:88px;padding:4px;border:0;border-radius:20px;cursor:pointer;
+  font-family:var(--font);font-weight:bold;font-size:20px;color:var(--ink);background:linear-gradient(#ffffff,#f4ece1);
+  box-shadow:0 5px 0 #dccfbf,0 9px 14px rgba(0,0,0,.12);transition:transform .08s;touch-action:manipulation}
+.tile .ti{font-size:34px;line-height:1.1}
+.tile:active{transform:translateY(4px);box-shadow:0 1px 0 #dccfbf}
+.pauseFoot{padding:0 16px 16px}
+.askCard{border:5px solid #fff;border-radius:30px;width:min(520px,100%)}
+.askCard .row{gap:12px}
+@media (max-width:640px){
+  .pauseBody{flex-direction:column;gap:10px;padding:12px}
+  .pauseMe{flex:0 0 auto;flex-direction:row;justify-content:center;gap:12px;padding:4px 12px}
+  #mMe{width:62px}
+  .headChips{display:none}
+  .pauseMe .meName::after{content:attr(data-stats);display:block;font-size:20px}
+  .setLbl{font-size:20px}
+  .seg button{min-width:56px;padding:0 10px}
+  .seg .si{display:none}
+}
+@media (max-height:520px){
   .overlay{padding:8px}
-  .menuCard{padding:12px;gap:8px}
-  .secretsLine{padding:4px 10px}
+  .pauseMe{display:none}
+  .pauseBody{padding:10px 12px}
+  .pauseSet{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:row dense;gap:8px}
+  #mSpeedRow,.tiles{grid-column:1 / -1}
+  .tile{min-height:60px;flex-direction:row;gap:8px}
+  .tile .ti{font-size:26px}
+  .pauseFoot{display:none}
+  .pauseHead{padding:6px 8px 6px 18px}
+  .pauseHead h2{font-size:28px}
 }
 
 /* ---------- toast (short feedback) ---------- */
@@ -229,7 +364,8 @@ body.g3 #gl{display:block}
 }
 
 /* ---------- parent screen, character creator, wardrobe, certificate ---------- */
-.sky{background:linear-gradient(#7fd3ff,#bdeaff 55%,#9ddc6e 55.1%,#86cf5c)!important}
+.sky{background:rgba(25,45,35,.3)!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.sky .panel{border:5px solid #fff;border-radius:30px;box-shadow:0 20px 44px rgba(0,0,0,.35)}
 .parentCard{width:min(580px,100%);text-align:left}
 .parentCard h2{text-align:center;font-size:clamp(24px,5vw,32px);line-height:1.2}
 .parentCard ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
@@ -257,7 +393,14 @@ body.g3 #gl{display:block}
 .swRow .ico{font-size:30px;width:42px;text-align:center}
 .sw{width:56px;height:56px;border-radius:50%;border:4px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.15);cursor:pointer;touch-action:manipulation;padding:0;-webkit-appearance:none;appearance:none}
 .sw.sel{box-shadow:0 0 0 4px var(--ink)}
-.bodyBtn{width:96px}
+.crTabs{display:flex;gap:8px}
+.crTab{flex:1 1 0;min-width:0;min-height:56px;padding:0 6px;border:0;border-radius:18px;background:#efe6da;font-family:var(--font);font-weight:bold;font-size:20px;color:#8a6a50;
+  cursor:pointer;touch-action:manipulation;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px}
+@media (max-width:420px){ .crTab{flex-direction:column;gap:0;padding:4px 2px;line-height:1.1} }
+.crTab.sel{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 3px var(--orange),0 3px 0 rgba(0,0,0,.1)}
+.crStyles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.crStyles .pick{padding:2px;border-radius:18px}
+.crStyles .pick.sel{border-color:var(--orange);background:#fff3e0}
 #wardrobe{z-index:34}
 .wardCard{width:min(560px,100%)}
 .wardTop{display:flex;gap:12px;align-items:center}
@@ -312,6 +455,8 @@ body.g3 #gl{display:block}
 </div>
 
 <div id="talkWrap" class="hidden"><button id="talkBtn" class="btn">Talk 💬</button></div>
+<div id="joyZone" class="hidden" aria-hidden="true"><div id="joyBase"><div id="joyKnob"></div></div></div>
+<button id="actBtn" class="hidden"><span class="ai" id="actIcon">💬</span><span class="al" id="actLbl"></span></button>
 
 <div id="dialog" class="hidden">
   <div id="dlgWho"><canvas id="dlgPortrait" width="176" height="176"></canvas></div>
@@ -342,17 +487,26 @@ body.g3 #gl{display:block}
 </div>
 
 <div id="menu" class="overlay hidden">
-  <div class="panel card menuCard">
-    <div class="menuHead"><h2 id="mTitle">Menu</h2><button id="mClose" class="btn round green" aria-label="Close">✖</button></div>
-    <div class="menuGrid">
-      <button id="mSound" class="btn blue wide"></button>
-      <div class="row"><button id="mSlow" class="btn wide"></button><button id="mNormal" class="btn wide"></button></div>
-      <button id="mLook" class="btn yellow wide"></button>
-      <button id="mView" class="btn white wide"></button>
-      <button id="mInfo" class="btn white wide"></button>
-      <button id="mRestart" class="btn pink wide"></button>
+  <div class="pause">
+    <div class="pauseHead">
+      <h2 id="mTitle">Menu</h2>
+      <div class="headChips"><span id="mStars" class="chip"></span><span id="mSecrets" class="chip"></span></div>
+      <button id="mClose" class="btn round green" aria-label="Close">✖</button>
     </div>
-    <div id="mSecrets" class="secretsLine"></div>
+    <div class="pauseBody">
+      <div class="pauseMe"><canvas id="mMe" width="240" height="288"></canvas><div class="meName" id="mName"></div></div>
+      <div class="pauseSet">
+        <div class="setRow"><span class="setLbl" id="mSoundLbl"></span><button id="mSound" class="toggle" role="switch" aria-checked="true"><span class="knob"></span></button></div>
+        <div class="setRow" id="mSpeedRow"><span class="setLbl" id="mSpeedLbl"></span><div class="seg"><button id="mSlow"></button><button id="mNormal"></button></div></div>
+        <div class="setRow" id="mViewRow"><span class="setLbl" id="mViewLbl"></span><div class="seg"><button id="mV3">3D</button><button id="mV2">2D</button></div></div>
+        <div class="tiles">
+          <button id="mLook" class="tile"><span class="ti">👕</span><span id="mLookLbl"></span></button>
+          <button id="mInfo" class="tile"><span class="ti">ℹ️</span><span id="mInfoLbl"></span></button>
+          <button id="mHome" class="tile"><span class="ti">🏠</span><span id="mHomeLbl"></span></button>
+        </div>
+      </div>
+    </div>
+    <div class="pauseFoot"><button id="mResume" class="gbtn"><span class="gi">▶</span><span id="mResumeLbl"></span></button></div>
   </div>
 </div>
 
@@ -397,26 +551,33 @@ body.g3 #gl{display:block}
       </div>
     </div>
     <button id="crLookLbl" class="lbl"></button>
-    <div class="swRow" id="crBody"></div>
-    <div class="swRow" id="crHair"></div>
-    <div class="swRow" id="crOutfit"></div>
+    <div class="crTabs" id="crTabs" role="tablist"></div>
+    <div class="crStyles" id="crStyles"></div>
+    <div class="swRow" id="crColors"></div>
     <button id="crOk" class="btn green wide"></button>
   </div>
 </div>
 
 <div id="title" class="overlay">
   <div id="titleBox">
-    <div class="sunBall"></div>
-    <h1 id="titleText">Sunny Hill</h1>
-    <div id="titleHi"></div>
-    <button id="startBtn" class="btn yellow">Start ▶</button>
+    <div class="titleL">
+      <div class="logo"><div class="logoSun"><div class="sunRays"></div><div class="sunFace">☀️</div></div><h1 id="titleText">Sunny Hill</h1></div>
+      <div class="ribbon" id="titleUnit"></div>
+    </div>
+    <div class="titleR">
+      <button id="tContinue" class="gbtn contBtn hidden"><canvas id="tMe" width="144" height="144"></canvas>
+        <span class="contText"><span id="tContLbl" class="contLbl"></span><span id="tContInfo" class="contInfo"></span></span><span class="gi">▶</span></button>
+      <button id="tNew" class="gbtn"><span class="gi">✨</span><span id="tNewLbl"></span></button>
+      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tView" class="pill"></button><button id="tInfo" class="pill"></button></div>
+      <div id="titleCredit"></div>
+    </div>
   </div>
 </div>
 
 <div id="ask" class="overlay hidden">
-  <div class="panel card">
+  <div class="panel card askCard">
     <p id="askText"></p>
-    <div class="row"><button id="askYes" class="btn pink wide"></button><button id="askNo" class="btn green wide"></button></div>
+    <div class="row"><button id="askYes" class="gbtn orange"></button><button id="askNo" class="gbtn"></button></div>
   </div>
 </div>
 
@@ -462,6 +623,10 @@ const GAME_CONTENT = {
     menu: 'Menu', sound: 'Sound', on: 'On', off: 'Off',
     slow: 'Slow', normal: 'Normal', myLook: 'My look', view: 'View', info: 'Info / Bilgi',
     restart: 'Restart game', close: 'Close',
+    // ana menü ve oyun içi menü
+    newGame: 'New Game', continue: 'Continue', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
+    unit: 'Unit 1 · What is a family?',
+    newGameAsk: 'Start a new game? Your stars will be lost. / Yeni oyun başlasın mı? Yıldızlar silinir.',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
     hi: 'Hi, {name}!',
     freeWalk: 'Walk around Sunny Hill!',
@@ -478,7 +643,9 @@ const GAME_CONTENT = {
       'Lütfen sesi açın: karakterler İngilizce konuşur.',
       'İlerleme bu cihazda, bu tarayıcıda kaydedilir.',
     ],
-    controls: 'Bilgisayarda ok tuşları veya WASD, telefon/tablette gitmek istediğiniz yere dokunun.',
+    controls: 'Ok tuşları veya WASD ile yürünür, Boşluk / Enter ile konuşulur. Ekrana tıklayarak da gidilebilir.',
+    controlsTouch: 'Sol alttaki joystick ile yürünür, sağ alttaki sarı düğmeyle konuşulur. Ekranda bir yere dokunarak da oraya gidilebilir.',
+    devices: { phone: 'Telefon', tablet: 'Tablet', computer: 'Bilgisayar' },
     credit: 'ELT / Batuhan Özçönke',
     // Ses durumu (veli ekranında ve gerekirse oyunun üstünde gösterilir)
     voiceChecking: 'İngilizce sesler kontrol ediliyor…',
@@ -492,7 +659,14 @@ const GAME_CONTENT = {
   },
 
   // Karakter oluşturma ekranı
-  creator: { name: "What's your name?", look: 'Choose your look!', ok: 'OK', hello: 'Hello, {name}!' },
+  creator: {
+    name: "What's your name?", look: 'Choose your look!', ok: 'OK', hello: 'Hello, {name}!',
+    hair: 'Hair', clothes: 'Clothes', skin: 'Skin',
+    styles: { spiky: 'Spiky hair', short: 'Short hair', curly: 'Curly hair', bob: 'Bob', ponytail: 'Ponytail', pigtails: 'Pigtails', long: 'Long hair', braids: 'Braids',
+      tee: 'T-shirt', stripes: 'Striped T-shirt', hoodie: 'Hoodie', overalls: 'Overalls', dress: 'Dress', skirt: 'Skirt' },
+    hairColors: ['Black', 'Brown', 'Yellow', 'Orange', 'Dark brown', 'Pink'],
+    colors: ['Red', 'Blue', 'Green', 'Purple', 'Yellow', 'Orange'],
+  },
 
   // Süsler: her 2 yıldızda bir tanesi açılır (2, 4, 6, 8 yıldız)
   accessories: [
@@ -855,16 +1029,17 @@ function personDims(L) {
 function personHeadY(L) { const d = personDims(L); return -d.legH - 2 - d.bodyH - d.hr + 6; }
 function personTop(L) { const d = personDims(L); return (personHeadY(L) - d.hr - 4 - (L.hat ? 9 : 0)) * (L.size || 1); }
 
-function legP(c, x, hipY, col, shoe, lift, dark, topCol) {
+function legP(c, x, hipY, col, shoe, lift, dark, topCol, socks) {
   const y1 = -3 - lift;
   rrect(c, x - 3.8, hipY - 3, 7.6, y1 - hipY + 3, 3.8, dark ? shade(col, -0.18) : col, 2.5);
+  if (socks) rrect(c, x - 3.9, y1 - 5.5, 7.8, 5.5, 2.5, dark ? shade(socks, -0.12) : socks, 2.2);
   if (topCol) rrect(c, x - 4.6, hipY - 3, 9.2, (y1 - hipY) * 0.42 + 3, 3.5, dark ? shade(topCol, -0.18) : topCol, 2.5);
   ell(c, x + 0.8, y1 + 0.3, 5.4, 3.5, shoe, 2.5);
 }
-function armP(c, x, y, ang, len, sleeve, skin) {
+function armP(c, x, y, ang, len, sleeve, skin, long) {
   c.save(); c.translate(x, y); c.rotate(ang);
-  rrect(c, -3.7, -2, 7.4, len, 3.7, skin, 2.5);
-  rrect(c, -4.5, -3.5, 9, len * 0.46, 4.2, sleeve, 2.5);
+  rrect(c, -3.7, -2, 7.4, len, 3.7, long ? sleeve : skin, 2.5);
+  if (!long) rrect(c, -4.5, -3.5, 9, len * 0.46, 4.2, sleeve, 2.5);
   circ(c, 0, len, 4.3, skin, 2.5);
   c.restore();
 }
@@ -877,8 +1052,18 @@ function torso(c, L, bw, shY, hipY, side, back) {
     if (L.apron && !back) rrect(c, -bw * 0.62, shY + 8, bw * 1.24, hipY - shY - 2, 5, L.apron, 2.5);
     if (L.belt) rrect(c, -bw - 1.5, hipY - 10, bw * 2 + 3, 6, 3, L.belt, 2.5);
   } else {
-    rrect(c, -bw + 1, hipY - 6, bw * 2 - 2, 9, 4, L.overalls || L.pants, 3);
+    if (!L.skirt) rrect(c, -bw + 1, hipY - 6, bw * 2 - 2, 9, 4, L.overalls || L.pants || '#4a5a8a', 3);
+    if (L.hoodie && back) { c.beginPath(); c.ellipse(0, shY + 5, bw * 0.75, 7, 0, 0, TAU); paint(c, shade(L.shirt, -0.08), 2.5); }
     rrect(c, -bw, shY, bw * 2, hipY - shY - 2, 8, L.shirt, 3);
+    if (L.skirt) {
+      c.beginPath(); c.moveTo(-bw, hipY - 9); c.lineTo(bw, hipY - 9); c.lineTo(bw + 6, hipY + 5);
+      c.quadraticCurveTo(0, hipY + 9, -bw - 6, hipY + 5); c.closePath(); paint(c, L.skirt, 3);
+    }
+    if (L.hoodie && !back) {
+      c.beginPath(); c.moveTo(-bw * 0.8, shY + 2); c.quadraticCurveTo(0, shY + 9, bw * 0.8, shY + 2); c.lineWidth = 5; c.strokeStyle = shade(L.shirt, -0.12); c.stroke();
+      rrect(c, -bw * 0.55, hipY - 13, bw * 1.1, 7, 3, shade(L.shirt, -0.1), 2);
+      seg(c, -2.5, shY + 5, -2.5, shY + 11, '#ffffff', 1.6); seg(c, 2.5, shY + 5, 2.5, shY + 11, '#ffffff', 1.6);
+    }
     if (L.stripes) {
       c.save(); c.beginPath(); rrPath(c, -bw, shY, bw * 2, hipY - shY - 2, 8); c.clip();
       c.fillStyle = L.stripes;
@@ -906,34 +1091,63 @@ function hairBack(c, L, hr, hy, shY, side) {
   const st = L.hairStyle, col = L.hair;
   if (st === 'long') {
     c.beginPath(); rrPath(c, -hr - 3 - (side ? 3 : 0), hy - 4, hr * 2 + 6, shY - hy + 16, 11); paint(c, col, 3);
+  } else if (st === 'bob') {
+    c.beginPath(); rrPath(c, -hr - 3 - (side ? 2 : 0), hy - 6, hr * 2 + 6, hr * 0.95 + 6, 10); paint(c, col, 3);
   } else if (st === 'bun') {
     circ(c, 0, hy - hr - 3, 8.5, col, 3);
   } else if (st === 'pigtails') {
     if (!side) ell(c, -hr - 5, hy + 7, 6.5, 10, col, 3, 0.25);
     ell(c, hr + 5 - (side ? hr + 8 : 0), hy + 7, 6.5, 10, col, 3, -0.25);
+  } else if (st === 'ponytail') {
+    const x = side ? -hr * 1.02 : hr * 0.95;
+    ell(c, x, hy + 5, 5, 12, col, 3, side ? 0.35 : -0.45);
+    circ(c, side ? -hr * 0.85 : hr * 0.72, hy - 5, 3, L.ties || '#ff7aa2', 2);
   }
 }
+// the hair over the forehead: bumpy, spiky, straight bangs or pulled back, then curls, cowlicks and ties
 function hairCap(c, L, hr, hy, side) {
   const st = L.hairStyle;
   if (!st || st === 'none') return;
-  const col = L.hair, r = hr + 2, fy = hy - hr * 0.2;
+  const col = L.hair, r = hr + 2, fy = hy - hr * 0.27;
+  if (st === 'bald') {               // hair only over the ears
+    for (const s of side ? [-0.62] : [-1, 1]) ell(c, s * (hr - 0.5), hy - 1.5, 4.2, 7.5, col, 2.5);
+    return;
+  }
+  if (st === 'curly') {
+    const a0 = side ? Math.PI * 0.6 : Math.PI * 0.86, a1 = side ? Math.PI * 1.85 : Math.PI * 2.14, n = side ? 7 : 9;
+    for (let i = 0; i < n; i++) { const a = a0 + (a1 - a0) * i / (n - 1); circ(c, Math.cos(a) * (hr - 0.5), hy - 1 + Math.sin(a) * (hr - 0.5), 6.8, col, 2.5); }
+    c.beginPath(); c.arc(0, hy - 1, hr - 1, Math.PI * 1.02, Math.PI * 1.98); c.closePath(); c.fillStyle = col; c.fill();
+    for (let i = 0; i < (side ? 3 : 4); i++) circ(c, (side ? 2 : -hr * 0.55) + i * (side ? 5 : hr * 0.37), fy + 1, 4.6, col, 2.2);
+    return;
+  }
   const aL = side ? Math.PI * 0.62 : Math.PI * 0.9, aR = Math.PI * 2.1;
   c.beginPath();
   c.arc(0, hy, r, aL, aR);
-  const xs = r * 0.72, xe = side ? -r * 0.02 : -r * 0.72, k = side ? 3 : 4, step = (xs - xe) / k;
-  c.quadraticCurveTo(r * 0.92, fy + 3, xs, fy + 5);
-  for (let i = 0; i < k; i++) {
-    const xa = xs - step * i, xb = xa - step;
-    c.quadraticCurveTo((xa + xb) / 2, fy - 5, xb, fy + 5);
+  const xs = r * 0.72, xe = side ? -r * 0.02 : -r * 0.72;
+  if (st === 'spiky') {
+    const k = side ? 4 : 6, step = (xs - xe) / k;
+    c.quadraticCurveTo(r * 0.92, fy + 2, xs, fy + 1);
+    for (let i = 0; i < k; i++) { const xa = xs - step * i, xb = xa - step; c.lineTo((xa + xb) / 2, fy + 7.5); c.lineTo(xb, fy + 1); }
+  } else if (st === 'ponytail') {
+    c.quadraticCurveTo(r * 0.9, fy, xs, fy - 2); c.quadraticCurveTo(0, fy - 7, xe, fy - 1);
+  } else if (st === 'bob' || st === 'long' || st === 'pigtails') {
+    const k = side ? 3 : 6, step = (xs - xe) / k;
+    c.quadraticCurveTo(r * 0.92, fy + 3, xs, fy + 5);
+    for (let i = 0; i < k; i++) { const xa = xs - step * i, xb = xa - step; c.lineTo((xa + xb) / 2, fy + 6.5); c.lineTo(xb, fy + 5); }
+  } else {
+    const k = side ? 3 : 4, step = (xs - xe) / k;
+    c.quadraticCurveTo(r * 0.92, fy + 3, xs, fy + 5);
+    for (let i = 0; i < k; i++) { const xa = xs - step * i, xb = xa - step; c.quadraticCurveTo((xa + xb) / 2, fy - 5, xb, fy + 5); }
   }
   const xl = Math.cos(aL) * r, yl = hy + Math.sin(aL) * r;
   if (side) c.quadraticCurveTo(-r * 0.2, hy + r * 0.45, xl, yl);
   else c.quadraticCurveTo(-r * 0.95, fy + 4, xl, yl);
   c.closePath(); paint(c, col, 3);
-  if (st === 'short' || st === 'curly') {
+  if (st === 'short') {
     c.beginPath(); c.moveTo(-4, hy - r + 2); c.quadraticCurveTo(-2, hy - r - 10, 7, hy - r - 7);
     c.quadraticCurveTo(3, hy - r - 3, 4, hy - r + 2); c.closePath(); paint(c, col, 2.5);
   }
+  if (st === 'bob') for (const s of side ? [-1] : [-1, 1]) { c.beginPath(); rrPath(c, s * (hr - 1) - 3.5 + (side ? 4 : 0), hy - hr * 0.35, 7, hr * 1.1, 3.5); paint(c, col, 2.5); }
   if (st === 'pigtails') {
     const tie = L.ties || '#ff7aa2';
     if (!side) circ(c, -hr - 1, hy + 0, 3.2, tie, 2);
@@ -956,23 +1170,28 @@ function eyeP(c, x, y, k, closed, lash, outward) {
     c.beginPath(); c.arc(x, y - 1, 3.2 * k, 0.15 * Math.PI, 0.85 * Math.PI);
     c.lineWidth = 2.4; c.strokeStyle = INK; c.stroke(); return;
   }
-  c.beginPath(); c.ellipse(x, y, 2.9 * k, 3.9, 0, 0, TAU); c.fillStyle = '#2b1d16'; c.fill();
-  c.beginPath(); c.arc(x + 0.9 * k, y - 1.4, 1.25, 0, TAU); c.fillStyle = '#fff'; c.fill();
-  if (lash) seg(c, x + outward * 2.3 * k, y - 2.8, x + outward * 4.6 * k, y - 4.6, INK, 1.8);
+  c.beginPath(); c.ellipse(x, y, 3.2 * k, 3.9, 0, 0, TAU); c.fillStyle = '#ffffff'; c.fill();
+  c.save(); c.clip();
+  c.beginPath(); c.ellipse(x + 0.2 * k, y + 0.6, 2.4 * k, 3.1, 0, 0, TAU); c.fillStyle = '#2f2833'; c.fill();
+  c.restore();
+  c.beginPath(); c.ellipse(x, y, 3.2 * k, 3.9, 0, 0, TAU); c.lineWidth = 1.2; c.strokeStyle = '#6b3a22'; c.stroke();
+  c.beginPath(); c.ellipse(x, y, 3.2 * k, 3.9, 0, 1.12 * Math.PI, 1.88 * Math.PI); c.lineWidth = 2.1; c.strokeStyle = INK; c.stroke();
+  circ(c, x + 0.9 * k, y - 1.1, 1.15, '#ffffff', 0); circ(c, x - 0.8 * k, y + 1.6, 0.5, '#ffffff', 0);
+  if (lash) seg(c, x + outward * 2.8 * k, y - 2.7, x + outward * 4.9 * k, y - 4.4, INK, 1.8);
 }
 function faceP(c, L, hr, hy, side, t, o) {
-  const fx = side ? hr * 0.3 : 0, ex = hr * 0.37, ey = hy + hr * 0.12;
+  const fx = side ? hr * 0.3 : 0, ex = hr * 0.37, ey = hy + hr * 0.2;
   const closed = o.sleep || ((t + (o.seed || 0) * 1.7) % 4.3) < 0.12;
   const lx = fx - ex * (side ? 0.8 : 1), rx = fx + ex * (side ? 1.02 : 1);
   eyeP(c, lx, ey, side ? 0.8 : 1, closed, L.lashes, -1);
   eyeP(c, rx, ey, 1, closed, L.lashes, 1);
   c.fillStyle = 'rgba(255,105,130,.42)';
-  c.beginPath(); c.ellipse(fx - hr * 0.6 * (side ? 0.75 : 1), hy + hr * 0.42, side ? 3.2 : 4.3, 2.6, 0, 0, TAU); c.fill();
-  c.beginPath(); c.ellipse(fx + hr * 0.62, hy + hr * 0.42, 4.3, 2.6, 0, 0, TAU); c.fill();
+  c.beginPath(); c.ellipse(fx - hr * 0.6 * (side ? 0.75 : 1), hy + hr * 0.5, side ? 3.2 : 4.3, 2.6, 0, 0, TAU); c.fill();
+  c.beginPath(); c.ellipse(fx + hr * 0.62, hy + hr * 0.5, 4.3, 2.6, 0, 0, TAU); c.fill();
   if (L.freckles) {
     c.fillStyle = 'rgba(140,80,40,.55)';
     for (const s of [-1, 1]) for (let k = 0; k < 3; k++) {
-      c.beginPath(); c.arc(fx + s * (hr * 0.5 + k * 2.2), hy + hr * 0.3 + (k % 2) * 2, 0.9, 0, TAU); c.fill();
+      c.beginPath(); c.arc(fx + s * (hr * 0.5 + k * 2.2), hy + hr * 0.38 + (k % 2) * 2, 0.9, 0, TAU); c.fill();
     }
   }
   if (L.glasses) {
@@ -982,7 +1201,7 @@ function faceP(c, L, hr, hy, side, t, o) {
     c.beginPath(); c.arc(rx, ey, 5.8, 0, TAU); c.stroke();
     seg(c, lx + 5.8, ey - 1, rx - 5.8, ey - 1, gc, 2);
   }
-  const my = hy + hr * 0.46;
+  const my = hy + hr * 0.53;
   if (L.beard) {
     c.beginPath(); c.arc(fx * 0.6, hy + 1, hr * 0.98, 0.02 * Math.PI, 0.98 * Math.PI);
     c.quadraticCurveTo(fx, hy + hr * 0.2, hr * 0.98 + fx * 0.6, hy + 1.5); c.closePath(); paint(c, L.beard, 2.5);
@@ -1068,35 +1287,47 @@ function drawPerson(c, L, o) {
   const shY = hipY - d.bodyH - br * 0.6;
   const hy = shY - d.hr + 6 - br * 0.3;
   const bw = side ? d.bw * 0.82 : d.bw;
-  const legCol = (L.dress || L.shorts) ? L.skin : (L.overalls || L.pants || '#4a5a8a');
-  const shoe = L.shoes || '#6b4430', topCol = L.shorts ? L.pants : null;
+  const legCol = (L.dress || L.shorts || L.skirt) ? L.skin : (L.overalls || L.pants || '#4a5a8a');
+  const shoe = L.shoes || '#6b4430', topCol = L.shorts ? L.pants : null, socks = L.socks;
   const hr = d.hr;
 
   if (L.cape && !back) capeP(c, L.cape, bw, shY, hipY, side, false);
   if (!back) hairBack(c, L, hr, hy, shY, side);
   if (side) {
-    legP(c, -sw * 5, hipY, legCol, shoe, 0, true, topCol);
-    legP(c, sw * 5, hipY, legCol, shoe, 0, false, topCol);
+    legP(c, -sw * 5, hipY, legCol, shoe, 0, true, topCol, socks);
+    legP(c, sw * 5, hipY, legCol, shoe, 0, false, topCol, socks);
   } else {
-    legP(c, -5.5, hipY, legCol, shoe, Math.max(0, sw) * 3.5, false, topCol);
-    legP(c, 5.5, hipY, legCol, shoe, Math.max(0, -sw) * 3.5, false, topCol);
+    legP(c, -5.5, hipY, legCol, shoe, Math.max(0, sw) * 3.5, false, topCol, socks);
+    legP(c, 5.5, hipY, legCol, shoe, Math.max(0, -sw) * 3.5, false, topCol, socks);
   }
   torso(c, L, bw, shY, hipY, side, back);
-  const armLen = d.A ? 19 : 15, sleeve = L.dress || L.shirt;
-  if (side) armP(c, -1, shY + 4, sw * 0.7, armLen, sleeve, L.skin);
+  const armLen = d.A ? 19 : 15, sleeve = L.dress || L.shirt, long = !!L.hoodie;
+  if (side) armP(c, -1, shY + 4, sw * 0.7, armLen, sleeve, L.skin, long);
   else {
-    armP(c, -bw - 0.5, shY + 4, 0.14 + sw * 0.2, armLen, sleeve, L.skin);
+    armP(c, -bw - 0.5, shY + 4, 0.14 + sw * 0.2, armLen, sleeve, L.skin, long);
     const wave = o.wave && !back ? -2.55 + Math.sin(t * 9) * 0.35 : -(0.14 - sw * 0.2);
-    armP(c, bw + 0.5, shY + 4, wave, armLen, sleeve, L.skin);
+    armP(c, bw + 0.5, shY + 4, wave, armLen, sleeve, L.skin, long);
   }
   if (L.cape && back) capeP(c, L.cape, bw, shY, hipY, false, true);
   if (back) {
     circ(c, 0, hy, hr, L.skin, 3);
-    if (L.hairStyle && L.hairStyle !== 'none') {
+    const hs = L.hairStyle;
+    if (hs === 'bald') {
+      c.save(); c.beginPath(); c.arc(0, hy, hr + 1.5, 0, TAU); c.clip(); c.fillStyle = L.hair; c.fillRect(-hr - 2, hy - 1, hr * 2 + 4, hr * 0.75); c.restore();
+      c.beginPath(); c.arc(0, hy, hr, 0, TAU); paint(c, null, 3);
+    } else if (hs === 'curly') {
+      for (let i = 0; i < 10; i++) { const a = Math.PI * 0.75 + Math.PI * 1.5 * i / 9; circ(c, Math.cos(a) * (hr - 0.5), hy + Math.sin(a) * (hr - 0.5), 6.8, L.hair, 2.5); }
+      circ(c, 0, hy, hr - 2, L.hair, 0);
+      for (let i = 0; i < 3; i++) circ(c, -7 + i * 7, hy + hr * 0.5, 5, L.hair, 2.2);
+    } else if (hs && hs !== 'none') {
       c.beginPath(); c.arc(0, hy, hr + 2, Math.PI * 0.78, Math.PI * 2.22);
-      c.quadraticCurveTo(0, hy + hr * 1.05, Math.cos(Math.PI * 0.78) * (hr + 2), hy + Math.sin(Math.PI * 0.78) * (hr + 2));
+      const xl = Math.cos(Math.PI * 0.78) * (hr + 2), yl = hy + Math.sin(Math.PI * 0.78) * (hr + 2);
+      if (hs === 'spiky') { const x0 = -xl; for (let i = 1; i <= 6; i++) { const x = x0 + (xl - x0) * i / 6; c.lineTo(x - (xl - x0) / 12, hy + hr * 0.95); c.lineTo(x, yl + 1); } }
+      else c.quadraticCurveTo(0, hy + hr * 1.05, xl, yl);
       c.closePath(); paint(c, L.hair, 3);
       if (L.hairStyle === 'long') { c.beginPath(); rrPath(c, -hr - 1, hy, hr * 2 + 2, shY - hy + 14, 10); paint(c, L.hair, 3); }
+      if (hs === 'bob') { c.beginPath(); rrPath(c, -hr - 2, hy - 2, hr * 2 + 4, hr * 0.95 + 2, 9); paint(c, L.hair, 3); }
+      if (hs === 'ponytail') { ell(c, 0, hy + hr * 0.55, 5, 12, L.hair, 3); circ(c, 0, hy - 2, 3.2, L.ties || '#ff7aa2', 2); }
       if (L.hairStyle === 'bun') circ(c, 0, hy - hr - 3, 8.5, L.hair, 3);
       if (L.hairStyle === 'pigtails') {
         ell(c, -hr - 5, hy + 7, 6.5, 10, L.hair, 3, 0.25); ell(c, hr + 5, hy + 7, 6.5, 10, L.hair, 3, -0.25);
@@ -1471,18 +1702,19 @@ function roleLook(role, i) {
   const hairs = ['#5a3620', '#2d2330', '#9a5530', '#7a4a2a', '#d9622b', '#f2c14e'];
   const cloth = ['#ff7aa2', '#4aa3ff', '#4cc36a', '#a77bd8', '#ffb238', '#ff5a5a', '#2ec4b6'];
   const h = (n) => hairs[(n + i) % hairs.length], cl = (n) => cloth[(n + i * 3) % cloth.length];
+  const kid = { socks: '#ffffff', shoes: ['#4a6fd8', '#ff5a8a', '#4cc36a', '#ff8c42'][i % 4] };
   switch (role) {
-    case 'mother': return { age: 'adult', skin, hair: h(2), hairStyle: 'long', dress: cl(0), lashes: true };
-    case 'father': return { age: 'adult', skin, hair: h(0), hairStyle: 'short', shirt: cl(1), pants: '#3b4f7a', mustache: i % 2 === 1 };
-    case 'grandmother': return { age: 'adult', skin, hair: '#eceaf4', hairStyle: 'bun', dress: cl(3), shawl: '#ffc4dc', glasses: true, lashes: true };
-    case 'grandfather': return { age: 'adult', skin, hair: '#e6e6ee', hairStyle: 'short', shirt: cl(4), pants: '#6b5a50', mustache: true, glasses: i % 2 === 0, glassesColor: INK };
-    case 'aunt': return { age: 'adult', skin, hair: h(4), hairStyle: i % 2 ? 'bun' : 'long', dress: cl(5), lashes: true, flower: '#ffd23c' };
-    case 'uncle': return { age: 'adult', skin, hair: h(1), hairStyle: 'short', shirt: cl(6), pants: '#4a5a8a', hat: i % 2 ? 'cap' : undefined, hatColor: '#ff8c42' };
-    case 'brother': return { age: 'kid', skin, hair: h(3), hairStyle: 'short', shirt: cl(2), pants: '#4a7bd0', shorts: true };
-    case 'sister': return { age: 'kid', skin, hair: h(5), hairStyle: 'pigtails', ties: '#ff7aa2', dress: cl(0), lashes: true };
+    case 'mother': return { age: 'adult', skin, hair: h(2), hairStyle: ['long', 'bob', 'ponytail'][i % 3], dress: cl(0), lashes: true };
+    case 'father': return { age: 'adult', skin, hair: h(0), hairStyle: i % 2 ? 'spiky' : 'short', shirt: cl(1), pants: '#3b4f7a', mustache: i % 2 === 1 };
+    case 'grandmother': return { age: 'adult', skin, hair: '#eceaf4', hairStyle: i % 2 ? 'curly' : 'bun', dress: cl(3), shawl: '#ffc4dc', glasses: true, lashes: true };
+    case 'grandfather': return { age: 'adult', skin, hair: '#e6e6ee', hairStyle: 'bald', shirt: cl(4), pants: '#6b5a50', mustache: true, glasses: i % 2 === 0, glassesColor: INK };
+    case 'aunt': return { age: 'adult', skin, hair: h(4), hairStyle: ['curly', 'ponytail', 'bob'][i % 3], dress: cl(5), lashes: true, flower: '#ffd23c' };
+    case 'uncle': return { age: 'adult', skin, hair: h(1), hairStyle: i % 2 ? 'spiky' : 'short', shirt: cl(6), pants: '#4a5a8a', hat: i % 2 ? 'cap' : undefined, hatColor: '#ff8c42' };
+    case 'brother': return Object.assign({ age: 'kid', skin, hair: h(3), hairStyle: ['spiky', 'short', 'curly'][i % 3], shirt: cl(2), pants: '#4a7bd0', shorts: true, hoodie: i % 3 === 2 }, kid);
+    case 'sister': return Object.assign({ age: 'kid', skin, hair: h(5), hairStyle: ['pigtails', 'ponytail', 'bob'][i % 3], ties: '#ff7aa2', lashes: true }, i % 2 ? { shirt: '#ffffff', skirt: cl(0) } : { dress: cl(0) }, kid);
     default: return i % 2
-      ? { age: 'kid', skin, hair: h(4), hairStyle: 'long', dress: cl(3), lashes: true, freckles: true }
-      : { age: 'kid', skin, hair: h(0), hairStyle: 'short', shirt: cl(4), pants: '#3b5a8c', shorts: true, freckles: true };
+      ? Object.assign({ age: 'kid', skin, hair: h(4), hairStyle: i % 4 === 1 ? 'long' : 'braids', dress: cl(3), lashes: true, freckles: true }, kid)
+      : Object.assign({ age: 'kid', skin, hair: h(0), hairStyle: i % 4 === 0 ? 'curly' : 'spiky', shirt: cl(4), stripes: i % 4 === 2 ? '#ffffff' : undefined, pants: '#3b5a8c', shorts: true, freckles: true }, kid);
   }
 }
 function drawFamilyPhoto2D(cv, counts, members) {
@@ -1496,12 +1728,12 @@ function drawFamilyPhoto2D(cv, counts, members) {
   const half = Math.ceil(front.length / 2);
   const kids = front.slice(0, half).concat([PLAYER_LOOK], front.slice(half));
   const n = Math.max(back.length, kids.length, 3);
-  const k = Math.min(H2 / 128, W2 / (n * 38 + 24));
+  const k = Math.min(H2 / 150, W2 / (n * 38 + 24));
   const row = (list, y) => {
     const sp = 38 * k, x0 = W2 / 2 - (list.length - 1) * sp / 2;
     list.forEach((L, i) => { g.save(); g.translate(x0 + i * sp, y); g.scale(k, k); drawPerson(g, L, { dir: 'down', t: 0.3 + i * 0.13, seed: 1.2 + i * 0.07 }); g.restore(); });
   };
-  row(back, H2 * 0.74);
+  row(back, H2 * 0.68);   // high enough that the children's heads never hide a grown-up's face
   row(kids, H2 * 0.97);
 }
 
@@ -2239,11 +2471,17 @@ void main() {
 const FS3 = `precision mediump float;
 varying vec4 vCol; varying float vFog; varying vec3 vNor; varying vec3 vView;
 uniform vec3 uSun, uSunCol, uSky, uGnd, uFogCol; uniform vec4 uTint; uniform float uUnlit, uSpec, uRim;
+uniform sampler2D uTex; uniform float uTexOn; uniform vec4 uUV;
 void main() {
   vec3 n = normalize(vNor), v = normalize(vView);
   float d = clamp((dot(n, uSun) + 0.2) / 1.2, 0.0, 1.0);          // wrapped light: soft, no hard dark side
   vec3 lit = mix(uGnd, uSky, n.y * 0.5 + 0.5) + uSunCol * d;
   lit += uRim * pow(1.0 - max(dot(n, v), 0.0), 3.0);
+  if (uTexOn > 0.5) {             // a painted face: the colour channels carry the picture's coordinates
+    vec4 p = texture2D(uTex, uUV.xy + vCol.rg * uUV.zw);
+    gl_FragColor = vec4(mix(p.rgb * lit, uFogCol * p.a, vFog), p.a);
+    return;
+  }
   vec3 c = vCol.rgb * mix(lit, vec3(1.0), uUnlit);
   if (uSpec > 0.0) c += uSpec * pow(max(dot(n, normalize(v + uSun)), 0.0), 48.0) * vec3(1.0, 0.98, 0.9);
   gl_FragColor = vec4(mix(c * uTint.rgb, uFogCol, vFog), vCol.a * uTint.a);
@@ -2263,8 +2501,10 @@ class GLR {
     const gl = cv.getContext('webgl', o) || cv.getContext('experimental-webgl', o);
     if (!gl) throw new Error('WebGL is not available');
     this.gl = gl; this.cv = cv; this.id = (GLR.count = (GLR.count || 0) + 1);
+    (GLR.all = GLR.all || {})[this.id] = this;
     this.p = this.program(VS3, FS3, ['aPos', 'aNor', 'aCol', 'aAnim'],
-      ['uP', 'uV', 'uM', 'uTime', 'uZBias', 'uUnlit', 'uSun', 'uSunCol', 'uSky', 'uGnd', 'uCam', 'uTint', 'uFog', 'uFogCol', 'uSpec', 'uRim']);
+      ['uP', 'uV', 'uM', 'uTime', 'uZBias', 'uUnlit', 'uSun', 'uSunCol', 'uSky', 'uGnd', 'uCam', 'uTint', 'uFog', 'uFogCol', 'uSpec', 'uRim', 'uTex', 'uTexOn', 'uUV']);
+    this.faces = new Map();
     this.tp = this.program(TVS3, TFS3, ['aPos', 'aUV'], ['uP', 'uV', 'uCam', 'uFog', 'uTex', 'uFogCol', 'uLight']);
     gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -2315,12 +2555,13 @@ class GLR {
     const fogNear = cam.fogNear || 1e5, fogFar = cam.fogFar || 2e5;
     gl.uniform2f(u.uFog, fogNear, fogFar); gl.uniform3fv(u.uFogCol, E.fog);
     gl.uniform4f(u.uTint, 1, 1, 1, 1); this.tint = [1, 1, 1, 1]; this.unlit = 0;
-    gl.uniform1f(u.uSpec, 0); gl.uniform1f(u.uRim, 0);
+    gl.uniform1f(u.uSpec, 0); gl.uniform1f(u.uRim, 0); gl.uniform1f(u.uTexOn, 0); gl.uniform1i(u.uTex, 0);
     this.E = E; this.fogNear = fogNear; this.fogFar = fogFar;
     this.mode('opaque');
   }
   mode(m) {
     const gl = this.gl;
+    this.curMode = m;
     if (m === 'opaque') { gl.disable(gl.BLEND); gl.depthMask(true); gl.depthFunc(gl.LESS); }
     else if (m === 'blend') { gl.enable(gl.BLEND); gl.depthMask(false); gl.depthFunc(gl.LESS); }
     else if (m === 'xray') { gl.enable(gl.BLEND); gl.depthMask(false); gl.depthFunc(gl.GREATER); }
@@ -2382,6 +2623,28 @@ class GLR {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     return t;
+  }
+  faceTex(key, paint) {
+    let tx = this.faces.get(key);
+    if (!tx) {
+      const gl = this.gl;
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);     // soft edges without dark fringes
+      tx = this.texture(paint());
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      this.faces.set(key, tx);
+    }
+    return tx;
+  }
+  // a patch lying just above a head, showing one frame of its face picture (uv = [x, y, w, h] in the picture)
+  decal(mesh, tex, uv, m) {
+    if (this.curMode === 'xray') return;
+    const gl = this.gl, u = this.p.u, prev = this.curMode;
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1f(u.uTexOn, 1); gl.uniform4f(u.uUV, uv[0], uv[1], uv[2], uv[3]);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+    this.draw(mesh, m);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.uniform1f(u.uTexOn, 0);
+    this.mode(prev);
   }
   // textured quads (sign boards): [{tex, buf}] drawn with their own little program
   drawTexQuads(list, light) {
@@ -2926,74 +3189,345 @@ function signQuad3(x, z, w, h, s) {
   return { canvas: cv, verts: v, gpu: {} };
 }
 
-/* ---- people: built from the same LOOKS as the 2D drawings, in parts that can move ---- */
+/* ---- people: built from the same LOOKS as the 2D drawings, in parts that can move ----
+   Big round heads with painted faces (eyes, blush and mouth are a small picture laid over the head,
+   so blinking and talking only swap pictures), hair shells with fringes and swinging tails,
+   flared shirts, mitten hands and sneakers. pose3() turns time into idle fidgets, walking and talking. */
 function dims3(L) {
   const d = L.age === 'adult'
-    ? { A: true, hip: 21, sh: 47, hr: 16.5, bw: 12, bz: 9, arm: 19, legR: 3.8, legX: 5.6 }
-    : { A: false, hip: 13.5, sh: 31, hr: 17, bw: 10.5, bz: 8.2, arm: 15, legR: 3.4, legX: 5 };
-  d.hy = d.sh + d.hr * 0.86;
-  d.ax = d.bw + 2.4;
+    ? { A: true, hip: 21, sh: 46, bw: 11.5, bz: 8.6, arm: 17.5, legR: 3.2, legX: 5.1, hx: 16.8, hyr: 16, hz: 15.6 }
+    : { A: false, hip: 14, sh: 30.5, bw: 9.6, bz: 7.8, arm: 13, legR: 2.6, legX: 4.2, hx: 18.6, hyr: 17.4, hz: 16.9 };
+  d.hr = d.hx;
+  d.hy = d.sh + d.hyr * 0.84;
+  d.ax = d.bw - 0.6;
   return d;
 }
-// a frame sitting on the head's surface, turned by yaw (sideways) and pitch (up)
-function surf3(d, yaw, pitch, lift) {
-  const out = d.hr * (0.9 + 0.1 * Math.abs(Math.sin(yaw))) + (lift || 0);
-  return m4t(RX3(RY3(T3(0, d.hy, 0), yaw), -pitch), 0, 0, out);
+const spow3 = (a, e) => (a < 0 ? -Math.pow(-a, e) : Math.pow(a, e));
+const sstep = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+const hash1 = (x) => { const s = Math.sin(x * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+// a point on the head: u turns around it (0 = the face, + toward the model's +X), v goes up; f pushes it out
+function headPt(d, u, v, f) {
+  const cv = Math.cos(v), ec = spow3(cv, 0.84), cheek = 1 + 0.05 * Math.max(0, Math.cos((v + 0.35) * 2.2));
+  f = f || 1;
+  return [d.hx * ec * spow3(Math.sin(u), 0.84) * f * cheek, d.hy + d.hyr * spow3(Math.sin(v), 0.84) * f, d.hz * ec * spow3(Math.cos(u), 0.84) * f * cheek];
 }
+// a frame sitting on the head, turned to face out at (u, v); lift pushes it off the surface
+function surfH(d, u, v, lift) {
+  const p = headPt(d, u, v, 1), m = T3(p[0], p[1], p[2]); m4ry(m, u); m4rx(m, -v);
+  return lift ? m4t(m, 0, 0, lift) : m;
+}
+function headMesh3(mb, d, col) {
+  const NU = 28, NV = 18, G = [];
+  for (let j = 0; j <= NV; j++) { const v = -Math.PI / 2 + Math.PI * j / NV, row = []; for (let i = 0; i <= NU; i++) row.push(headPt(d, -Math.PI + TAU * i / NU, v, 1)); G.push(row); }
+  mb.color(col);
+  for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) mb.quad(G[j][i], G[j][i + 1], G[j + 1][i + 1], G[j + 1][i]);
+}
+
+/* ---- painted faces ---- */
+const FACE_W = 512, FACE_H = 256;
+const EYE_U3 = [-0.98, 0.98], EYE_V3 = [-0.42, 0.44], MOUTH_U3 = [-0.5, 0.5], MOUTH_V3 = [-0.84, -0.3];
+const EYE_FR3 = { open: [2, 2], half: [258, 2], closed: [2, 106], happy: [258, 106] };            // 252 x 100 each
+const MOUTH_FR3 = { smile: [2, 210], open: [130, 210], wide: [258, 210], o: [386, 210] };          // 124 x 44 each
+const FACE_UV3 = { eyes: {}, mouth: {} };
+for (const k in EYE_FR3) FACE_UV3.eyes[k] = [EYE_FR3[k][0] / FACE_W, EYE_FR3[k][1] / FACE_H, 252 / FACE_W, 100 / FACE_H];
+for (const k in MOUTH_FR3) FACE_UV3.mouth[k] = [MOUTH_FR3[k][0] / FACE_W, MOUTH_FR3[k][1] / FACE_H, 124 / FACE_W, 44 / FACE_H];
+const FACE_CV = new Map();
+// F: { skin, lashes, freckles, brows, iris }. Drawn in head angles (radians), so round things stay round on the head.
+function paintFace3(F) {
+  const key = JSON.stringify(F);
+  let cv = FACE_CV.get(key);
+  if (cv) return cv;
+  cv = cnv(FACE_W, FACE_H);
+  const g = cv.getContext('2d');
+  const frame = (x, y, w, h, U, V, fn) => {
+    g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+    const sx = w / (U[1] - U[0]), sy = h / (V[1] - V[0]);
+    g.setTransform(sx, 0, 0, -sy, x - U[0] * sx, y + V[1] * sy);
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    fn(); g.restore();
+  };
+  const line = (w, col) => { g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
+  const LID = '#4a2412', RIM = '#6b3a22', EX = 0.37, RX = 0.215, RY = 0.25;
+  const cheeks = (happy) => {
+    for (const s of [-1, 1]) {
+      const gr = g.createRadialGradient(s * 0.63, -0.25, 0, s * 0.63, -0.25, 0.15);
+      gr.addColorStop(0, 'rgba(255,105,125,0.42)'); gr.addColorStop(1, 'rgba(255,105,125,0)');
+      g.fillStyle = gr; g.beginPath(); g.ellipse(s * 0.63, -0.25, 0.16, 0.1, 0, 0, TAU); g.fill();
+      if (F.freckles) { g.fillStyle = 'rgba(150,85,45,0.6)'; for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(s * (0.5 + k * 0.085), -0.15 - (k % 2) * 0.045, 0.02, 0, TAU); g.fill(); } }
+      if (F.brows) { const b = happy ? 0.035 : 0; g.beginPath(); g.moveTo(s * 0.22, 0.31 + b); g.quadraticCurveTo(s * 0.37, 0.37 + b, s * 0.52, 0.31 + b); line(0.05, F.brows); }
+    }
+  };
+  const lashes = (s, cx, cy) => {
+    if (!F.lashes) return;
+    for (const [a, dx, dy] of [[0.2, 0.075, 0.05], [0.33, 0.045, 0.08]]) {
+      const ang = s > 0 ? a * Math.PI : (1 - a) * Math.PI, px = cx + RX * Math.cos(ang), py = cy + RY * Math.sin(ang);
+      g.beginPath(); g.moveTo(px, py); g.lineTo(px + s * dx, py + dy); line(0.035, LID);
+    }
+  };
+  const eye = (s, mode) => {
+    const cx = s * EX, cy = 0;
+    if (mode === 'closed' || mode === 'happy') {
+      g.beginPath();
+      if (mode === 'closed') { g.moveTo(cx - 0.19, cy - 0.02); g.quadraticCurveTo(cx, cy - 0.12, cx + 0.19, cy - 0.02); }
+      else { g.moveTo(cx - 0.18, cy - 0.07); g.quadraticCurveTo(cx, cy + 0.17, cx + 0.18, cy - 0.07); }
+      line(0.05, LID);
+      if (F.lashes) { const ex = cx + s * 0.19, ey = mode === 'closed' ? cy - 0.02 : cy - 0.07; g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex + s * 0.06, ey + 0.05); line(0.035, LID); }
+      return;
+    }
+    g.save();
+    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, TAU); g.fillStyle = '#ffffff'; g.fill(); g.clip();
+    g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.04, 0.152, 0.19, 0, 0, TAU); g.fillStyle = F.iris; g.fill();
+    g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.12, 0.1, 0.08, 0, 0, TAU); g.fillStyle = 'rgba(255,255,255,0.14)'; g.fill();
+    g.fillStyle = '#ffffff';
+    g.beginPath(); g.arc(cx + 0.06, cy + 0.075, 0.058, 0, TAU); g.fill();
+    g.beginPath(); g.arc(cx - 0.055, cy - 0.1, 0.024, 0, TAU); g.fill();
+    if (mode === 'half') { g.fillStyle = F.skin; g.fillRect(cx - 0.3, cy + 0.03, 0.6, 0.4); }
+    g.restore();
+    if (mode === 'half') {
+      g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, Math.PI * 1.05, Math.PI * 1.95); line(0.026, RIM);
+      g.beginPath(); g.moveTo(cx - RX, cy + 0.03); g.quadraticCurveTo(cx, cy + 0.07, cx + RX, cy + 0.03); line(0.05, LID);
+      lashes(s, cx, cy - 0.12);
+      return;
+    }
+    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, TAU); line(0.026, RIM);
+    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, Math.PI * 0.14, Math.PI * 0.86); line(0.05, LID);
+    lashes(s, cx, cy);
+  };
+  for (const k in EYE_FR3) {
+    const [x, y] = EYE_FR3[k];
+    frame(x, y, 252, 100, EYE_U3, EYE_V3, () => { cheeks(k === 'happy'); eye(-1, k); eye(1, k); });
+  }
+  const MC = '#6b2a1a', MI = '#8a2436', TG = '#ff8e9c';
+  const openMouth = (w, top, bot) => {
+    g.beginPath(); g.moveTo(-w, top); g.quadraticCurveTo(0, top - 0.025, w, top);
+    g.quadraticCurveTo(w * 0.85, bot + 0.02, 0, bot); g.quadraticCurveTo(-w * 0.85, bot + 0.02, -w, top); g.closePath();
+    g.fillStyle = MI; g.fill();
+    g.save(); g.clip();
+    g.fillStyle = TG; g.beginPath(); g.ellipse(0, bot + 0.01, w * 0.62, (top - bot) * 0.42, 0, 0, TAU); g.fill();
+    g.fillStyle = '#ffffff'; g.fillRect(-w * 0.55, top - 0.04, w * 1.1, 0.035);
+    g.restore();
+    line(0.026, MC);
+  };
+  frame(MOUTH_FR3.smile[0], MOUTH_FR3.smile[1], 124, 44, MOUTH_U3, MOUTH_V3, () => {
+    g.beginPath(); g.moveTo(-0.2, -0.46); g.quadraticCurveTo(0, -0.66, 0.2, -0.46); line(0.036, MC);
+  });
+  frame(MOUTH_FR3.open[0], MOUTH_FR3.open[1], 124, 44, MOUTH_U3, MOUTH_V3, () => openMouth(0.15, -0.46, -0.68));
+  frame(MOUTH_FR3.wide[0], MOUTH_FR3.wide[1], 124, 44, MOUTH_U3, MOUTH_V3, () => openMouth(0.19, -0.44, -0.77));
+  frame(MOUTH_FR3.o[0], MOUTH_FR3.o[1], 124, 44, MOUTH_U3, MOUTH_V3, () => {
+    g.beginPath(); g.ellipse(0, -0.56, 0.075, 0.095, 0, 0, TAU); g.fillStyle = MI; g.fill(); line(0.026, MC);
+  });
+  FACE_CV.set(key, cv);
+  return cv;
+}
+// the patches the face picture is laid on (the same for every head of one age)
+function patch3(d, U, V, nu, nv) {
+  const mb = new MB(1); mb.smooth = 89;
+  const P = (i, j) => headPt(d, U[0] + (U[1] - U[0]) * i / nu, V[0] + (V[1] - V[0]) * j / nv, 1.022);
+  const C = (i, j) => [i / nu, 1 - j / nv, 0, 1];
+  for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) {
+    mb.triC(P(i, j), P(i + 1, j), P(i + 1, j + 1), C(i, j), C(i + 1, j), C(i + 1, j + 1));
+    mb.triC(P(i, j), P(i + 1, j + 1), P(i, j + 1), C(i, j), C(i + 1, j + 1), C(i, j + 1));
+  }
+  return pack(mb);
+}
+const PATCH3 = {};
+
+/* ---- hair: a shell over the head whose lower edge (the hairline) each style shapes ---- */
+// hairline pitch at |u| = front, 0.8, 1.25 (temples), 1.6 (ears), back; teeth: [count, reach, depth in front, depth at the back]
+const HAIR_K3 = [0, 0.8, 1.25, 1.6, Math.PI];
+const HAIR3 = {
+  spiky: { e: [0.66, 0.58, 0.24, 0, -0.38], vol: 1.13, teeth: [[16, Math.PI, 0.37, 0.17]], tips: 0.05 },
+  short: { e: [0.52, 0.46, 0.14, -0.06, -0.48], vol: 1.09, teeth: [[7, 1.1, 0.15]], swoop: 0.13 },
+  curly: { e: [0.44, 0.38, 0.08, -0.14, -0.5], vol: 1.08, curls: 1 },
+  bob: { e: [0.36, 0.32, -0.3, -0.7, -0.78], vol: 1.1, hang: -0.2, flare: 0.16, teeth: [[12, 1.0, 0.035]] },
+  long: { e: [0.42, 0.3, -0.8, -1.2, -1.45], vol: 1.08, hang: -0.25, flare: 0.1, part: 1, teeth: [[10, Math.PI, 0, 0.07]] },
+  ponytail: { e: [0.54, 0.46, 0.12, -0.04, -0.3], vol: 1.06, swoop: 0.12, tail: 'pony' },
+  pigtails: { e: [0.4, 0.34, 0.06, -0.06, -0.34], vol: 1.07, teeth: [[7, 0.95, 0.08]], tail: 'pig' },
+  braids: { e: [0.48, 0.4, 0.04, -0.16, -0.4], vol: 1.06, part: 1, tail: 'braid' },
+  bun: { e: [0.5, 0.44, 0.08, -0.08, -0.34], vol: 1.05, part: 1, bun: 1 },
+  bald: { e: [0.0, 0.0, -0.06, -0.12, -0.42], vol: 1.05, bald: 0.45 },
+};
+function hairEdge3(S, u) {
+  const a = Math.abs(u), K = HAIR_K3;
+  let i = 0; while (i < 3 && a > K[i + 1]) i++;
+  const s = sstep((a - K[i]) / (K[i + 1] - K[i]));
+  let v = S.e[i] + (S.e[i + 1] - S.e[i]) * s, tooth = 0;
+  if (S.swoop && a < 1.3) v -= S.swoop * (0.5 + 0.5 * Math.sin(u * 1.4)) * Math.cos(a / 1.3 * Math.PI / 2);   // swept to one side
+  if (S.teeth) for (const [n, r, dep, dep2] of S.teeth) if (a <= r + 1e-6) {
+    const w = 2 * r / n, x = (((u + r) / w) % 1 + 1) % 1, tw = 1 - Math.abs(x * 2 - 1);
+    v -= (dep2 == null ? dep : dep + (dep2 - dep) * clamp((a - 0.9) / 0.9, 0, 1)) * tw;
+    tooth = Math.max(tooth, tw);
+  }
+  return [v, tooth];
+}
+function hair3(mb, d, L, P) {
+  const S = HAIR3[L.hairStyle];
+  if (!S) return;
+  const hair = L.hair, base = rgb3(hair);
+  const tone = (a) => shade3(hair, a).concat(1);
+  // columns: even steps around the head plus each tooth's tip and gap, so points stay sharp
+  const us = [];
+  for (let i = 0; i <= 60; i++) us.push(-Math.PI + TAU * i / 60);
+  if (S.teeth) for (const [n, r] of S.teeth) { const w = 2 * r / n; for (let k = 0; k <= n * 2; k++) us.push(-r + k * w / 2); }
+  if (S.part) us.push(-0.03, 0.03);
+  us.sort((a, b) => a - b);
+  const U = us.filter((u, i) => i === 0 || u - us[i - 1] > 0.004);
+  const fAt = (v) => 1.04 + (S.vol - 1.04) * Math.pow(Math.max(0, Math.sin(v)), 0.7);
+  const pt = (u, v, f) => {
+    if (S.hang == null || v >= S.hang) return headPt(d, u, v, f);
+    const p = headPt(d, u, S.hang, f), dv = S.hang - v, k = 1 + dv * (S.flare || 0);
+    return [p[0] * k, p[1] - dv * d.hyr * 1.1, p[2] * k];
+  };
+  const inward = (p, th) => { const r = Math.hypot(p[0], p[2]) || 1, k = Math.max(0, 1 - th / r); return [p[0] * k, p[1], p[2] * k]; };
+  const ROWS = 9, cols = [];
+  for (const u of U) {
+    const [e, tooth] = hairEdge3(S, u);
+    let top = Math.PI / 2;
+    if (S.bald) { const a = Math.abs(u); if (a < 1.05) { cols.push(null); continue; } top = e + (S.bald - e) * sstep((a - 1.05) / 0.75); }
+    const vs = [], ps = [];
+    for (let k = 0; k <= ROWS; k++) { const v = e + (top - e) * k / ROWS; vs.push(v); ps.push(pt(u, v, fAt(v) + (k === 0 ? tooth * (S.tips || 0) : 0))); }
+    cols.push({ u, e, vs, ps, inner: headPt(d, u, e, 0.985) });
+  }
+  for (let c = 0; c < cols.length - 1; c++) {
+    const A = cols[c], B = cols[c + 1];
+    if (!A || !B) continue;
+    const um = (A.u + B.u) / 2;
+    for (let k = 0; k < ROWS; k++) {
+      const vm = (A.vs[k] + A.vs[k + 1]) / 2;
+      let col = tone(0.13 * Math.exp(-Math.pow((vm - 0.95) / 0.2, 2)) - 0.06 * Math.max(0, -vm));   // a soft shine band on top
+      if (S.part && Math.abs(um) < 0.035 && vm > A.e + 0.12) col = tone(-0.28);
+      mb.quad(A.ps[k], B.ps[k], B.ps[k + 1], A.ps[k + 1], col);
+      // hanging hair is seen from inside too
+      if (S.hang != null && A.vs[k + 1] <= S.hang && B.vs[k + 1] <= S.hang) mb.quad(inward(A.ps[k], 1.6), inward(A.ps[k + 1], 1.6), inward(B.ps[k + 1], 1.6), inward(B.ps[k], 1.6), tone(-0.22));
+    }
+    // the thickness of the edge
+    const hangA = S.hang != null && A.vs[0] < S.hang, hangB = S.hang != null && B.vs[0] < S.hang;
+    const iA = hangA ? inward(A.ps[0], 1.6) : A.inner, iB = hangB ? inward(B.ps[0], 1.6) : B.inner;
+    mb.quad(iA, iB, B.ps[0], A.ps[0], tone(-0.18));
+    if (S.bald) mb.quad(A.ps[ROWS], B.ps[ROWS], headPt(d, B.u, B.vs[ROWS], 0.985), headPt(d, A.u, A.vs[ROWS], 0.985), tone(-0.1));
+  }
+  if (S.curls) {        // a head of curls: bumps over the shell and small ones along the fringe
+    mb.color(base);
+    const R = rng(7 + Math.round(base[0] * 90));
+    for (const [v, n, r] of [[0.1, 13, 0.3], [0.45, 12, 0.3], [0.8, 9, 0.29], [1.15, 5, 0.27], [1.45, 1, 0.26]]) for (let i = 0; i < n; i++) {
+      const u = -Math.PI + TAU * (i + (v * 3 % 1)) / n;
+      if (Math.abs(u) < 0.95 && v < 0.5) continue;
+      const p = headPt(d, u, v, S.vol - 0.02);
+      mb.ico(p[0], p[1], p[2], d.hx * r * 1.05, { jit: 0.1, seed: (R() * 999) | 0 });
+    }
+    for (let i = 0; i < 7; i++) { const u = -0.9 + 1.8 * i / 6, e = hairEdge3(S, u)[0], p = headPt(d, u, e + 0.1, 1.05); mb.ico(p[0], p[1], p[2], d.hx * 0.18, { jit: 0.1, seed: 40 + i }); }
+  }
+  if (S.bun) {
+    const p = headPt(d, Math.PI, 1.05, 1.02);
+    mb.color(hair).sphere(p[0], p[1] + 2, p[2], d.hx * 0.46, d.hx * 0.42, d.hx * 0.46, 14, 10);
+    mb.color(tone(-0.2)).torus(p[0], p[1] - 1.5, p[2], d.hx * 0.3, 1.1, 14, 5, 'y');
+  }
+  if (S.curl) {          // one springy curl on top
+    const p = headPt(d, 0.1, 1.2, S.vol);
+    mb.push(RX3(T3(p[0], p[1] - 0.5, p[2]), -0.3)); mb.color(hair).torus(0, 2.8, 0, 2.8, 1.35, 12, 6, 'z', -0.4, Math.PI * 1.35); mb.pop();
+  }
+  const tie = L.ties || '#ff7aa2';
+  const tailMesh = (prof, tieR) => { const m = new MB(8); m.color(hair).lathe(0, 0, 0, prof, 12); m.color(tie).torus(0, -0.6, 0, tieR, 1.15, 14, 6, 'y'); return pack(m); };
+  if (S.tail === 'pony') {
+    P.tails.push({ mesh: tailMesh([[0.3, -27], [2.2, -24], [3.8, -17], [4.4, -9], [3.6, -3.5], [2.4, 0]], 2.8), p: headPt(d, Math.PI, 0.78, 1.04), rx: 0.34, rz: 0, s: 1 });
+  } else if (S.tail === 'pig') {
+    for (const s of [-1, 1]) P.tails.push({ mesh: tailMesh([[0.3, -18], [1.8, -15.5], [3.2, -11], [3.4, -6], [2.5, -1.8], [1.6, 0]], 2.2), p: headPt(d, s * 1.45, 0.32, 1.04), rx: 0.2, rz: s * 0.5, s });
+  } else if (S.tail === 'braid') {
+    for (const s of [-1, 1]) {
+      const m = new MB(8);
+      m.color(hair);
+      for (let k = 0; k < 4; k++) m.sphere(0, -2.5 - k * 4.4, 0, 2.7 - k * 0.2, 2.6, 2.5 - k * 0.2, 10, 7);
+      m.color('#ffd23c').sphere(0, -19.5, 0, 1.9, 1.9, 1.9, 8, 6);
+      m.color(hair).cone(0, -24, 0, 1.8, 3.4, 8);
+      P.tails.push({ mesh: pack(m), p: headPt(d, s * 1.9, -0.3, 1.0), rx: 0.25, rz: s * 0.12, s });
+    }
+  }
+}
+
 const PERSON3 = new Map();
+function freePerson3(P) {
+  for (const m of [P.legA, P.legB, P.torso, P.armA, P.armB, P.head].concat(P.tails.map((t) => t.mesh)))
+    if (m) for (const id in m.gpu) { const R = GLR.all && GLR.all[id]; if (R) R.gl.deleteBuffer(m.gpu[id]); }
+}
 function personModel3(L) {
   const key = JSON.stringify(L);
   let P = PERSON3.get(key);
-  if (P) return P;
+  if (P) { PERSON3.delete(key); PERSON3.set(key, P); return P; }     // most recently used last
   const d = dims3(L), hr = d.hr, hy = d.hy, skin = L.skin, hair = L.hair;
-  const legCol = (L.dress || L.shorts) ? skin : (L.overalls || L.pants || '#4a5a8a'), shoe = L.shoes || '#6b4430';
-  const bzk = d.bz / d.bw, top = L.dress || L.shirt, low = L.overalls || L.pants || '#4a5a8a';
   const C = (h) => rgb3(h).concat(1);
-  P = { d };
-  // legs, with rounded shoes
+  P = { d, L, tails: [] };
+  // legs: socks, shorts' cuffs and round sneakers with white soles
+  const legCol = (L.dress || L.shorts || L.skirt) ? skin : (L.overalls || L.pants || '#4a5a8a');
+  const shoe = L.shoes || '#6b4430', sc = d.A ? 1.12 : 1;
   for (const s of [-1, 1]) {
-    const mb = new MB(3), x = s * d.legX;
-    mb.color(legCol).lathe(x, 2.5, 0, [[d.legR * 1.04, 0], [d.legR * 0.96, (d.hip - 2.5) * 0.5], [d.legR * 1.05, d.hip - 2.5]], 10, { cap: false });
-    if (L.shorts) mb.color(L.pants).lathe(x, d.hip - 8, 0, [[d.legR + 1.5, 0], [d.legR + 1.35, 5.5], [d.legR + 0.9, 7]], 10, { cap: false });
-    mb.color(shoe).sphere(x, 1.2, 1.6, 4.4, 3.6, 6.2, 12, 8, { l1: 0.55, cap: true });
+    const mb = new MB(3), x = s * d.legX, r = d.legR;
+    mb.color(legCol).lathe(x, 3, 0, [[r * 0.95, 0], [r, (d.hip - 3) * 0.5], [r * 1.08, d.hip - 3]], 10, { cap: false });
+    if (L.socks) mb.color(L.socks).lathe(x, 2.6, 0, [[r * 1.14, 0], [r * 1.12, 2.6], [r * 1.03, 3.3]], 10, { cap: false });
+    if (L.shorts) mb.color(L.pants).lathe(x, d.hip - 7.5, 0, [[r + 1.6, 0], [r + 1.55, 1], [r + 1, 4.5]], 10, { cap: false });
+    mb.push(m4s(T3(x, 0, 0), sc, sc, sc));
+    mb.color(shoe).sphere(0, 2.3, 1.2, 3.4, 2.7, 5.1, 12, 8, { l1: 0.56, cap: true });
+    mb.color('#f4efe6').sphere(0, 1.1, 1.2, 3.65, 1.15, 5.35, 12, 6);
+    mb.sphere(0, 4.4, 3, 0.8, 0.5, 1.5, 6, 4);
+    mb.pop();
     P[s < 0 ? 'legA' : 'legB'] = pack(mb);
   }
-  // body: turned like a vase, so shoulders and hips are round
-  const tb = new MB(5);
-  const b = d.bw, H = d.hip, S = d.sh;
-  let prof, cols;
-  if (L.dress) {
-    prof = [[b + 6.5, H - 6], [b + 6.2, H - 4.5], [b + 2.6, H + 4], [b + 0.3, S - 8], [b - 1.4, S - 2.5], [b * 0.62, S + 1.6], [0.01, S + 2.8]];
-    cols = prof.slice(1).map(() => C(L.dress));
-  } else {
-    prof = [[b * 0.9, H - 6.5], [b + 0.4, H - 3.5], [b + 0.6, H + 1.2], [b + 0.2, H + 1.8], [b + 0.35, H + 6]];
-    cols = [C(low), C(low), C(low), C(L.shirt)];
-    const stripeTop = S - 8;
-    if (L.stripes) {
-      let y = H + 6, k = 0;
-      while (y + 4 < stripeTop) { y += 4; prof.push([b + 0.35 - (y - H - 6) / (stripeTop - H - 6) * 0.35, y]); cols.push(C(k++ % 2 ? L.stripes : L.shirt)); }
+  // body: turned like a vase; the shirt flares out over the shorts like a little bell
+  const tb = new MB(5), b = d.bw, H = d.hip, S = d.sh, bzk = d.bz / d.bw;
+  const low = L.overalls || L.pants || '#4a5a8a', top = L.dress || L.shirt || '#ffffff';
+  const neck = [[b - 1.1, S - 2.8], [b * 0.62, S + 1.2], [0.01, S + 2.4]];
+  let prof;
+  if (L.dress) prof = [[b + 6.6, H - 6.6], [b + 6.3, H - 5.3], [b + 2.4, H + 4], [b + 0.4, S - 8]].concat(neck);
+  else {
+    tb.lathe(0, 0, 0, [[b * 0.8, H - 6.8], [b * 0.97, H - 5], [b + 0.15, H - 0.5], [b * 0.9, H + 1.5]], 16, { sz: bzk, cols: [C(low)] });
+    if (L.skirt) {
+      tb.color(L.skirt).lathe(0, 0, 0, [[b + 6, H - 5.4], [b + 5.7, H - 4.2], [b + 1.4, H + 3.6]], 16, { sz: bzk, cap: false });
+      tb.color(shade3(L.skirt, -0.2)).lathe(0, 0, 0, [[b * 0.7, H - 5.4], [b + 6, H - 5.4]], 16, { sz: bzk, cap: false });
+      prof = [[b + 0.9, H + 2.4], [b + 1.1, H + 5.5], [b + 0.4, S - 7.5]].concat(neck);
+    } else if (L.overalls) prof = [[b + 0.7, H - 1.5], [b + 0.7, H + 3], [b + 0.4, S - 7.5]].concat(neck);
+    else {
+      const hem = L.hoodie ? H - 3 : H - 2.2;
+      prof = [[b + 2.9, hem], [b + 2.8, hem + 1.4], [b + 1.6, H + 5.5], [b + 0.4, S - 7.5]].concat(neck);
     }
-    prof.push([b, stripeTop], [b - 1.4, S - 2.5], [b * 0.62, S + 1.6], [0.01, S + 2.8]);
-    while (cols.length < prof.length - 1) cols.push(C(L.shirt));
   }
-  tb.lathe(0, 0, 0, prof, 16, { sz: bzk, cols });
   const rAt = (y) => { for (let i = 1; i < prof.length; i++) if (y <= prof[i][1]) { const a = prof[i - 1], c = prof[i], k = (y - a[1]) / (c[1] - a[1]); return a[0] + (c[0] - a[0]) * k; } return 0; };
   const front = (y, out) => rAt(y) * bzk + (out || 0);
-  if (L.belt) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.belt).torus(0, H + 2.5, 0, rAt(H + 2.5) + 0.6, 1.5, 18, 6, 'y'); tb.pop(); }
+  // stripes: cut the shirt into bands
+  let rows = prof;
+  if (L.stripes) {
+    const y0 = prof[1][1], y1 = prof[prof.length - 4][1], mid = [];
+    for (let y = y0 + 2.6; y < y1 - 1; y += 2.6) mid.push([rAt(y), y]);
+    rows = prof.slice(0, 2).concat(mid, prof.slice(prof.length - 4));
+  }
+  const cols = [];
+  for (let j = 0; j < rows.length - 1; j++) {
+    const ym = (rows[j][1] + rows[j + 1][1]) / 2;
+    let c = top;
+    if (L.stripes && ym > rows[1][1] && ym < S - 7.5) c = Math.floor((ym - rows[1][1]) / 2.6) % 2 ? L.stripes : top;
+    if (L.hoodie && j === 0) c = shade3(top, -0.12);
+    cols.push(typeof c === 'string' ? C(c) : c.concat(1));
+  }
+  tb.lathe(0, 0, 0, rows, 18, { sz: bzk, cols });
+  tb.color(shade3(top, -0.2)).lathe(0, 0, 0, [[b * 0.7, prof[0][1]], [prof[0][0], prof[0][1]]], 18, { sz: bzk, cap: false });   // under the hem
+  if (L.belt) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.belt).torus(0, H + 4, 0, rAt(H + 4) + 0.5, 1.4, 18, 6, 'y'); tb.pop(); }
   if (L.overalls) {
-    tb.color(L.overalls).box(-b * 0.55, H, front(H + 6) - 1.2, b * 0.55, S - 5, front(H + 6) + 0.9);
+    const zf = front(H + 3);
+    tb.color(L.overalls).box(-b * 0.58, H - 1, zf - 1.2, b * 0.58, S - 6, zf + 0.9);
     for (const s of [-1, 1]) {
       const sx = s * b * 0.45;
-      tb.box(sx - 1.5, S - 6, -front(S - 4) * 0.3, sx + 1.5, S + 0.6, front(S - 5) + 0.8);
-      tb.color('#ffd23c').sphere(s * b * 0.38, S - 8, front(S - 8) + 1.6, 1.4, 1.4, 1, 8, 5);
-      tb.color(L.overalls);
+      tb.color(L.overalls).box(sx - 1.4, S - 6.5, -front(S - 4) * 0.3, sx + 1.4, S + 0.6, front(S - 5) + 0.8);
+      tb.color('#ffd23c').sphere(s * b * 0.38, S - 8, zf + 1.4, 1.3, 1.3, 1, 8, 5);
     }
+    tb.color(shade3(L.overalls, -0.15)).box(-b * 0.32, H + 3, zf + 0.9, b * 0.32, H + 7, zf + 1.4);     // bib pocket
   }
-  if (L.apron) {
-    tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.apron).lathe(0, 0, 0, [[b + 3.6, H - 2], [b + 1.4, S - 8]], 10, { arc: [Math.PI * 0.2, Math.PI * 0.8] }); tb.pop();
+  if (L.hoodie) {
+    const zf = front(H + 3.5);
+    tb.color(shade3(top, -0.1)).box(-b * 0.55, H + 0.5, zf - 0.8, b * 0.55, H + 6.5, zf + 0.9);        // front pocket
+    tb.color(shade3(top, -0.08)).sphere(0, S - 1.5, -b * 0.62, b * 0.8, 5.4, 4.4, 14, 8);                // hood, bunched behind the neck
+    for (const s of [-1, 1]) tb.color('#ffffff').cyl(s * 1.9, S - 10, front(S - 6) + 0.3, 0.5, 0.5, 6, 6);  // drawstrings
   }
+  if (L.apron) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.apron).lathe(0, 0, 0, [[rAt(H - 2) + 0.8, H - 2], [rAt(S - 8) + 0.5, S - 8]], 10, { arc: [Math.PI * 0.22, Math.PI * 0.78] }); tb.pop(); }
   if (L.buttons) {
-    for (let k = 0; k < 3; k++) { const y = S - 11 - k * 7; tb.color(L.buttons).sphere(0, y, front(y) + 0.2, 1.5, 1.5, 1, 8, 5); }
+    for (let k = 0; k < 3; k++) { const y = S - 11 - k * 6.5; tb.color(L.buttons).sphere(0, y, front(y) + 0.2, 1.5, 1.5, 1, 8, 5); }
     tb.color('#ffffff').lathe(0, 0, 0, [[b * 0.45, S - 6], [b * 0.64, S + 0.8]], 12, { sz: bzk * 1.12, cap: false });
   }
   if (L.shawl) tb.color(L.shawl).lathe(0, 0, 0, [[b + 3.8, S - 10], [b + 2.2, S - 4], [b * 0.66, S + 2.2], [0.01, S + 3.3]], 16, { sz: bzk * 1.08 });
@@ -3004,130 +3538,170 @@ function personModel3(L) {
     tb.color(shade3(L.cape, -0.1)).torus(0, S + 0.5, 0, b * 0.62, 1.4, 14, 5, 'y');
   }
   P.torso = pack(tb);
-  // arms: round shoulder, sleeve, a tapered arm and a hand
+  // arms hang from round shoulders: a sleeve, a thin arm and a mitten hand with a thumb
+  const long = !!L.hoodie;
   for (const s of [-1, 1]) {
-    const mb = new MB(4), x = s * d.ax, a = d.arm;
-    mb.color(skin).lathe(x, S - a, 0, [[2.5, 0], [2.8, a - 4], [3.1, a - 1]], 10, { cap: false });
-    mb.color(top).sphere(x - s * 0.4, S - 2, 0, 4.5, 4.5, 4.5, 12, 8);
-    mb.color(top).lathe(x, S - 9, 0, [[4.1, 0], [4.3, 1.2], [4.2, 7]], 12, { cap: false });
-    mb.color(skin).sphere(x, S - a - 1, 0, 3.4, 3.8, 3.4, 10, 8);
+    const mb = new MB(4), x = s * d.ax, a = d.arm, y0 = S - 2.4, sr = d.A ? 3.9 : 3.5;
+    mb.color(top).sphere(x, y0, 0, sr, sr, sr, 12, 8);
+    if (long) {
+      mb.lathe(x, y0 - a + 2.4, 0, [[2.9, 0], [3.1, 1.2], [3.3, a - 5], [sr + 0.2, a - 2.4]], 10, { cap: false });
+      mb.color(shade3(top, -0.14)).lathe(x, y0 - a + 1.4, 0, [[2.6, 0], [2.9, 1.8]], 10, { cap: false });
+    } else {
+      mb.lathe(x, y0 - 7.2, 0, [[sr + 0.5, 0], [sr + 0.45, 1.1], [sr - 0.1, 7.2]], 12, { cap: false });
+      mb.color(skin).lathe(x, y0 - a + 1.5, 0, [[1.95, 0], [2.15, a - 8], [2.35, a - 5.5]], 10, { cap: false });
+    }
+    mb.color(skin).sphere(x, y0 - a, 0.2, 3.0, 3.3, 2.7, 10, 8);
+    mb.sphere(x - s * 0.4, y0 - a + 1.3, 2.1, 1.2, 1.5, 1.2, 8, 6);
     P[s < 0 ? 'armA' : 'armB'] = pack(mb);
   }
-  // head: skin, hair, hats, glasses, beard (eyes and mouth are separate so they can blink and talk)
+  // head: skin, ears, nose, hair, hats, glasses, beard (the eyes and mouth are painted on)
   const hb = new MB(6);
-  hb.color(skin).sphere(0, hy, 0, hr, hr * 0.95, hr * 0.9, 20, 14);
-  for (const s of [-1, 1]) { hb.push(surf3(d, s * 1.52, -0.04, -1.4)); hb.color(skin).sphere(0, 0, 0, 3.1, 4, 2.6, 10, 6); hb.pop(); }
-  hb.push(surf3(d, 0, -0.14, -0.6)); hb.color(shade3(skin, -0.05)).sphere(0, 0, 0, 2, 1.6, 1.6, 8, 6); hb.pop();
-  for (const s of [-1, 1]) { hb.push(surf3(d, s * 0.62, -0.28, -0.5)); hb.color('#ffa3b3').sphere(0, 0, 0, 3.8, 2.3, 0.9, 12, 6); hb.pop(); }
-  if (L.freckles) for (const s of [-1, 1]) for (let k = 0; k < 3; k++) { hb.push(surf3(d, s * (0.46 + k * 0.1), -0.16 - (k % 2) * 0.06, -0.2)); hb.color('#b07a4a').sphere(0, 0, 0, 0.75, 0.75, 0.4, 6, 3); hb.pop(); }
-  const st = L.hairStyle;
-  if (st && st !== 'none') {
-    if (st === 'long') {
-      hb.color(hair).sphere(0, hy - hr * 0.55, -hr * 0.42, hr * 1.02, hr * 1.06, hr * 0.56, 16, 10);
-      for (const s of [-1, 1]) hb.sphere(s * hr * 0.9, hy - hr * 0.45, -hr * 0.08, hr * 0.3, hr * 0.75, hr * 0.44, 10, 8);
-    }
-    if (st === 'bun') hb.color(hair).sphere(0, hy + hr * 0.95, -hr * 0.4, hr * 0.47, hr * 0.45, hr * 0.47, 12, 8);
-    hb.color(hair).sphere(0, hy + hr * 0.2, -hr * 0.14, hr * 1.05, hr * 1.0, hr * 1.0, 20, 14);
-    // a soft fringe: overlapping flattened curls along the forehead
-    for (const a of [-0.62, -0.31, 0, 0.31, 0.62]) { hb.push(surf3(d, a, 0.36 + Math.abs(a) * 0.12, -1.9)); hb.color(hair).sphere(0, 0, 0, hr * 0.24, hr * 0.19, hr * 0.15, 10, 6); hb.pop(); }
-    if (st === 'short' && !d.A) {       // a little curl on top
-      hb.push(RX3(T3(0, hy + hr * 1.05, hr * 0.05), -0.25)); hb.color(hair).torus(0, 2.6, 0, 2.6, 1.3, 10, 6, 'z', -0.4, Math.PI * 1.35); hb.pop();
-    }
-    if (st === 'pigtails') for (const s of [-1, 1]) {
-      hb.color(hair).sphere(s * hr * 1.1, hy - hr * 0.22, -hr * 0.2, hr * 0.42, hr * 0.5, hr * 0.42, 12, 8);
-      hb.color(L.ties || '#ff7aa2').sphere(s * hr * 0.9, hy + hr * 0.06, -hr * 0.18, hr * 0.17, hr * 0.17, hr * 0.17, 8, 6);
-    }
-    if (st === 'braids') for (const s of [-1, 1]) {
-      for (let k = 0; k < 3; k++) hb.color(hair).sphere(s * hr * 0.82, hy - hr * (0.55 + k * 0.36), hr * 0.18, hr * 0.25, hr * 0.24, hr * 0.25, 10, 6);
-      hb.color('#ffd23c').sphere(s * hr * 0.82, hy - hr * 1.62, hr * 0.18, 2.2, 2.2, 2.2, 8, 5);
-    }
+  headMesh3(hb, d, skin);
+  for (const s of [-1, 1]) {
+    hb.push(surfH(d, s * 1.6, -0.06, -0.9)); hb.color(skin).sphere(0, 0, 0, 3.3, 4.3, 2.3, 10, 8);
+    hb.color(shade3(skin, -0.1)).sphere(0, 0, 0.9, 1.7, 2.6, 1.4, 8, 6); hb.pop();
   }
+  hb.push(surfH(d, 0, -0.27, -0.35)); hb.push(RX3(m4(), Math.PI / 2));     // a little round triangle of a nose
+  hb.color(mixHex3(skin, '#ff8a5c', 0.4)).sphere(0, 0, 0, 2.3, 1.5, 2.1, 3, 4, { rot: Math.PI / 2 });
+  hb.pop(); hb.pop();
+  hair3(hb, d, L, P);
   const h = L.hat;
   const visor = (y, z, w, depth, col) => { hb.color(col).sphere(0, y, z, w, 1.3, depth, 16, 6, { l1: 0.5, cap: true }); };
   if (h === 'cap') {
     const c = L.hatColor || '#ff4d4d';
-    hb.color(c).sphere(0, hy + hr * 0.14, -hr * 0.03, hr * 1.09, hr * 0.98, hr * 1.06, 18, 12, { l1: 0.5, cap: true });
-    hb.color(c).sphere(0, hy + hr * 1.12, 0, 2.4, 2.4, 2.4, 8, 5);
-    visor(hy + hr * 0.16, hr * 0.78, hr * 0.8, hr * 0.62, shade3(c, -0.22));
+    hb.color(c).sphere(0, hy + hr * 0.14, -hr * 0.03, hr * 1.12, hr * 1.02, hr * 1.1, 18, 12, { l1: 0.5, cap: true });
+    hb.color(c).sphere(0, hy + hr * 1.16, 0, 2.4, 2.4, 2.4, 8, 5);
+    visor(hy + hr * 0.18, hr * 0.8, hr * 0.8, hr * 0.62, shade3(c, -0.22));
   } else if (h === 'captain') {
-    const y0 = hy + hr * 0.4;
-    hb.lathe(0, y0, -hr * 0.04, [[hr * 1.0, 0], [hr * 1.02, hr * 0.26], [hr * 1.26, hr * 0.48], [hr * 1.2, hr * 0.58], [0.01, hr * 0.6]], 20,
+    const y0 = hy + hr * 0.36;
+    hb.lathe(0, y0, -hr * 0.04, [[hr * 1.02, 0], [hr * 1.04, hr * 0.26], [hr * 1.28, hr * 0.48], [hr * 1.22, hr * 0.58], [0.01, hr * 0.6]], 20,
       { cols: [C('#1f2f5e'), C('#ffffff'), C('#ffffff'), C('#ffffff')] });
-    visor(y0 + 1, hr * 0.84, hr * 0.74, hr * 0.5, '#222222');
-    hb.color('#ffd23c').sphere(0, y0 + hr * 0.16, hr * 1.02, 2.8, 2.6, 1.3, 10, 6);
+    visor(y0 + 1, hr * 0.86, hr * 0.74, hr * 0.5, '#222222');
+    hb.color('#ffd23c').sphere(0, y0 + hr * 0.16, hr * 1.04, 2.8, 2.6, 1.3, 10, 6);
   } else if (h === 'straw') {
-    const y0 = hy + hr * 0.46;
-    hb.color('#f2cf6b').lathe(0, y0, 0, [[hr * 1.8, -0.8], [hr * 1.74, 0.8], [hr * 0.95, 2.2], [0.01, 2.4]], 22);
-    hb.color('#f6d77e').lathe(0, y0 + 2, 0, [[hr * 0.92, 0], [hr * 0.86, hr * 0.5], [hr * 0.6, hr * 0.62], [0.01, hr * 0.64]], 18);
-    hb.color('#e8503a').lathe(0, y0 + 2, 0, [[hr * 0.935, 0], [hr * 0.91, 4]], 18, { cap: false });
+    const y0 = hy + hr * 0.5;
+    hb.color('#f2cf6b').lathe(0, y0, 0, [[hr * 1.8, -0.8], [hr * 1.74, 0.8], [hr * 0.98, 2.2], [0.01, 2.4]], 22);
+    hb.color('#f6d77e').lathe(0, y0 + 2, 0, [[hr * 0.95, 0], [hr * 0.88, hr * 0.5], [hr * 0.6, hr * 0.62], [0.01, hr * 0.64]], 18);
+    hb.color('#e8503a').lathe(0, y0 + 2, 0, [[hr * 0.965, 0], [hr * 0.94, 4]], 18, { cap: false });
   } else if (h === 'bucket') {
-    const y0 = hy + hr * 0.4;
-    hb.color('#3d8fe0').lathe(0, y0, 0, [[hr * 1.46, -2.5], [hr * 1.4, -1], [hr * 0.98, 1.2], [0.01, 1.4]], 20);
-    hb.color('#4aa3ff').sphere(0, y0, 0, hr * 1.02, hr * 0.9, hr * 1.02, 18, 12, { l1: 0.5 });
-    hb.push(surf3(d, 0, 0.62, 1.5)); hb.color('#ffd23c').sphere(0, 0, 0, 3.4, 3.4, 1.4, 8, 5); hb.pop();
+    const y0 = hy + hr * 0.42;
+    hb.color('#3d8fe0').lathe(0, y0, 0, [[hr * 1.5, -2.5], [hr * 1.44, -1], [hr * 1.02, 1.2], [0.01, 1.4]], 20);
+    hb.color('#4aa3ff').sphere(0, y0, 0, hr * 1.06, hr * 0.92, hr * 1.06, 18, 12, { l1: 0.5 });
+    hb.push(surfH(d, 0, 0.62, 3.2)); hb.color('#ffd23c').sphere(0, 0, 0, 3.4, 3.4, 1.4, 8, 5); hb.pop();
   } else if (h === 'crown') {
-    const y0 = hy + hr * 0.74;
-    hb.color('#ffd23c').lathe(0, y0, 0, [[hr * 0.74, 0], [hr * 0.78, 7]], 16, { cap: false });
-    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU + Math.PI / 2; hb.cone(Math.cos(a) * hr * 0.73, y0 + 7, Math.sin(a) * hr * 0.73, 2.8, 8, 8); hb.sphere(Math.cos(a) * hr * 0.73, y0 + 15.3, Math.sin(a) * hr * 0.73, 1.3, 1.3, 1.3, 6, 4); }
+    const y0 = hy + hr * 0.84;
+    hb.color('#ffd23c').lathe(0, y0, 0, [[hr * 0.66, 0], [hr * 0.7, 7]], 16, { cap: false });
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU + Math.PI / 2; hb.cone(Math.cos(a) * hr * 0.65, y0 + 7, Math.sin(a) * hr * 0.65, 2.8, 8, 8); hb.sphere(Math.cos(a) * hr * 0.65, y0 + 15.3, Math.sin(a) * hr * 0.65, 1.3, 1.3, 1.3, 6, 4); }
     const J = ['#ff5a8a', '#4aa3ff', '#4cc36a'];
-    for (let k = 0; k < 3; k++) { const a = Math.PI / 2 + (k - 1) * 0.7; hb.color(J[k]).sphere(Math.cos(a) * hr * 0.79, y0 + 3.5, Math.sin(a) * hr * 0.79, 1.8, 1.8, 1.8, 8, 5); }
+    for (let k = 0; k < 3; k++) { const a = Math.PI / 2 + (k - 1) * 0.7; hb.color(J[k]).sphere(Math.cos(a) * hr * 0.71, y0 + 3.5, Math.sin(a) * hr * 0.71, 1.8, 1.8, 1.8, 8, 5); }
   }
-  if (L.flower) { hb.push(surf3(d, 0.95, 0.55, 0.5)); for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; hb.color(L.flower).sphere(Math.cos(a) * 3.4, Math.sin(a) * 3.4, 0, 2.6, 2.6, 1.4, 8, 5); } hb.color('#ff8c42').sphere(0, 0, 0.8, 1.8, 1.8, 1.2, 8, 5); hb.pop(); }
+  if (L.flower) { hb.push(surfH(d, 0.95, 0.55, 1.6)); for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; hb.color(L.flower).sphere(Math.cos(a) * 3.4, Math.sin(a) * 3.4, 0, 2.6, 2.6, 1.4, 8, 5); } hb.color('#ff8c42').sphere(0, 0, 0.8, 1.8, 1.8, 1.2, 8, 5); hb.pop(); }
   if (L.glasses) {
     const gc = L.glassesColor || '#7a4ab0';
-    for (const s of [-1, 1]) { hb.push(surf3(d, s * 0.36, 0.02, 1.4)); hb.color(gc).torus(0, 0, 0, 5, 0.8, 16, 6, 'z'); hb.pop(); }
-    hb.push(surf3(d, 0, 0.04, 1.2)); hb.color(gc).box(-3, -0.6, -0.6, 3, 0.6, 0.6); hb.pop();
+    for (const s of [-1, 1]) { hb.push(surfH(d, s * 0.37, 0.0, 1.6)); hb.color(gc).torus(0, 0, 0, 5.4, 0.8, 18, 6, 'z'); hb.pop(); }
+    hb.push(surfH(d, 0, 0.03, 1.4)); hb.color(gc).box(-2.2, -0.6, -0.6, 2.2, 0.6, 0.6); hb.pop();
   }
-  if (L.beard) hb.color(L.beard).sphere(0, hy - hr * 0.6, hr * 0.38, hr * 0.84, hr * 0.52, hr * 0.56, 16, 10);
-  if (L.mustache || L.beard) for (const s of [-1, 1]) { hb.push(surf3(d, s * 0.14, -0.3, 0.3)); hb.color(L.beard || hair).sphere(s * 0.5, 0, 0, 3.8, 1.8, 1.6, 10, 6); hb.pop(); }
+  if (L.beard) hb.color(L.beard).sphere(0, hy - hr * 0.62, hr * 0.36, hr * 0.84, hr * 0.52, hr * 0.56, 16, 10);
+  if (L.mustache || L.beard) for (const s of [-1, 1]) { hb.push(surfH(d, s * 0.15, -0.4, 0.4)); hb.color(L.beard || hair).sphere(s * 0.6, 0, 0, 4, 1.9, 1.6, 10, 6); hb.pop(); }
   P.head = pack(hb);
-  // eyes (a separate part, squashed to blink)
-  const eb = new MB(8);
-  for (const s of [-1, 1]) {
-    eb.push(surf3(d, s * 0.36, 0.02, -0.9));
-    eb.color('#2b1d16').sphere(0, 0, 0, 2.5, 3.4, 1.6, 12, 8);
-    eb.color('#ffffff').sphere(s * -0.2 + 0.9, 1.3, 1.1, 0.95, 0.95, 0.6, 8, 5);
-    if (L.lashes) { eb.push(RZ3(T3(s * 2.4, 2.6, 0.3), s * -0.6)); eb.color('#2b1d16').box(-0.5, 0, -0.5, 0.5, 2.6, 0.5); eb.pop(); }
-    eb.pop();
-  }
-  P.eyes = pack(eb);
-  P.eyeY = hy + hr * 0.02;
-  const sm = new MB(9); sm.push(surf3(d, 0, -0.4, -0.2)); sm.color('#7a2b2b').torus(0, 1.2, 0, 3, 0.7, 12, 5, 'z', Math.PI * 1.12, Math.PI * 1.88); sm.pop();
-  P.smile = pack(sm);
-  const om = new MB(10); om.push(surf3(d, 0, -0.4, -0.4)); om.color('#b8434f').sphere(0, 0, 0, 2.7, 2.2, 1.2, 10, 6); om.pop();
-  P.open = pack(om);
-  P.mouthY = hy - hr * 0.37;
+  const pa = PATCH3[d.A ? 'A' : 'K'] || (PATCH3[d.A ? 'A' : 'K'] = { eyes: patch3(d, EYE_U3, EYE_V3, 18, 8), mouth: patch3(d, MOUTH_U3, MOUTH_V3, 10, 6) });
+  P.eyes = pa.eyes; P.mouth = pa.mouth;
+  const white = /^#(e|f|d)[0-9a-f]{5}$/i.test(hair || '');
+  P.face = { skin, lashes: !!L.lashes, freckles: !!L.freckles, brows: d.A ? (white ? '#b9b2bf' : shade(hair || '#5a3620', -0.1)) : null, iris: L.eyes || '#2f2833' };
+  P.faceKey = JSON.stringify(P.face);
   PERSON3.set(key, P);
+  if (PERSON3.size > 48) { const old = PERSON3.keys().next().value; freePerson3(PERSON3.get(old)); PERSON3.delete(old); }
   return P;
 }
-/* st: { x, z, y, yaw, moving, phase, t, seed, talk, wave, closed } */
+function mixHex3(a, b, k) { const x = rgb3(a), y = rgb3(b); return [x[0] + (y[0] - x[0]) * k, x[1] + (y[1] - x[1]) * k, x[2] + (y[2] - x[2]) * k]; }
+
+/* ---- how a person stands, walks and talks at time t (the same t always gives the same pose) ----
+   st: { t, seed, mv (0 standing .. 1 walking) or moving, phase, talk, wave, closed, still } */
+function pose3(L, st) {
+  const t = st.t || 0, sd = st.seed || 0, kid = L.age !== 'adult';
+  const mv = st.mv != null ? st.mv : st.moving ? 1 : 0, ph = st.phase || 0, id = 1 - mv;
+  const q = { y: 0, tx: 0, roll: 0, lean: 0, twist: 0, br: 0, legA: 0, legB: 0, liftA: 0, liftB: 0,
+    armAx: 0, armAz: kid ? -0.36 : -0.26, armBx: 0, armBz: kid ? 0.36 : 0.26, hYaw: 0, hPitch: 0, hRoll: 0, tailX: 0, tailZ: 0, eyes: 'open', mouth: 'smile' };
+  if (id > 0) {
+    const br = Math.sin(t * 2.1 + sd), ws = Math.sin(t * 0.55 + sd * 1.7);
+    q.br = br * id; q.roll = ws * 0.03 * id; q.tx = ws * 0.5 * id; q.hRoll = -ws * 0.035 * id; q.hPitch = br * 0.012 * id;
+    q.armAx = Math.sin(t * 1.3 + sd) * 0.05 * id; q.armBx = Math.sin(t * 1.3 + sd + 1.3) * 0.05 * id;
+    q.armAz -= br * 0.03 * id; q.armBz += br * 0.03 * id;
+    q.tailX = Math.sin(t * 1.6 + sd) * 0.05 * id; q.tailZ = ws * 0.06 * id;
+    // every few seconds a little something: look around, tilt the head, bounce, rock, stretch, sway
+    if (!st.talk && !st.wave && !st.closed && !st.still) {
+      const k = (t + sd * 3.1) / 4.6, slot = Math.floor(k), f = k - slot;
+      const h = hash1(slot * 7.13 + sd * 13.7), dir = hash1(slot * 3.7 + sd * 5.1) < 0.5 ? -1 : 1;
+      const e = sstep(f / 0.14) * sstep((0.64 - f) / 0.14) * id;
+      switch (Math.floor(h * 9)) {
+        case 1: case 2: q.hYaw += dir * 0.55 * e; q.hPitch -= 0.05 * e; q.twist += dir * 0.08 * e; break;
+        case 3: q.hRoll += dir * 0.22 * e; q.armAz -= 0.1 * e; q.armBz += 0.1 * e; if (e > 0.5) q.eyes = 'happy'; break;
+        case 4: { const b = Math.abs(Math.sin(f * Math.PI * 7)) * e; q.y += (kid ? 2.2 : 1.2) * b; q.armAz -= 0.35 * e; q.armBz += 0.35 * e; q.tailX -= 0.3 * b; if (e > 0.5) q.eyes = 'happy'; break; }
+        case 5: { const r = Math.sin(f * Math.PI * 5) * e; q.lean += 0.07 * r; q.armAx += 0.55 * e; q.armBx += 0.55 * e; q.armAz += 0.16 * e; q.armBz -= 0.16 * e; break; }
+        case 6: { const u = sstep(f / 0.2) * sstep((0.6 - f) / 0.2) * id; q.armAz -= 2.3 * u; q.armBz += 2.3 * u; q.y += 0.8 * u; q.hPitch -= 0.18 * u; if (u > 0.7) { q.eyes = 'closed'; q.mouth = 'o'; } break; }
+        case 7: q.hPitch += 0.3 * e; q.hYaw += dir * 0.15 * e; break;
+        case 8: { const w = Math.sin(f * Math.PI * 6) * e; q.hRoll += 0.12 * w; q.roll += 0.04 * w; q.tailZ += 0.2 * w; if (e > 0.4) q.eyes = 'happy'; break; }
+      }
+    }
+  }
+  if (mv > 0) {
+    const sn = Math.sin(ph), cs = Math.cos(ph), up = 0.5 + 0.5 * Math.cos(2 * ph), amp = kid ? 0.78 : 0.62;
+    q.legA += sn * amp * mv; q.legB -= sn * amp * mv;
+    q.liftA += Math.max(0, -cs) * 1.7 * mv; q.liftB += Math.max(0, cs) * 1.7 * mv;
+    q.y += (kid ? 1.9 : 1.2) * up * mv;
+    q.roll += sn * 0.04 * mv; q.lean += 0.08 * mv; q.twist += sn * 0.08 * mv; q.hYaw -= sn * 0.08 * mv; q.hRoll -= sn * 0.03 * mv;
+    q.armAx -= sn * 0.75 * mv; q.armBx += sn * 0.75 * mv; q.armAz += 0.14 * mv; q.armBz -= 0.14 * mv;
+    q.tailX += (0.2 + 0.18 * Math.cos(2 * ph)) * mv; q.tailZ += sn * 0.22 * mv;
+  }
+  if (st.talk) {
+    const hh = hash1(Math.floor(t * 8.5) * 3.7 + sd);
+    q.mouth = hh < 0.18 ? 'smile' : hh < 0.52 ? 'open' : hh < 0.8 ? 'wide' : 'o';
+    q.hPitch += Math.sin(t * 5.3) * 0.04; q.hYaw += Math.sin(t * 1.9 + sd) * 0.07; q.hRoll += Math.sin(t * 1.3) * 0.04;
+    const g = 0.5 + 0.5 * Math.sin(t * 1.1 + sd);          // hands help with the words
+    q.armBx -= (0.3 + 0.25 * Math.sin(t * 3.1)) * g * id; q.armBz += 0.12 * g * id; q.armAx -= 0.18 * (1 - g) * id;
+    if (hash1(Math.floor(t / 2.2) + sd) > 0.72) q.eyes = 'happy';
+  }
+  if (st.wave) { q.armAz = -2.5 + Math.sin(t * 9) * 0.35; q.armAx = -0.2; q.roll += Math.sin(t * 4.5) * 0.04; q.eyes = 'happy'; if (!st.talk) q.mouth = 'open'; }
+  if (st.closed) { q.eyes = 'closed'; q.mouth = 'smile'; }
+  else if (q.eyes === 'open' && !st.still) {       // blinks, sometimes twice
+    const bt = (t + sd * 1.7) % 4.1;
+    if (bt < 0.04 || (bt >= 0.12 && bt < 0.17)) q.eyes = 'half';
+    else if (bt < 0.12) q.eyes = 'closed';
+    else if (bt > 0.3 && bt < 0.4 && hash1(Math.floor((t + sd * 1.7) / 4.1) + sd) > 0.65) q.eyes = 'closed';
+  }
+  return q;
+}
 function drawPerson3(R, L, st) {
-  const P = personModel3(L), d = P.d, s = (L.size || 1) * (st.scale || 1);
+  const P = personModel3(L), d = P.d, s = (L.size || 1) * (st.scale || 1), q = pose3(L, st);
   const root = T3(st.x, st.y || 0, st.z); m4ry(root, st.yaw || 0); if (s !== 1) m4s(root, s, s, s);
-  const t = st.t || 0, sw = st.moving ? Math.sin(st.phase) : 0, bob = st.moving ? Math.abs(Math.cos(st.phase)) * 1.8 : 0;
-  const br = st.moving ? 0 : Math.sin(t * 2.2 + (st.seed || 0));
-  const base = m4t(new Float32Array(root), 0, bob, 0);
-  const pivot = (px, py, fn) => { const m = m4t(new Float32Array(base), px, py, 0); fn(m); return m4t(m, -px, -py, 0); };
-  R.draw(P.legA, pivot(0, d.hip, (m) => m4rx(m, sw * 0.6)));
-  R.draw(P.legB, pivot(0, d.hip, (m) => m4rx(m, -sw * 0.6)));
-  R.draw(P.torso, pivot(0, d.hip, (m) => m4s(m, 1, 1 + br * 0.012, 1)));
-  const wave = st.wave ? -2.55 + Math.sin(t * 9) * 0.35 : 0.1;
-  R.draw(P.armA, pivot(-d.ax, d.sh - 2, (m) => { m4rx(m, -sw * 0.55); m4rz(m, st.wave ? wave : -0.1); }));
-  R.draw(P.armB, pivot(d.ax, d.sh - 2, (m) => { m4rx(m, sw * 0.55); m4rz(m, 0.1); }));
-  const hm = pivot(0, d.sh, (m) => { m4t(m, 0, br * 0.4, 0); m4rx(m, st.moving ? 0.04 : Math.sin(t * 1.3 + (st.seed || 0)) * 0.03); });
-  drawHead3(R, P, hm, st);
+  const at = (base, px, py, pz, fn) => { const m = m4t(new Float32Array(base), px, py, pz); fn(m); return m4t(m, -px, -py, -pz); };
+  // the legs stay on the ground; everything above the hips bobs, sways and leans
+  const hips = m4t(new Float32Array(root), q.tx, 0, 0);
+  const body = at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.y, 0); m4rz(m, q.roll); m4rx(m, q.lean); m4ry(m, q.twist); });
+  R.draw(P.legA, at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.liftA, 0); m4rx(m, q.legA); }));
+  R.draw(P.legB, at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.liftB, 0); m4rx(m, q.legB); }));
+  R.draw(P.torso, at(body, 0, d.hip, 0, (m) => m4s(m, 1 + q.br * 0.008, 1 + q.br * 0.014, 1 + q.br * 0.008)));
+  const shY = d.sh - 2.4, lift = q.br * 0.25;
+  R.draw(P.armA, at(body, -d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armAz); m4rx(m, q.armAx); }));
+  R.draw(P.armB, at(body, d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armBz); m4rx(m, q.armBx); }));
+  const hm = at(body, 0, d.sh + 1, 0, (m) => { m4t(m, 0, q.br * 0.35, 0); m4ry(m, q.hYaw); m4rx(m, q.hPitch); m4rz(m, q.hRoll); });
+  drawHeadParts3(R, P, hm, q);
 }
-function drawHead3(R, P, hm, st) {
-  const t = st.t || 0;
+function drawHeadParts3(R, P, hm, q) {
   R.draw(P.head, hm);
-  const shut = st.closed || ((t + (st.seed || 0) * 1.7) % 4.3) < 0.12;
-  const em = m4t(new Float32Array(hm), 0, P.eyeY, 0); m4s(em, 1, shut ? 0.12 : 1, 1); m4t(em, 0, -P.eyeY, 0);
-  R.draw(P.eyes, em);
-  if (st.talk && Math.sin(t * 17) > -0.3) {
-    const om = m4t(new Float32Array(hm), 0, P.mouthY, 0); m4s(om, 1, 0.7 + Math.abs(Math.sin(t * 17)) * 0.6, 1); m4t(om, 0, -P.mouthY, 0);
-    R.draw(P.open, om);
-  } else R.draw(P.smile, hm);
+  if (R.curMode !== 'xray') {
+    const tex = R.faceTex(P.faceKey, () => paintFace3(P.face));
+    R.decal(P.eyes, tex, FACE_UV3.eyes[q.eyes] || FACE_UV3.eyes.open, hm);
+    R.decal(P.mouth, tex, FACE_UV3.mouth[q.mouth] || FACE_UV3.mouth.smile, hm);
+  }
+  for (const tl of P.tails) {
+    const m = m4t(new Float32Array(hm), tl.p[0], tl.p[1], tl.p[2]);
+    m4rz(m, tl.rz + q.tailZ * 0.6 + (tl.s !== 0 && P.tails.length > 1 ? q.tailX * 0.3 * tl.s : 0)); m4rx(m, tl.rx + q.tailX);
+    R.draw(tl.mesh, m);
+  }
 }
+// just a head (Leo peeking out of the tree house, the twins asleep)
+function drawHead3(R, P, hm, st) { drawHeadParts3(R, P, hm, pose3(P.L, st)); }
 
 /* ---- animals ---- */
 const ANIMAL3 = {};
@@ -3392,6 +3966,7 @@ function buildItems3() {
 const CAM3 = { x: 1200, z: 1100, fov: 32 * Math.PI / 180, pitch: 44 * Math.PI / 180, D: 1000, dpr: 1 };
 const CS3 = 1.22;   // people and animals are drawn a little larger than the map, as in picture books
 const DIR_YAW3 = { down: 0, up: Math.PI, right: Math.PI / 2, left: -Math.PI / 2 };
+function mvOf3(e, dt) { e._mv = (e._mv || 0) + ((e.moving ? 1 : 0) - (e._mv || 0)) * Math.min(1, dt * 9); return e._mv; }
 function turn3(e, target, dt) {
   if (e._yaw === undefined) { e._yaw = target; return; }
   let d = target - e._yaw;
@@ -3460,17 +4035,23 @@ function g3Camera(dt, snap) {
   const k = snap ? 1 : 1 - Math.exp(-dt * 6);
   CAM3.x += (tx - CAM3.x) * k; CAM3.z += (tz - CAM3.z) * k;
 }
-function g3CamObj() {
+function g3CamObj(tour) {
+  if (tour) {                  // a slow sightseeing flight around the village
+    const t = game.t, D = CAM3.D * 1.3, pitch = 0.64, yaw = Math.sin(t * 0.021) * 0.6;
+    const at = [1190 + Math.sin(t * 0.043) * 420, 10, 960 + Math.sin(t * 0.029 + 1) * 280];
+    return { eye: [at[0] + Math.sin(yaw) * Math.cos(pitch) * D, at[1] + Math.sin(pitch) * D, at[2] + Math.cos(yaw) * Math.cos(pitch) * D], at,
+      fov: CAM3.fov, near: 40, far: D * 3.5, fogNear: D * 1.1, fogFar: D * 2.4 };
+  }
   const D = CAM3.D, at = [CAM3.x, 18, CAM3.z];
   return { eye: [at[0], at[1] + Math.sin(CAM3.pitch) * D, at[2] + Math.cos(CAM3.pitch) * D], at, fov: CAM3.fov, near: 40, far: D * 3.5, fogNear: D * 1.05, fogFar: D * 2.3 };
 }
 const blob3 = (R, x, z, rx, rz, a, y) => { const m = T3(x, (y || 0) + 2.8, z); m4s(m, rx, 1, rz); R.setTint(1, 1, 1, a / 0.3, 0); R.draw(W3.dyn.blob, m); };
-function g3Render(t, dt) {
-  const R = G3.R, cam = g3CamObj();
+function g3Render(t, dt, tour) {
+  const R = G3.R, cam = g3CamObj(tour);
   R.begin(R.cv.width, R.cv.height, cam, game.ev, t);
   // the village
   for (const c of W3.chunks) if (R.visible(c.box)) R.draw(c);
-  const who = [{ x: player.x, z: player.y, h: -personTop(PLAYER_LOOK) * CS3 }];
+  const who = tour ? [] : [{ x: player.x, z: player.y, h: -personTop(PLAYER_LOOK) * CS3 }];
   if (Dialog.open && Dialog.focus) who.push({ x: Dialog.focus.x, z: Dialog.focus.y, h: (Dialog.focus.y - Dialog.focus.top) * CS3 });
   const rects = who.map((p) => { const a = R.project(p.x, 0, p.z), b = R.project(p.x, p.h, p.z); if (!a || !b) return null; const hw = (a.y - b.y) * 0.3; return { x0: a.x - hw, x1: a.x + hw, y0: b.y - 6, y1: a.y, z: p.z }; });
   const faded = [];
@@ -3515,7 +4096,7 @@ function g3Render(t, dt) {
   }
   // people and animals
   const look = Dialog.focus && Dialog.open ? Dialog.focus : null;
-  const pst = { x: player.x, z: player.y, y: standY3(player.x, player.y), yaw: face3(player, dt, look, true), moving: player.moving, phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3 };
+  const pst = { x: player.x, z: player.y, y: standY3(player.x, player.y), yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3 };
   drawPerson3(R, PLAYER_LOOK, pst);
   drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
   for (const n of NPCS) {
@@ -3526,7 +4107,7 @@ function g3Render(t, dt) {
       continue;
     }
     const dp = Math.hypot(player.x - n.x, player.y - n.y), lk = (Dialog.partner === n || dp < 150) && !n.follow ? player : null;
-    drawPerson3(R, n.look, { x: n.x, z: n.y, y: standY3(n.x, n.y), yaw: face3(n, dt, lk), moving: n.moving, phase: n.phase, t, seed: n.seed, talk: Dialog.mouth === n.id, wave: n.waving, scale: CS3 });
+    drawPerson3(R, n.look, { x: n.x, z: n.y, y: standY3(n.x, n.y), yaw: face3(n, dt, lk), moving: n.moving, mv: mvOf3(n, dt), phase: n.phase, t, seed: n.seed, talk: Dialog.mouth === n.id, wave: n.waving, scale: CS3 });
   }
   for (const a of ANIMALS) {
     if (a.kind === 'cow') drawAnimal3(R, 'cow', { x: a.x, z: a.y, yaw: -Math.PI / 2, t, graze: Math.max(0, Math.sin(t * 0.5)) > 0.6, scale: CS3 });
@@ -3583,10 +4164,12 @@ function g3Render(t, dt) {
   const age = t - tapMark.t;
   if (age < 0.6 && player.path) { const m = T3(tapMark.x, 3.5, tapMark.y), r = 10 + age * 30; m4s(m, r, 1, r); R.setTint(1, 1, 1, 1 - age / 0.6, 1); R.draw(W3.dyn.tapRing, m); }
   // the player stays visible behind buildings and trees as a soft silhouette
-  R.mode('xray'); R.gl.uniform1f(R.p.u.uZBias, 60); R.setTint(0.5, 0.42, 0.85, 0.5, 1);
-  drawPerson3(R, PLAYER_LOOK, pst);
-  R.gl.uniform1f(R.p.u.uZBias, 0); R.setTint(1, 1, 1, 1, 0); R.mode('opaque');
-  g3Overlay(t);
+  if (!tour) {
+    R.mode('xray'); R.gl.uniform1f(R.p.u.uZBias, 60); R.setTint(0.5, 0.42, 0.85, 0.5, 1);
+    drawPerson3(R, PLAYER_LOOK, pst);
+    R.gl.uniform1f(R.p.u.uZBias, 0); R.setTint(1, 1, 1, 1, 0); R.mode('opaque');
+    g3Overlay(t);
+  } else { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
 }
 // 2D things drawn over the 3D view: markers above heads, sparkles, Z z z
 function g3Overlay(t) {
@@ -3632,26 +4215,28 @@ const Snap = {
     draw(this.R);
     return cv;
   },
-  // head and shoulders of a character, over the round coloured background of the 2D portraits
-  portrait(cv, who) {
+  // head and shoulders of a character, over the round coloured background of the 2D portraits.
+  // live = { t, talk } draws this moment of its idle animation instead of the cached still picture.
+  portrait(cv, who, live) {
     const S = cv.width, g = cv.getContext('2d');
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
     g.save(); g.beginPath(); g.arc(S / 2, S / 2, S / 2, 0, TAU); g.fillStyle = PORTRAIT_BG[who] || '#d8f3c8'; g.fill(); g.clip();
     const key = who + ':' + S + ':' + (who === 'player' ? JSON.stringify(PLAYER_LOOK) : '');
-    let img = PORTRAIT_CACHE.get(key);
+    let img = live ? null : PORTRAIT_CACHE.get(key);
     if (!img) {
+      const t = live ? live.t : 0.4, talk = !!(live && live.talk);
       let shot;
-      if (who === 'sparky') shot = this.shoot(S, S, { eye: [26, 34, 62], at: [3, 24, 10], fov: 0.62 }, (R) => drawAnimal3(R, 'dog', { x: 0, z: 0, yaw: 0.4, t: 0.4 }));
-      else if (EGG_PORTRAIT3[who]) { const k = EGG_PORTRAIT3[who]; shot = this.shoot(S, S, k.cam, k.draw); }
-      else if (who === 'owl') shot = this.shoot(S, S, { eye: [0, 26, 70], at: [0, 20, 0], fov: 0.62 }, (R) => drawAnimal3(R, 'owl', { x: 0, z: 0, yaw: 0, t: 0.4 }));
+      if (who === 'sparky') shot = this.shoot(S, S, { eye: [26, 34, 62], at: [3, 24, 10], fov: 0.62 }, (R) => drawAnimal3(R, 'dog', { x: 0, z: 0, yaw: 0.4, t, talk }));
+      else if (EGG_PORTRAIT3[who]) { const k = EGG_PORTRAIT3[who]; shot = this.shoot(S, S, k.cam, (R) => k.draw(R, t, talk)); }
+      else if (who === 'owl') shot = this.shoot(S, S, { eye: [0, 26, 70], at: [0, 20, 0], fov: 0.62 }, (R) => drawAnimal3(R, 'owl', { x: 0, z: 0, yaw: 0, t, talk }));
       else {
         const L0 = who === 'player' ? PLAYER_LOOK : LOOKS[who];
         if (!L0) { g.restore(); return; }
         const L = Object.assign({}, L0, { size: 1 }), d = dims3(L);
-        shot = this.shoot(S, S, { eye: [0, d.hy + 6, 84], at: [0, d.hy - 7, 0], fov: 0.62 }, (R) => drawPerson3(R, L, { x: 0, z: 0, yaw: 0, t: 0.3, seed: 1.5 }));
+        shot = this.shoot(S, S, { eye: [0, d.hy + 5, 92], at: [0, d.hy - 6, 0], fov: 0.66 }, (R) => drawPerson3(R, L, { x: 0, z: 0, yaw: 0, t, seed: 1.5, talk, still: !live }));
       }
-      img = document.createElement('canvas'); img.width = S; img.height = S; img.getContext('2d').drawImage(shot, 0, 0);
-      PORTRAIT_CACHE.set(key, img);
+      if (live) img = shot;
+      else { img = document.createElement('canvas'); img.width = S; img.height = S; img.getContext('2d').drawImage(shot, 0, 0); PORTRAIT_CACHE.set(key, img); }
     }
     g.drawImage(img, 0, 0);
     g.restore();
@@ -3660,15 +4245,16 @@ const Snap = {
     o = o || {};
     const L2 = Object.assign({}, L), d = dims3(L2), s = L2.size || 1, h = (d.hy + d.hr + 6) * s;
     const W2 = cv.width, H2 = cv.height, fov = 0.5, dist = (h * 0.56) / Math.tan(fov / 2) / Math.min(1, W2 / H2);
+    const live = o.t != null;
     const shot = this.shoot(W2, H2, { eye: [0, h * 0.62, dist], at: [0, h * 0.5, 0], fov }, (R) => {
       R.mode('blend'); blob3(R, 0, 0, 16, 10, 0.25); R.mode('opaque'); R.setTint(1, 1, 1, 1, 0);
-      drawPerson3(R, L2, { x: 0, z: 0, yaw: o.dir === 'up' ? Math.PI : 0, t: 0.3, seed: 1.5 });
+      drawPerson3(R, L2, { x: 0, z: 0, yaw: (o.dir === 'up' ? Math.PI : 0) + (o.yaw || 0), t: live ? o.t : 0.3, seed: 1.5, still: !live });
     });
     const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W2, H2); g.drawImage(shot, 0, 0);
   },
-  bust(cv, L) {
-    const L2 = Object.assign({}, L, { size: 1 }), d = dims3(L2);
-    const shot = this.shoot(cv.width, cv.height, { eye: [0, d.hy + 12, 100], at: [0, d.hy + 2, 0], fov: 0.62 }, (R) => drawPerson3(R, L2, { x: 0, z: 0, yaw: 0, t: 0.3, seed: 1.5 }));
+  bust(cv, L, o) {
+    const L2 = Object.assign({}, L, { size: 1 }), d = dims3(L2), yaw = o && o.yaw != null ? o.yaw : 0.25;
+    const shot = this.shoot(cv.width, cv.height, { eye: [0, d.hy + 12, 100], at: [0, d.hy + 2, 0], fov: 0.62 }, (R) => drawPerson3(R, L2, { x: 0, z: 0, yaw, t: 0.3, seed: 1.5, still: true }));
     const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.drawImage(shot, 0, 0);
   },
   // a group photo on grass under a blue sky
@@ -3683,15 +4269,25 @@ const Snap = {
     for (const m of members) for (let i = 0; i < (counts[m] || 0); i++) (KID_ROLES.indexOf(m) >= 0 ? front : back).push(roleLook(m, i));
     const half = Math.ceil(front.length / 2);
     const kids = front.slice(0, half).concat([PLAYER_LOOK], front.slice(half));
-    const sp = 34, widest = Math.max(back.length, kids.length, 3) * sp + 30;
-    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 66 / Math.tan(fov / 2));
-    const shot = this.shoot(W2, H2, { eye: [0, 80, dist], at: [0, 40, 0], fov }, (R) => {
-      const place = (list, z) => list.forEach((L, i) => {
-        const x = (i - (list.length - 1) / 2) * sp;
-        R.mode('blend'); blob3(R, x, z, 14, 9, 0.22); R.mode('opaque'); R.setTint(1, 1, 1, 1, 0);
-        drawPerson3(R, L, { x, z, yaw: 0, t: 0.3 + i * 0.13, seed: 1.2 + i * 0.07 });
+    // Children are nearly as tall as grown-ups here, so the grown-ups stand on a step behind them and
+    // fill the gaps between the children's heads, like in a real family photo.
+    const sp = 36, nb = back.length, nk = kids.length;
+    const shift = nb && (nb % 2) === (nk % 2) ? sp / 2 : 0, STEP = nb ? 24 : 0;
+    const widest = Math.max(nb * sp + shift * 2, nk * sp, 3 * sp) + 40;
+    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 100 / Math.tan(fov / 2));
+    const shot = this.shoot(W2, H2, { eye: [0, 110, dist], at: [0, 56, -6], fov }, (R) => {
+      if (nb) {
+        const w = nb * sp + shift * 2 + 26, mb = new MB(4);
+        mb.color('#c98552').box(-w / 2 + shift, 0, -52, w / 2 + shift, STEP, -8);
+        mb.color('#b3743f').box(-w / 2 + shift, STEP - 3, -9, w / 2 + shift, STEP, -6);
+        R.draw(pack(mb));
+      }
+      const place = (list, z, y, dx) => list.forEach((L, i) => {
+        const x = (i - (list.length - 1) / 2) * sp + dx;
+        R.mode('blend'); blob3(R, x, z, 14, 9, 0.22, y); R.mode('opaque'); R.setTint(1, 1, 1, 1, 0);
+        drawPerson3(R, L, { x, z, y, yaw: 0, t: 0.3 + i * 0.13, seed: 1.2 + i * 0.07, still: true });
       });
-      place(back, -22); place(kids, 18);
+      place(back, -30, STEP, shift); place(kids, 18, 0, 0);
     });
     g.drawImage(shot, 0, 0);
   },
@@ -3715,17 +4311,17 @@ const Snap = {
 };
 const PLACE3 = new Map();
 const EGG_PORTRAIT3 = {
-  cat: { cam: { eye: [0, 27, 58], at: [0, 20, 0], fov: 0.62 }, draw: (R) => drawAnimal3(R, 'cat', { x: 0, z: 0, yaw: 0, t: 0.3 }) },
-  frog: { cam: { eye: [0, 16, 42], at: [0, 9, 0], fov: 0.62 }, draw: (R) => drawAnimal3(R, 'frog', { x: 0, z: 0, yaw: 0, t: 0.3 }) },
-  rabbit: { cam: { eye: [0, 25, 52], at: [0, 19, 0], fov: 0.62 }, draw: (R) => drawAnimal3(R, 'rabbit', { x: 0, z: 0, yaw: 0, t: 0.3 }) },
-  duck: { cam: { eye: [4, 19, 50], at: [0, 12, 2], fov: 0.62 }, draw: (R) => drawAnimal3(R, 'duck', { x: 0, z: 0, yaw: 0.35, t: 0.3 }) },
-  scarecrow: { cam: { eye: [0, 62, 58], at: [0, 56, 0], fov: 0.62 }, draw: (R) => R.draw(W3.dyn.scarecrow) },
+  cat: { cam: { eye: [0, 27, 58], at: [0, 20, 0], fov: 0.62 }, draw: (R, t, talk) => drawAnimal3(R, 'cat', { x: 0, z: 0, yaw: 0, t, talk }) },
+  frog: { cam: { eye: [0, 16, 42], at: [0, 9, 0], fov: 0.62 }, draw: (R, t, talk) => drawAnimal3(R, 'frog', { x: 0, z: 0, yaw: 0, t, talk }) },
+  rabbit: { cam: { eye: [0, 25, 52], at: [0, 19, 0], fov: 0.62 }, draw: (R, t, talk) => drawAnimal3(R, 'rabbit', { x: 0, z: 0, yaw: 0, t, talk }) },
+  duck: { cam: { eye: [4, 19, 50], at: [0, 12, 2], fov: 0.62 }, draw: (R, t, talk) => drawAnimal3(R, 'duck', { x: 0, z: 0, yaw: 0.35, t, talk }) },
+  scarecrow: { cam: { eye: [0, 62, 58], at: [0, 56, 0], fov: 0.62 }, draw: (R, t) => { const m = T3(0, 0, 0); m4rz(m, Math.sin(t * 1.3) * 0.04); R.draw(W3.dyn.scarecrow, m); } },
 };
 const EGG_EMOJI = { cat: '🐱', frog: '🐸', rabbit: '🐰', duck: '🦆', scarecrow: '🌾' };
 // the UI's picture functions go through 3D when it is on
-function drawPortrait(cv, who) { if (G3.on) Snap.portrait(cv, who); else drawPortrait2D(cv, who); }
+function drawPortrait(cv, who, live) { if (G3.on) Snap.portrait(cv, who, live); else drawPortrait2D(cv, who, live); }
 function drawFigure(cv, L, o) { if (G3.on) Snap.figure(cv, L, o); else drawFigure2D(cv, L, o); }
-function drawBust(cv, L) { if (G3.on) Snap.bust(cv, L); else drawBust2D(cv, L); }
+function drawBust(cv, L, o) { if (G3.on) Snap.bust(cv, L, o); else drawBust2D(cv, L); }
 function drawFamilyPhoto(cv, counts, members) { if (G3.on) Snap.group(cv, counts, members); else drawFamilyPhoto2D(cv, counts, members); }
 function drawSpriteFit(cv, key, water) { if (G3.on) Snap.place(cv, key); else drawSpriteFit2D(cv, key, water); }
 // screen ↔ world for taps and the Talk button, in whichever view is on
@@ -3739,15 +4335,34 @@ function screenToWorld(sx, sy) {
 }
 
 /* ============================== OYUNCU ============================== */
-const HAIR_COLORS = ['#2d2330', '#7a4a2a', '#f2c14e', '#d9622b'];
-const OUTFIT_COLORS = ['#ff5a5a', '#4aa3ff', '#4cc36a', '#a77bd8'];
+const HAIR_COLORS = ['#2d2330', '#7a4a2a', '#f2c14e', '#d9622b', '#5a3620', '#ff8fc0'];
+const OUTFIT_COLORS = ['#ff5a5a', '#4aa3ff', '#4cc36a', '#a77bd8', '#ffd23c', '#ff8c42'];
+const SKIN_TONES = ['#fde3cc', '#f7cfa6', '#e6ae84', '#c68a5e', '#8e5b3c'];
+const HAIR_STYLES = ['spiky', 'short', 'curly', 'bob', 'ponytail', 'pigtails', 'long', 'braids'];
+const CLOTHES = ['tee', 'stripes', 'hoodie', 'overalls', 'dress', 'skirt'];
 let PLAYER_LOOK = null;
+// the creator's choices, filled in for games saved before there were hair styles (body 0 / 1)
+function lookChoice(l) {
+  l = l || {};
+  const girl = l.body === 1, n = (v, max, def) => (Number.isInteger(v) && v >= 0 && v < max ? v : def);
+  return {
+    skin: n(l.skin, SKIN_TONES.length, 1), style: HAIR_STYLES.indexOf(l.style) >= 0 ? l.style : girl ? 'pigtails' : 'spiky',
+    hair: n(l.hair, HAIR_COLORS.length, 1), clothes: CLOTHES.indexOf(l.clothes) >= 0 ? l.clothes : girl ? 'dress' : 'tee', outfit: n(l.outfit, OUTFIT_COLORS.length, 0),
+  };
+}
 function playerBaseLook(l) {        // the look chosen in the creator, without accessories
-  l = l || state.look;
-  const hair = HAIR_COLORS[l.hair] || HAIR_COLORS[1], col = OUTFIT_COLORS[l.outfit] || OUTFIT_COLORS[0];
-  return l.body === 1
-    ? { age: 'kid', skin: '#f7cfa6', hair, hairStyle: 'pigtails', ties: '#ffffff', dress: col, lashes: true, shoes: '#ff5a8a' }
-    : { age: 'kid', skin: '#f7cfa6', hair, hairStyle: 'short', shirt: col, pants: '#35507a', shorts: true, shoes: '#6b4430' };
+  const c = lookChoice(l || state.look), col = OUTFIT_COLORS[c.outfit];
+  const L = { age: 'kid', skin: SKIN_TONES[c.skin], hair: HAIR_COLORS[c.hair], hairStyle: c.style, ties: '#ff7aa2' };
+  if (['bob', 'ponytail', 'pigtails', 'long', 'braids'].indexOf(c.style) >= 0) L.lashes = true;
+  const kidShoes = { socks: '#ffffff', shoes: '#4a6fd8' };
+  switch (c.clothes) {
+    case 'stripes': return Object.assign(L, kidShoes, { shirt: col, stripes: '#ffffff', pants: '#35507a', shorts: true });
+    case 'hoodie': return Object.assign(L, { shirt: col, hoodie: true, pants: '#4a5a8a', shoes: '#ff7a3d' });
+    case 'overalls': return Object.assign(L, kidShoes, { shirt: '#fff4e0', overalls: col, pants: col, shorts: true, shoes: '#6b4430' });
+    case 'dress': return Object.assign(L, kidShoes, { dress: col, shoes: '#ff5a8a' });
+    case 'skirt': return Object.assign(L, kidShoes, { shirt: '#ffffff', skirt: col, shoes: '#ff5a8a' });
+    default: return Object.assign(L, kidShoes, { shirt: col, pants: '#35507a', shorts: true });
+  }
 }
 function withAccessory(L, id) {
   if (id === 'crown') L.hat = 'crown';
@@ -3775,6 +4390,7 @@ const sparky = {
   draw(c, t) { drawDog(c, { x: this.x, y: this.y, face: this.face, moving: this.moving, phase: this.phase, t, talk: Dialog.mouth === 'sparky' }); },
 };
 const keys = { up: 0, down: 0, left: 0, right: 0 };
+const Joy = { id: null, vx: 0, vy: 0, m: 0, speed: 1, cx: 0, cy: 0, used: false };     // the on-screen joystick
 
 function faceDir(dx, dy, cur) {
   const ax = Math.abs(dx), ay = Math.abs(dy);
@@ -3829,7 +4445,8 @@ function arrive() {
   if (g && game.mode === 'play' && inTalkRange(g)) interact(g);
 }
 function updatePlayer(dt) {
-  let vx = keys.right - keys.left, vy = keys.down - keys.up;
+  let vx = keys.right - keys.left, vy = keys.down - keys.up, spf = 1;
+  if (!vx && !vy && Joy.m > 0) { vx = Joy.vx; vy = Joy.vy; spf = Joy.speed; }
   if (game.mode !== 'play') vx = vy = 0;
   if (vx || vy) { player.path = null; player.goal = null; const l = Math.hypot(vx, vy); vx /= l; vy /= l; }
   else if (player.path && game.mode === 'play') {
@@ -3849,11 +4466,11 @@ function updatePlayer(dt) {
     }
   }
   if (vx || vy) {
-    const ox = player.x, oy = player.y, sp = SETTINGS.walkSpeed * dt;
+    const ox = player.x, oy = player.y, sp = SETTINGS.walkSpeed * dt * (player.path ? 1 : spf);
     moveBody(player, vx * sp, vy * sp, PR_FEET);
     const moved = Math.hypot(player.x - ox, player.y - oy);
     player.moving = moved > 0.2;
-    player.phase += moved * 0.085;
+    player.phase += moved * 0.13;
     player.dir = faceDir(vx, vy, player.dir);
     if (player.path) {
       if (moved < sp * 0.25) { player.stuck += dt; if (player.stuck > 0.5) { const g = player.path[player.path.length - 1]; player.stuck = 0; if (player.goal) walkTo(player.goal.x, player.goal.y + 18, player.goal); else walkTo(g.x, g.y); if (!player.path) player.moving = false; } }
@@ -4441,20 +5058,20 @@ function drawButterflies(c, t, cx, cy, vw, vh) {
 
 /* ============================== NPC'LER ============================== */
 const LOOKS = {
-  milo: { age: 'kid', skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'short', shirt: '#4aa3ff', pants: '#3b5a8c' },
-  leo:  { age: 'kid', size: 0.84, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'short', shirt: '#ffd23c', stripes: '#ff8c42', pants: '#4a7bd0', hat: 'cap', hatColor: '#ff4d4d' },
+  milo: { age: 'kid', skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'spiky', shirt: '#4aa3ff', pants: '#3b5a8c', shorts: true, socks: '#ffffff', shoes: '#ff5a5a' },
+  leo:  { age: 'kid', size: 0.84, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'short', shirt: '#ffd23c', stripes: '#ff8c42', pants: '#4a7bd0', shorts: true, socks: '#ffffff', shoes: '#4cc36a', hat: 'cap', hatColor: '#ff4d4d' },
   mom:  { age: 'adult', skin: '#f6c7a0', hair: '#9a5530', hairStyle: 'long', dress: '#ff7aa2', lashes: true, shoes: '#c2185b' },
   dad:  { age: 'adult', skin: '#f6c7a0', hair: '#5a3620', hairStyle: 'short', shirt: '#4cc36a', pants: '#3b4f7a', mustache: true },
   rosa: { age: 'adult', skin: '#f3c6a5', hair: '#eceaf4', hairStyle: 'bun', dress: '#a77bd8', shawl: '#ffc4dc', glasses: true, lashes: true },
-  nomi: { age: 'kid', skin: '#eab98c', hair: '#2d2330', hairStyle: 'braids', dress: '#ff5a5a', belt: '#ffd23c', lashes: true, shoes: '#8a3b2b' },
-  bob:  { age: 'adult', skin: '#efc19a', hair: '#ffffff', hairStyle: 'none', beard: '#ffffff', hat: 'captain', shirt: '#2f4a8a', buttons: '#ffd23c', pants: '#24345e', shoes: '#3a2a20' },
+  nomi: { age: 'kid', skin: '#eab98c', hair: '#2d2330', hairStyle: 'braids', dress: '#ff5a5a', belt: '#ffd23c', lashes: true, socks: '#ffffff', shoes: '#8a3b2b' },
+  bob:  { age: 'adult', skin: '#efc19a', hair: '#ffffff', hairStyle: 'bald', beard: '#ffffff', hat: 'captain', shirt: '#2f4a8a', buttons: '#ffd23c', pants: '#24345e', shoes: '#3a2a20' },
   max:  { age: 'adult', skin: '#f0c098', hair: '#6b3f22', hairStyle: 'short', mustache: true, shirt: '#ff6b5b', overalls: '#4a7bd0', hat: 'straw' },
-  lily: { age: 'adult', skin: '#b87a52', hair: '#2d2330', hairStyle: 'long', dress: '#5cc86a', apron: '#fff7e0', flower: '#ffd23c', lashes: true },
-  pip:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'pigtails', ties: '#ff7aa2', shirt: '#ffd23c', pants: '#ff7aa2', shorts: true, freckles: true, lashes: true },
-  pop:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'short', shirt: '#4cc36a', pants: '#4a7bd0', shorts: true, freckles: true },
+  lily: { age: 'adult', skin: '#b87a52', hair: '#2d2330', hairStyle: 'curly', dress: '#5cc86a', apron: '#fff7e0', flower: '#ffd23c', lashes: true },
+  pip:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'pigtails', ties: '#ff7aa2', shirt: '#ffd23c', pants: '#ff7aa2', shorts: true, freckles: true, lashes: true, socks: '#ffffff', shoes: '#ff7aa2' },
+  pop:  { age: 'kid', skin: '#d9a078', hair: '#4a2c1c', hairStyle: 'curly', shirt: '#4cc36a', hoodie: true, pants: '#4a7bd0', shorts: true, freckles: true, socks: '#ffffff', shoes: '#4a6fd8' },
   // only in Milo's family photo (Quest 2)
-  grandpa: { age: 'adult', skin: '#f3c6a5', hair: '#e6e6ee', hairStyle: 'short', mustache: true, glasses: true, glassesColor: '#4a3222', shirt: '#ffb238', pants: '#6b5a50' },
-  mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, shoes: '#ff5a8a' },
+  grandpa: { age: 'adult', skin: '#f3c6a5', hair: '#e6e6ee', hairStyle: 'bald', mustache: true, glasses: true, glassesColor: '#4a3222', shirt: '#ffb238', pants: '#6b5a50' },
+  mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, socks: '#ffffff', shoes: '#ff5a8a' },
 };
 const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
 // pitch per speaker (see Speech.pitchFor)
@@ -4519,7 +5136,7 @@ function followPath(n, dt, speed) {
   const s = Math.min(d, speed * dt), ox = n.x, oy = n.y;
   moveBody(n, dx / d * s, dy / d * s, PR_FEET);
   const moved = Math.hypot(n.x - ox, n.y - oy);
-  n.moving = moved > 0.1; n.phase += moved * 0.09; n.dir = faceDir(dx, dy, n.dir);
+  n.moving = moved > 0.1; n.phase += moved * 0.13; n.dir = faceDir(dx, dy, n.dir);
   if (n.face !== undefined && Math.abs(dx) > 0.5) n.face = dx < 0 ? -1 : 1;
   if (moved < s * 0.2) {
     if ((n.stuck += dt) > 0.8) {
@@ -5579,6 +6196,8 @@ function buildEggs3() {
 const game = { mode: 'title', t: 0, paused: false, sleepT: 0, ev: 0 };
 // While one of these full-screen windows is open the village is not updated or redrawn.
 const FROZEN = { title: 1, parent: 1, creator: 1, minigame: 1, menu: 1, wardrobe: 1, cert: 1, ask: 1 };
+// ...except these, where the village is shown from a slow sightseeing camera behind the menu
+const BACKDROP = { title: 1, parent: 1, creator: 1 };
 function setMode(m) { game.mode = m; }
 function fillName(s) { return String(s).replace(/\{name\}/g, state.name || GAME_CONTENT.defaultName); }
 function charName(id) { const c = GAME_CONTENT.characters[id]; return c ? fillName(c.name) : id; }
@@ -5717,21 +6336,21 @@ const Dialog = {
 
 /* ---- portraits ---- */
 const PORTRAIT_BG = { cat: '#ffe0c2', frog: '#d6f5d6', rabbit: '#ffe4ef', duck: '#dff4ff', scarecrow: '#fff0b8', sparky: '#ffe7a8', milo: '#bfe6ff', leo: '#ffe0e0', mom: '#ffd6e6', dad: '#d6f5d6', rosa: '#eadcff', nomi: '#ffe0cc', bob: '#cfe0ff', max: '#fff0b8', lily: '#d6f5e0', pip: '#fff4b8', pop: '#d6f5d6', owl: '#e8dcc8', player: '#d8f3ff' };
-function drawPortrait2D(cv, who) {
-  const g = cv.getContext('2d'), S = cv.width;
+function drawPortrait2D(cv, who, live) {
+  const g = cv.getContext('2d'), S = cv.width, t = live ? live.t : 0.2, talk = !!(live && live.talk);
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
   g.lineJoin = 'round'; g.lineCap = 'round';
   g.save();
   g.beginPath(); g.arc(S / 2, S / 2, S / 2, 0, TAU); g.fillStyle = PORTRAIT_BG[who] || '#d8f3c8'; g.fill(); g.clip();
-  if (who === 'sparky') { const k = S / 40; g.translate(S / 2 - 12 * k, S * 0.54 + 29 * k); g.scale(k, k); drawDog(g, { t: 0, noShadow: true, face: 1 }); }
-  else if (who === 'owl') { const k = S / 44; g.translate(S / 2, S * 0.57 + 26 * k); g.scale(k, k); drawOwl(g, { t: 0.5 }); }
+  if (who === 'sparky') { const k = S / 40; g.translate(S / 2 - 12 * k, S * 0.54 + 29 * k); g.scale(k, k); drawDog(g, { t, noShadow: true, face: 1, talk }); }
+  else if (who === 'owl') { const k = S / 44; g.translate(S / 2, S * 0.57 + 26 * k); g.scale(k, k); drawOwl(g, { t: t + 0.3, talk }); }
   else {
     const L0 = who === 'player' ? PLAYER_LOOK : LOOKS[who];
     if (!L0 && EGG_EMOJI[who]) { g.font = Math.round(S * 0.62) + 'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(EGG_EMOJI[who], S / 2, S * 0.56); }
     if (L0) {
       const L = Object.assign({}, L0, { size: 1 }), hy = personHeadY(L), k = S / 60;
       g.translate(S / 2, S * 0.56 - hy * k); g.scale(k, k);
-      drawPerson(g, L, { dir: 'down', t: 0.2, noShadow: true, seed: 1.5 });
+      drawPerson(g, L, { dir: 'down', t, talk, noShadow: true, seed: 1.5 });
     }
   }
   g.restore();
@@ -5757,13 +6376,118 @@ const Talk = {
     const it = game.mode === 'play' ? nearestInteractable() : null;
     this.it = it;
     if (!it) { if (!this.wrap.classList.contains('hidden')) this.wrap.classList.add('hidden'); return; }
-    const lb = it.label || 'talk';
-    if (lb !== this.label) { this.label = lb; this.el.textContent = (GAME_CONTENT.ui[lb] || lb) + ' ' + (TALK_ICON[lb] || ''); }
+    const lb = it.label || 'talk', key = lb + (Touch.on ? '*' : '');
+    if (key !== this.label) {
+      this.label = key;
+      this.el.textContent = Touch.on ? TALK_ICON[lb] || '💬' : (GAME_CONTENT.ui[lb] || lb) + ' ' + (TALK_ICON[lb] || '');
+      this.wrap.classList.toggle('mini', Touch.on);
+    }
     this.wrap.classList.remove('hidden');
     const sp = worldToScreen(it.x, heightOf(it), it.y), sx = sp.x, sy = sp.y;
     const w = this.el.offsetWidth || 130, h = this.el.offsetHeight || 60;
     const x = Math.round(clamp(sx - w / 2, 8, view.cw - w - 8)), y = Math.round(clamp(sy - h - 4, 78, view.ch - h - 8));
     if (x !== this.lx || y !== this.ly) { this.wrap.style.transform = 'translate(' + x + 'px,' + y + 'px)'; this.lx = x; this.ly = y; }
+  },
+};
+
+/* ---- which device: phone, tablet or computer ----
+   A touch screen as the main pointer, or a phone/tablet browser, means touch controls. iPads say
+   they are Macs, so a "Mac" with a touch screen is an iPad. Phone or tablet goes by the screen's short side. */
+const Device = {
+  kind: 'computer', touch: false,
+  detect() {
+    const mq = (q) => { try { return window.matchMedia(q).matches; } catch (e) { return false; } };
+    const ua = navigator.userAgent || '', tp = navigator.maxTouchPoints || 0;
+    const iPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1);
+    const phoneUA = /iPhone|iPod|Windows Phone|Mobile/i.test(ua) || !!(navigator.userAgentData && navigator.userAgentData.mobile);
+    const tabletUA = iPad || /Tablet|Kindle|Silk|PlayBook/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua));
+    this.touch = mq('(pointer: coarse)') || (mq('(hover: none)') && tp > 0) || phoneUA || tabletUA;
+    const short = Math.min(screen.width || innerWidth, screen.height || innerHeight);
+    this.kind = !this.touch ? 'computer' : tabletUA || (!phoneUA && short >= 600) ? 'tablet' : 'phone';
+    return this.kind;
+  },
+};
+/* Touch controls: a joystick under the left thumb (it comes to wherever the thumb lands in the
+   bottom-left corner) and a big action button under the right thumb that shows what it will do. */
+const Touch = {
+  on: false, shown: null, lbl: null, zone: null, base: null, knob: null, btn: null,
+  init() {
+    Device.detect();
+    document.body.classList.add('dev-' + Device.kind);
+    this.zone = $('joyZone'); this.base = $('joyBase'); this.knob = $('joyKnob'); this.btn = $('actBtn');
+    if (Device.touch) this.enable();
+    // a touch screen we did not recognise (a laptop with one): switch on at the first touch
+    window.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch' && !this.on) this.enable(); }, true);
+    const z = this.zone;
+    z.addEventListener('pointerdown', (e) => {
+      if (game.mode !== 'play' || Joy.id !== null) return;
+      e.preventDefault(); e.stopPropagation();
+      Joy.id = e.pointerId;
+      try { z.setPointerCapture(e.pointerId); } catch (err) { /* old browsers */ }
+      const r = z.getBoundingClientRect(), R = this.radius();
+      Joy.cx = clamp(e.clientX - r.left, R + 6, Math.max(R + 6, r.width - R - 6));
+      Joy.cy = clamp(e.clientY - r.top, R + 6, Math.max(R + 6, r.height - R - 6));
+      this.place(Joy.cx, Joy.cy);
+      z.classList.add('held'); z.classList.remove('joyHint'); Joy.used = true;
+      Sfx.unlock();
+      this.drag(e);
+    });
+    z.addEventListener('pointermove', (e) => { if (e.pointerId === Joy.id) { e.preventDefault(); this.drag(e); } });
+    const up = (e) => { if (e.pointerId === Joy.id) this.release(); };
+    z.addEventListener('pointerup', up); z.addEventListener('pointercancel', up); z.addEventListener('lostpointercapture', up);
+    // acts as soon as a finger lands: browsers send no click for a second finger, and the left thumb is often on the joystick
+    const act = () => {
+      Sfx.unlock();
+      if (game.mode !== 'play') return;
+      if (Talk.it) interact(Talk.it);
+      else { Sfx.play('tap'); this.btn.classList.remove('nope'); void this.btn.offsetWidth; this.btn.classList.add('nope'); }
+    };
+    this.btn.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); this.btn.classList.add('down'); this.acted = performance.now(); act(); });
+    const lift = () => this.btn.classList.remove('down');
+    for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) this.btn.addEventListener(ev, lift);
+    this.btn.addEventListener('click', (e) => { e.stopPropagation(); this.btn.blur(); if (performance.now() - (this.acted || 0) > 700) act(); });   // keyboard
+    window.addEventListener('resize', () => { if (Joy.id === null) this.home(); });
+  },
+  enable() { this.on = true; document.body.classList.add('touchUI'); this.zone.classList.add('joyHint'); this.lbl = null; this.home(); },
+  radius() { return (this.base.offsetWidth || 136) / 2; },
+  place(x, y) { this.base.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'; },
+  home() {
+    const r = this.zone.getBoundingClientRect(), R = this.radius(), pad = 20;
+    const sl = parseFloat(getComputedStyle(this.zone).paddingLeft) || 0, sb = parseFloat(getComputedStyle(this.zone).paddingBottom) || 0;
+    this.place(pad + R + sl, (r.height || 300) - pad - R - sb);
+  },
+  drag(e) {
+    const r = this.zone.getBoundingClientRect(), R = this.radius();
+    let dx = e.clientX - r.left - Joy.cx, dy = e.clientY - r.top - Joy.cy;
+    const d = Math.hypot(dx, dy);
+    if (d > R) { dx *= R / d; dy *= R / d; }
+    this.knob.style.transform = 'translate(' + Math.round(dx) + 'px,' + Math.round(dy) + 'px)';
+    const m = Math.min(1, d / R), dead = 0.18, l = Math.hypot(dx, dy);
+    if (m < dead || !l) { Joy.vx = Joy.vy = Joy.m = 0; return; }
+    Joy.vx = dx / l; Joy.vy = dy / l; Joy.m = m; Joy.speed = clamp((m - dead) / 0.5, 0.35, 1);
+  },
+  release() {
+    Joy.id = null; Joy.vx = Joy.vy = Joy.m = 0;
+    this.knob.style.transform = ''; this.zone.classList.remove('held'); this.home();
+  },
+  update() {            // every frame: shown only while walking around, the button says what it will do
+    const show = this.on && game.mode === 'play' && !Dialog.open;
+    if (show !== this.shown) {
+      this.shown = show;
+      this.zone.classList.toggle('hidden', !show); this.btn.classList.toggle('hidden', !show);
+      if (!show && Joy.id !== null) this.release();
+      if (show) this.home();
+    }
+    if (!show) return;
+    const it = Talk.it, lb = it ? (it.label || 'talk') : '';
+    if (lb !== this.lbl) {
+      this.lbl = lb;
+      const U = GAME_CONTENT.ui;
+      $('actIcon').textContent = TALK_ICON[lb || 'talk'] || '💬';
+      $('actLbl').textContent = lb ? (U[lb] || lb) : '';
+      this.btn.classList.toggle('off', !lb); this.btn.classList.toggle('ready', !!lb);
+      this.btn.setAttribute('aria-label', lb ? (U[lb] || lb) : U.talk);
+    }
   },
 };
 
@@ -5804,38 +6528,41 @@ const Fx = {
 const UI = {
   init() {
     const U = GAME_CONTENT.ui;
-    $('startBtn').textContent = U.start + ' ▶';
     $('titleText').textContent = GAME_CONTENT.title;
     document.title = GAME_CONTENT.title;
     Talk.el = $('talkBtn'); Talk.wrap = $('talkWrap');
     $('talkBtn').textContent = U.talk + ' ' + TALK_ICON.talk;
     const tap = (id, fn) => $(id).addEventListener('click', (e) => { e.stopPropagation(); e.currentTarget.blur && e.currentTarget.blur(); fn(e); });
-    const restart = () => Confirm.ask(U.restartAsk, restartGame);
-    tap('startBtn', startGame);
+    tap('tContinue', () => Title.resume());
+    tap('tNew', () => Title.newGame());
+    tap('tSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Title.small(); Sfx.unlock(); Sfx.play('tap'); });
+    tap('tView', () => { setView(!G3.on); Title.small(); if (state.created) drawPortrait($('tMe'), 'player'); });
+    tap('tInfo', () => { Sfx.unlock(); Parent.open(true); });
     tap('talkBtn', () => { if (Talk.it) interact(Talk.it); });
     tap('dlgNext', () => Dialog.next());
     tap('dlgSpeak', () => Dialog.replay());
     tap('questCard', () => Hud.speakCard());
     tap('menuBtn', () => Menu.open());
     tap('mClose', () => Menu.close());
-    tap('mSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Menu.render(); });
+    tap('mSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Menu.render(); Sfx.play('tap'); });
     tap('mSlow', () => { state.settings.slow = true; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
     tap('mNormal', () => { state.settings.slow = false; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
+    tap('mV3', () => { setView(true); Menu.render(true); });
+    tap('mV2', () => { setView(false); Menu.render(true); });
+    tap('mHome', () => Menu.home());
+    tap('mResume', () => Menu.close());
     tap('mLook', () => { Menu.close(); Wardrobe.open(); });
-    tap('mView', () => {
-      if (!G3.tried) g3Init();
-      setView3(!G3.on); state.settings.view = G3.on ? '3d' : '2d'; Save.save(); Menu.render();
-    });
     tap('mInfo', () => { Menu.close(); Parent.open(true); });
-    tap('mRestart', restart);
     tap('askNo', () => Confirm.no());
     tap('askYes', () => Confirm.yes());
     tap('mgSpeak', () => MG.replay());
     tap('mgQuit', () => MG.quit());
     tap('wdOk', () => Wardrobe.close());
-    tap('certAgain', restart);
+    tap('certAgain', () => Title.newGame());
     tap('certWalk', () => Cert.close());
     tap('pStart', () => Parent.start());
+    { const T = $('titleText'), s = T.textContent; T.textContent = '';
+      [...s].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.12) + 's'; T.appendChild(sp); }); }
     tap('pVoiceTest', () => Parent.test());
     tap('vwOk', () => VoiceWarn.hide());
     Speech.onChange = (st) => { if (game.mode === 'parent') Parent.voiceLine(); else if (st === 'none') VoiceWarn.show(); };
@@ -5865,47 +6592,56 @@ const UI = {
     setTimeout(() => { s.remove(); Hud.refresh(); const sb = $('starBox'); sb.classList.remove('bump'); void sb.offsetWidth; sb.classList.add('bump'); }, 1800);
   },
 };
+function segLabel(b, icon, text) {
+  b.textContent = ''; const i = document.createElement('span'); i.className = 'si'; i.textContent = icon;
+  b.appendChild(i); b.appendChild(document.createTextNode(text));
+}
 const Menu = {
   prev: 'play',
   open() {
     if (game.mode !== 'play' && game.mode !== 'dialog') return;
     this.prev = game.mode; setMode('menu'); Talk.hide();
-    $('menu').classList.remove('hidden'); this.render();
+    $('menu').classList.remove('hidden'); this.render(true);
   },
   close() { $('menu').classList.add('hidden'); setMode(this.prev); },
-  render() {
+  home() {                        // back to the main menu (the game is saved)
+    $('menu').classList.add('hidden');
+    Speech.stop(); hardCloseDialog(); Talk.hide();
+    Save.save();
+    Title.open();
+  },
+  render(me) {
     const U = GAME_CONTENT.ui, s = state.settings;
-    $('mTitle').textContent = U.menu;
-    $('mSound').textContent = (s.sound ? '🔊 ' : '🔇 ') + U.sound + ': ' + (s.sound ? U.on : U.off);
-    $('mSlow').textContent = '🐢 ' + U.slow; $('mNormal').textContent = '🐇 ' + U.normal;
-    $('mSlow').className = 'btn wide ' + (s.slow ? 'sel' : 'unsel');
-    $('mNormal').className = 'btn wide ' + (s.slow ? 'unsel' : 'sel');
-    $('mLook').textContent = '👕 ' + U.myLook;
-    $('mView').textContent = (G3.on ? '🧊 ' : '🖼️ ') + U.view + ': ' + (G3.on ? '3D' : '2D');
-    $('mView').classList.toggle('hidden', G3.tried && !G3.ok);
-    $('mInfo').textContent = 'ℹ️ ' + U.info;
-    $('mSecrets').textContent = '🔍 ' + GAME_CONTENT.secrets.label + ': ' + EGGS.count() + ' / ' + EGGS.ids.length;
-    $('mRestart').textContent = '🔄 ' + U.restart;
+    $('mTitle').textContent = U.paused;
+    const stars = '⭐ ' + state.stars + '/' + SETTINGS.totalStars, secrets = '🔍 ' + EGGS.count() + '/' + EGGS.ids.length;
+    $('mStars').textContent = stars; $('mSecrets').textContent = secrets;
+    $('mName').textContent = state.name; $('mName').setAttribute('data-stats', stars + '  ' + secrets);
+    if (me) drawFigure($('mMe'), PLAYER_LOOK);
+    $('mSoundLbl').textContent = (s.sound ? '🔊 ' : '🔇 ') + U.sound;
+    $('mSound').classList.toggle('on', !!s.sound); $('mSound').setAttribute('aria-checked', s.sound ? 'true' : 'false');
+    $('mSpeedLbl').textContent = '🗣️ ' + U.speed;
+    segLabel($('mSlow'), '🐢', U.slow); segLabel($('mNormal'), '🐇', U.normal);
+    $('mSlow').classList.toggle('on', !!s.slow); $('mNormal').classList.toggle('on', !s.slow);
+    $('mViewLbl').textContent = '🧊 ' + U.view;
+    $('mV3').classList.toggle('on', G3.on); $('mV2').classList.toggle('on', !G3.on);
+    $('mViewRow').classList.toggle('hidden', !!G3.tried && !G3.ok);
+    $('mLookLbl').textContent = U.myLook; $('mInfoLbl').textContent = U.info.split(' /')[0]; $('mHomeLbl').textContent = U.mainMenu;
+    $('mResumeLbl').textContent = U.resume;
     $('mClose').setAttribute('aria-label', U.close);
   },
 };
-/* Restart: save a fresh start (keeping sound, speed and view), then reload. Some file viewers and
-   in-app browsers do not let a page reload itself; if the page is still here a moment later, the
-   game resets itself in place instead. */
-function restartGame() {
-  const keep = Object.assign({}, state.settings);
-  Speech.stop();
-  state = defaultState(); state.settings = keep;
-  Save.save();
-  let gone = false;
-  window.addEventListener('pagehide', () => { gone = true; }, { once: true });
-  try { location.reload(); } catch (e) { /* navigation blocked */ }
-  setTimeout(() => { if (!gone) resetInPlace(keep); }, 1200);
+function setView(on) {           // 3D or flat 2D, from the pause menu or the main menu
+  if (on === G3.on) return;
+  if (on && !G3.tried) g3Init();
+  setView3(on); state.settings.view = G3.on ? '3d' : '2d'; Save.save();
 }
-function resetInPlace(settings) {
+/* New Game: everything back to the start in place (keeping sound, speed and view). No page reload,
+   so it also works in file viewers and in-app browsers that do not let a page reload itself. */
+function resetInPlace(settings) { resetProgress(settings); showEntry(); }
+function resetProgress(settings) {
+  settings = Object.assign({}, settings || state.settings);
   Speech.stop();
-  clearTimeout(Dialog.fbTimer); clearTimeout(Dialog.mouthTimer);
-  Dialog.open = false; Dialog.done = null; Dialog.mouth = null; Dialog.partner = null; Dialog.focus = null;
+  hardCloseDialog();
   MG.token++; MG.onQuit = null; MG.onReplay = null;
   for (const id of ['dialog', 'mg', 'menu', 'ask', 'cert', 'wardrobe', 'creator', 'title', 'banner', 'toast', 'talkWrap', 'questCard', 'topRight']) $(id).classList.add('hidden');
   Fx.parts.length = 0;
@@ -5925,7 +6661,6 @@ function resetInPlace(settings) {
   applyWorldState(true);
   Talk.hide(); Hud.cardKey = '';
   snapCamera();
-  showEntry();
 }
 const Confirm = {                 // "Are you sure?" box used by Restart and Play again
   prev: 'play', fn: null,
@@ -5956,12 +6691,14 @@ const Parent = {
     $('pTitle').textContent = P.title;
     const ul = $('pList'); ul.innerHTML = '';
     for (const p of P.points) ul.appendChild(el('li', null, p));
-    $('pControls').textContent = '🎮 ' + P.controls;
+    const dv = (P.devices && P.devices[Device.kind]) || '';
+    $('pControls').textContent = ({ phone: '📱 ', tablet: '📲 ', computer: '💻 ' }[Device.kind] || '🎮 ') + (dv ? dv + ': ' : '') + (Touch.on ? P.controlsTouch : P.controls);
     $('pCredit').textContent = P.credit;
     $('pStart').textContent = readOnly ? '✖ ' + GAME_CONTENT.ui.close : P.start + ' ▶';
     this.voiceLine();
     $('title').classList.add('hidden'); $('parent').classList.remove('hidden');
     setMode('parent');
+    $('parent').scrollTop = 0;
   },
   voiceLine() {     // tells the parent whether this browser can speak English, with a sample to listen to
     const P = GAME_CONTENT.parent, st = Speech.status;
@@ -5981,7 +6718,7 @@ const Parent = {
   },
   start() {
     $('parent').classList.add('hidden');
-    if (this.readOnly) { setMode(this.prev); return; }
+    if (this.readOnly) { if (this.prev === 'title') Title.open(); else setMode(this.prev); return; }
     Sfx.unlock();                  // this tap also unlocks sound on phones and tablets
     state.parentSeen = true; Save.save();
     Creator.open();
@@ -6000,33 +6737,50 @@ const Creator = {
     inp.placeholder = GAME_CONTENT.defaultName;
     $('title').classList.add('hidden'); $('creator').classList.remove('hidden');
     setMode('creator');
+    this.tab = 'hair';
     this.build();
     sayThen(T.name, 'narrator', () => { if (game.mode === 'creator') Speech.speak(T.look, { who: 'narrator' }); });
   },
+  tab: 'hair',
   build() {
-    const l = state.look;
-    const body = $('crBody'); body.innerHTML = '';
-    for (let v = 0; v < 2; v++) {
-      const L = playerBaseLook({ body: v, hair: l.hair, outfit: l.outfit });
-      const b = pickBtn((cv) => drawFigure(cv, L, { k: cv.height / 96 }), null, 120, 140, 'bodyBtn' + (l.body === v ? ' sel' : ''));
-      b.setAttribute('aria-label', 'Body ' + (v + 1));
-      b.addEventListener('click', () => this.pick('body', v));
-      body.appendChild(b);
+    const c = lookChoice(state.look), T = GAME_CONTENT.creator, tab = this.tab;
+    const tabs = $('crTabs'); tabs.innerHTML = '';
+    for (const [id, icon] of [['hair', '💇'], ['clothes', '👕'], ['skin', '🖐️']]) {
+      const b = el('button', 'crTab' + (tab === id ? ' sel' : ''));
+      b.appendChild(el('span', 'ti', icon)); b.appendChild(el('span', null, T[id]));
+      b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', tab === id ? 'true' : 'false');
+      b.addEventListener('click', () => { this.tab = id; Sfx.play('tap'); Speech.speak(T[id], { who: 'narrator' }); this.build(); });
+      tabs.appendChild(b);
     }
-    const swatches = (box, icon, cols, key) => {
-      box.innerHTML = ''; box.appendChild(el('span', 'ico', icon));
-      cols.forEach((col, v) => {
-        const b = el('button', 'sw' + (l[key] === v ? ' sel' : ''));
-        b.style.background = col; b.setAttribute('aria-label', key + ' ' + (v + 1));
-        b.addEventListener('click', () => this.pick(key, v));
-        box.appendChild(b);
-      });
-    };
-    swatches($('crHair'), '💇', HAIR_COLORS, 'hair');
-    swatches($('crOutfit'), '👕', OUTFIT_COLORS, 'outfit');
+    // a picture for every hair style or outfit, each wearing the other things already chosen
+    const box = $('crStyles'); box.innerHTML = '';
+    const list = tab === 'hair' ? HAIR_STYLES : tab === 'clothes' ? CLOTHES : [];
+    box.classList.toggle('hidden', !list.length);
+    for (const s of list) {
+      const L = playerBaseLook(Object.assign({}, c, tab === 'hair' ? { style: s } : { clothes: s }));
+      const cur = tab === 'hair' ? c.style : c.clothes;
+      const b = pickBtn((cv) => (tab === 'hair' ? drawBust(cv, L, { yaw: 0.7 }) : drawFigure(cv, L, { k: cv.height / 100 })), null, 120, tab === 'hair' ? 120 : 140, cur === s ? 'sel' : '');
+      b.setAttribute('aria-label', T.styles[s] || s);
+      b.addEventListener('click', () => this.pick(tab === 'hair' ? 'style' : 'clothes', s, T.styles[s]));
+      box.appendChild(b);
+    }
+    const [cols, key, names] = tab === 'hair' ? [HAIR_COLORS, 'hair', T.hairColors] : tab === 'clothes' ? [OUTFIT_COLORS, 'outfit', T.colors] : [SKIN_TONES, 'skin', null];
+    const sw = $('crColors'); sw.innerHTML = '';
+    sw.appendChild(el('span', 'ico', tab === 'skin' ? '🖐️' : '🎨'));
+    cols.forEach((col, v) => {
+      const b = el('button', 'sw' + (c[key] === v ? ' sel' : ''));
+      b.style.background = col; b.setAttribute('aria-label', (names && names[v]) || key + ' ' + (v + 1));
+      b.addEventListener('click', () => this.pick(key, v, names && names[v]));
+      sw.appendChild(b);
+    });
     drawFigure($('crPreview'), PLAYER_LOOK, { k: 264 / 96 });
   },
-  pick(key, v) { state.look[key] = v; refreshPlayerLook(); Sfx.play('tap'); this.build(); },
+  pick(key, v, word) {
+    state.look = Object.assign(lookChoice(state.look), { [key]: v });
+    refreshPlayerLook(); Sfx.play('tap');
+    if (word) Speech.speak(word, { who: 'narrator' });
+    this.build();
+  },
   done() {
     const v = $('crName').value.replace(/\s+/g, ' ').trim().slice(0, 14);
     state.name = v || GAME_CONTENT.defaultName;
@@ -6484,7 +7238,7 @@ function renderWorld(c, cx, cy, pr, vw, vh, t) {
     if (d > 130) drawGuideArrow(c, sparky.x, sparky.y - 62, Math.atan2(ty - sparky.y, tx - sparky.x), t);
   }
 }
-function update(dt) {
+function update(dt, tour) {
   game.t += dt;
   updatePlayer(dt);
   updateFollower(sparky, 40, dt);
@@ -6498,7 +7252,12 @@ function update(dt) {
     game.sleepT = 0; NPC.pip.sleeping = NPC.pop.sleeping = false;
     Toast.show('☀️ ' + GAME_CONTENT.ui.morning); Speech.speak(GAME_CONTENT.ui.morning, { who: 'narrator' });
   }
+  if (tour) return;
   if (G3.on) g3Camera(dt, false); else updateCamera(dt, false);
+}
+function tour2D(t) {          // the flat view pans slowly across the village behind the menu
+  cam.x = clamp(W / 2 - view.w / 2 + Math.sin(t * 0.05) * 420, 0, Math.max(0, W - view.w));
+  cam.y = clamp(H / 2 - view.h / 2 + Math.sin(t * 0.037 + 1) * 300, 0, Math.max(0, H - view.h));
 }
 function eveningTarget() {
   if (game.sleepT > 0) return 1;
@@ -6520,6 +7279,23 @@ const Perf = {
     else { setView3(false); state.settings.view = '2d'; Save.save(); }
   },
 };
+/* Pictures that stay alive while their window is open: whoever is talking in the dialog box keeps
+   breathing, blinking and moving their mouth; the creator, wardrobe and menu figures idle. */
+const Live = {
+  last: 0,
+  tick(now) {
+    if (now - this.last < 33) return;         // about 30 pictures a second is plenty
+    this.last = now;
+    const t = now / 1000, m = game.mode;
+    try {
+      if (Dialog.open && m === 'dialog') { const who = Dialog.who || 'sparky'; drawPortrait($('dlgPortrait'), who, { t, talk: !!Dialog.mouth && Dialog.mouth === Dialog.who }); }
+      else if (m === 'minigame') drawPortrait($('mgPortrait'), MG.who, { t });
+      else if (m === 'creator') drawFigure($('crPreview'), PLAYER_LOOK, { k: 264 / 96, t });
+      else if (m === 'wardrobe') drawFigure($('wdPreview'), PLAYER_LOOK, { k: 240 / 96, t });
+      else if (m === 'menu') drawFigure($('mMe'), PLAYER_LOOK, { t });
+    } catch (e) { /* a picture is never worth stopping the game */ }
+  },
+};
 let last = performance.now();
 function frame(now) {
   requestAnimationFrame(frame);
@@ -6527,11 +7303,15 @@ function frame(now) {
   const dt = Math.min(0.05, Math.max(0, raw));
   last = now;
   if (game.paused) return;
+  Live.tick(now);
+  Touch.update();
   Fx.update(dt);
-  if (FROZEN[game.mode]) return;
-  update(dt);
-  if (G3.on) { g3Render(game.t, dt); Perf.tick(raw); }
+  const tour = !!BACKDROP[game.mode] || (game.mode === 'ask' && Confirm.prev === 'title');
+  if (FROZEN[game.mode] && !tour) return;
+  update(dt, tour);
+  if (G3.on) { g3Render(game.t, dt, tour); if (!tour) Perf.tick(raw); }
   else {
+    if (tour) tour2D(game.t);
     const pr = view.pr;
     const cx = Math.round(cam.x * pr) / pr, cy = Math.round(cam.y * pr) / pr;
     renderWorld(ctx, cx, cy, pr, view.w, view.h, game.t);
@@ -6539,22 +7319,61 @@ function frame(now) {
   Talk.update();
 }
 function snapCamera() { updateCamera(0, true); if (G3.on) g3Camera(0, true); }
-/* First visit: parent screen → character creator → village. Later visits: title → village. */
+/* Every visit starts at the main menu: Continue (when there is a saved game) or New Game.
+   New Game → parent screen → character creator → village. */
 function showEntry() {
-  if (!state.parentSeen) { Parent.open(false); return; }
-  $('titleHi').textContent = state.created ? fmt(GAME_CONTENT.ui.hi) : '';
   if (Speech.status === 'none') VoiceWarn.show();
-  $('title').classList.remove('hidden'); setMode('title');
+  Title.open();
 }
-function startGame() {
+function startGame() {            // Enter on the main menu
   if (game.mode !== 'title') return;
-  Sfx.unlock();
-  if (!state.parentSeen) Parent.open(false);
-  else if (!state.created) Creator.open();
-  else enterWorld(false);
+  if (state.created) Title.resume(); else Title.newGame();
+}
+const Title = {
+  open() {
+    const U = GAME_CONTENT.ui, has = !!state.created;
+    for (const id of ['parent', 'creator', 'menu', 'questCard', 'topRight', 'talkWrap', 'dialog']) $(id).classList.add('hidden');
+    $('tContinue').classList.toggle('hidden', !has);
+    $('tNew').classList.toggle('orange', has);
+    $('tNewLbl').textContent = U.newGame; $('tContLbl').textContent = U.continue;
+    if (has) {
+      drawPortrait($('tMe'), 'player');
+      const info = $('tContInfo'); info.textContent = '';
+      for (const [cls, txt] of [['ciName', state.name], ['', '⭐ ' + state.stars + '/' + SETTINGS.totalStars], ['', '🔍 ' + EGGS.count() + '/' + EGGS.ids.length]]) {
+        const s = document.createElement('span'); if (cls) s.className = cls; s.textContent = txt; info.appendChild(s);
+      }
+    }
+    $('titleUnit').textContent = U.unit;
+    $('titleCredit').textContent = GAME_CONTENT.parent.credit;
+    this.small();
+    $('title').classList.remove('hidden'); setMode('title');
+  },
+  small() {
+    const U = GAME_CONTENT.ui;
+    $('tSound').textContent = state.settings.sound ? '🔊' : '🔇'; $('tSound').setAttribute('aria-label', U.sound);
+    $('tView').textContent = (G3.on ? '🧊' : '🖼️') + ' ' + (G3.on ? '3D' : '2D');
+    $('tView').classList.toggle('hidden', !!G3.tried && !G3.ok);
+    $('tInfo').textContent = 'ℹ️ ' + U.info;
+  },
+  resume() {
+    Sfx.unlock(); Sfx.play('tap');
+    $('title').classList.add('hidden');
+    enterWorld(false);
+  },
+  newGame() {
+    Sfx.unlock();
+    const go = () => { resetProgress(state.settings); Parent.open(false); };
+    if (state.created) Confirm.ask(GAME_CONTENT.ui.newGameAsk, go); else go();
+  },
+};
+function hardCloseDialog() {      // close without running what the dialog would do next (it is simply asked again later)
+  clearTimeout(Dialog.fbTimer); clearTimeout(Dialog.mouthTimer);
+  Dialog.open = false; Dialog.done = null; Dialog.mouth = null; Dialog.partner = null; Dialog.focus = null;
+  $('dialog').classList.add('hidden');
 }
 function enterWorld(first) {
   $('title').classList.add('hidden');
+  snapCamera();
   $('questCard').classList.remove('hidden');
   $('topRight').classList.remove('hidden');
   setMode('play');
@@ -6584,6 +7403,7 @@ function boot() {
   applyWorldState(true);
   UI.init();
   initInput();
+  Touch.init();
   resize();
   let rt = 0;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
@@ -6598,7 +7418,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, restartGame, resetInPlace, MG, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');

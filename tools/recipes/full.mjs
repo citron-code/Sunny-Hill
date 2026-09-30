@@ -202,6 +202,6 @@ export default async function ({ evaluate, shot, sleep, navigate, URL, viewport 
 
   await navigate(URL); await sleep(400);
   log('after reload: mode', await S('SH.game.mode'), 'stars', await stars(), 'finished', await S('SH.state.finished'),
-    'family', await S('JSON.stringify(SH.state.family)'), 'title hi:', await S(`document.getElementById('titleHi').textContent`));
+    'family', await S('JSON.stringify(SH.state.family)'), 'continue:', await S(`document.getElementById('tContinue').classList.contains('hidden') ? 'hidden' : document.getElementById('tContInfo').textContent`));
   await shot('66-title-return');
 }

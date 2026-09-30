@@ -15,12 +15,13 @@ export default async function ({ evaluate, sleep, shot, viewport }) {
   await S('SH.resetInPlace(SH.state.settings)');
   await sleep(400);
   const st = await S(`({ mode: SH.game.mode, stars: SH.state.stars, quest: SH.state.quest, eggs: Object.keys(SH.state.eggs).length, wear: JSON.stringify(SH.state.wear),
-    mgHidden: document.getElementById('mg').classList.contains('hidden'), parent: !document.getElementById('parent').classList.contains('hidden'),
+    mgHidden: document.getElementById('mg').classList.contains('hidden'), title: !document.getElementById('title').classList.contains('hidden'),
     herd: SH.HERD.map(a => a.st).join(','), leoHidden: SH.NPC.leo.hidden, decoysWander: ['pip','pop','nomi'].every(id => !!SH.NPC[id].wander),
     saved: (() => { try { return JSON.parse(localStorage.getItem('sunnyHill.save.v1')).stars; } catch (e) { return 'x'; } })() })`);
   log('after in-place reset:', JSON.stringify(st));
   await shot('r3-after-reset');
   // go through the parent screen and the creator with real buttons, then play Quest 1
+  await S(`document.getElementById('tNew').click()`); await sleep(300);
   await S(`document.getElementById('pStart').click()`); await sleep(300);
   await S(`document.getElementById('crName').value = 'Deniz'; document.getElementById('crOk').click()`); await sleep(300);
   const next = async () => { for (let i = 0; i < 10 && await S('SH.Dialog.open'); i++) { await sleep(300); await S(`document.getElementById('dlgNext').click()`); } };
@@ -40,9 +41,11 @@ export default async function ({ evaluate, sleep, shot, viewport }) {
     log(label.padEnd(12), r.join(' | '));
   };
   await S(`document.getElementById('menuBtn').click()`); await sleep(200);
-  await shot('r3-menu-landscape'); await reach('menu', ['#mRestart', '#mClose', '#mSound', '#mInfo']);
-  await S(`document.getElementById('mRestart').click()`); await sleep(200); await reach('ask', ['#askYes', '#askNo']);
-  await S(`document.getElementById('askNo').click(); document.getElementById('mClose').click()`); await sleep(200);
+  await shot('r3-menu-landscape'); await reach('menu', ['#mClose', '#mSound', '#mSlow', '#mNormal', '#mV2', '#mLook', '#mInfo', '#mHome']);
+  await S(`document.getElementById('mHome').click()`); await sleep(300);
+  await shot('r3-title-landscape'); await reach('main menu', ['#tContinue', '#tNew', '#tSound', '#tView', '#tInfo']);
+  await S(`document.getElementById('tNew').click()`); await sleep(200); await reach('ask', ['#askYes', '#askNo']);
+  await S(`document.getElementById('askNo').click(); document.getElementById('tContinue').click()`); await sleep(300); await S('SH.Dialog.close()');
   await S(`SH.state.finished = true; SH.state.finishedAt = '30.09.2026'; SH.Cert.open()`); await sleep(500);
   await shot('r3-cert-landscape'); await reach('certificate', ['#certAgain', '#certWalk']);
   await S(`SH.Cert.close(); SH.Wardrobe.open()`); await sleep(300); await reach('wardrobe', ['#wdOk']); await S('SH.Wardrobe.close()');
