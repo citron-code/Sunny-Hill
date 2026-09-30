@@ -3714,12 +3714,34 @@ function drawHead3(R, P, hm, st) { drawHeadParts3(R, P, hm, pose3(P.L, st)); }
 /* ---- animals ---- */
 const ANIMAL3 = {};
 const ANIMAL_KINDS3 = { dog: 1, owl: 1, cow: 1, chicken: 1, goat: 1, lamb: 1, horse: 1, cat: 1, catsleep: 1, frog: 1, rabbit: 1, duck: 1, duckling: 1 };
-function legs3(mb, pts, r, h, col, hoof) {
+let LEGS3 = null;          // while an animal is being built: its legs, so four-legged ones can walk leg by leg
+function legs3(mb, pts, r, h, col, hoof, paw) {
   for (const p of pts) {
     mb.color(col).lathe(p[0], 0, p[1], [[r * 1.08, 0], [r, h * 0.45], [r * 1.12, h]], 10, { cap: false });
     if (hoof) mb.color(hoof).lathe(p[0], 0, p[1], [[r * 1.18, 0], [r * 1.12, 3.5], [0.01, 3.6]], 10);
+    if (paw) mb.color(paw).sphere(p[0], 1.2, p[1] + 1, 2.9, 1.8, 3.4, 8, 5);
+    if (LEGS3) LEGS3.push({ x: p[0], z: p[1], r, h, col, hoof, paw });
   }
 }
+// one leg in two pieces that bend at the knee
+function legParts3(L) {
+  const up = new MB(3), lo = new MB(4), k = L.h * 0.52, r = L.r;
+  up.color(L.col).lathe(L.x, k, L.z, [[r * 1.02, 0], [r * 1.06, (L.h - k) * 0.4], [r * 1.14, L.h - k], [r * 1.45, L.h - k + r * 1.3], [0.01, L.h - k + r * 2.7]], 10);
+  up.sphere(L.x, k, L.z, r * 1.03, r * 1.03, r * 1.03, 10, 6);
+  lo.color(L.col).lathe(L.x, 0, L.z, [[r * 1.08, 0], [r * 0.98, k * 0.85], [r * 1.0, k]], 10, { cap: false });
+  if (L.hoof) lo.color(L.hoof).lathe(L.x, 0, L.z, [[r * 1.18, 0], [r * 1.12, 3.5], [0.01, 3.6]], 10);
+  if (L.paw) lo.color(L.paw).sphere(L.x, 1.2, L.z + 1, 2.9, 1.8, 3.4, 8, 5);
+  return { up: pack(up), lo: pack(lo), x: L.x, z: L.z, knee: k };
+}
+/* How four-legged animals walk: swing of each leg, knee bend while it steps forward, radians of the
+   step cycle per world unit walked (so feet don't slide), and a trot (diagonal pairs) or a walk (one foot at a time). */
+const GAIT3 = {
+  dog: { amp: 0.55, bend: 0.8, rate: 0.16, trot: true },
+  horse: { amp: 0.3, bend: 1.05, rate: 0.09, nod: 0.07 },
+  cow: { amp: 0.26, bend: 0.8, rate: 0.12 },
+  goat: { amp: 0.34, bend: 0.95, rate: 0.13, nod: 0.05 },
+  lamb: { amp: 0.38, bend: 0.95, rate: 0.16, nod: 0.05 },
+};
 function eyes3(mb, pts, r, white) {           // shiny black eyes with a white glint
   for (const p of pts) {
     if (white) mb.color('#ffffff').sphere(p[0], p[1], p[2] - r * 0.2, r * 1.5, r * 1.5, r * 0.8, 12, 8);
@@ -3729,13 +3751,13 @@ function eyes3(mb, pts, r, white) {           // shiny black eyes with a white g
 }
 function animalModel3(kind) {
   if (ANIMAL3[kind]) return ANIMAL3[kind];
+  LEGS3 = [];
   const A = {}, body = new MB(2), la = new MB(3), lb = new MB(4), head = new MB(5), tail = new MB(6), wings = new MB(7);
   if (kind === 'dog') {
     const c = '#f2b563', dk = '#b8732f', lt = '#fff3dc';
     body.color(c).sphere(0, 16, 0, 9, 8.5, 15, 16, 12); body.color(lt).sphere(0, 13, 7, 6.5, 6, 7, 12, 8);
     body.color('#ff4d4d').torus(0, 21.5, 9, 6.6, 1.6, 16, 6, 'y'); body.color('#ffd23c').sphere(0, 17.5, 15.5, 1.8, 1.8, 1.2, 8, 5);
-    legs3(la, [[-5, 9], [5, -9]], 2.5, 12, c); legs3(lb, [[5, 9], [-5, -9]], 2.5, 12, c);
-    for (const p of [[-5, 9], [5, -9], [5, 9], [-5, -9]]) (p[0] * p[1] < 0 ? la : lb).color(lt).sphere(p[0], 1.2, p[1] + 1, 2.9, 1.8, 3.4, 8, 5);
+    legs3(la, [[-5, 9], [5, -9]], 2.5, 12, c, null, lt); legs3(lb, [[5, 9], [-5, -9]], 2.5, 12, c, null, lt);
     head.color(c).sphere(0, 26, 13, 9, 8.5, 8.5, 16, 12); head.color(lt).sphere(0, 23.5, 19.5, 5, 4, 5.4, 12, 8);
     head.color('#2b1d16').sphere(0, 25, 24.8, 2, 1.6, 1.4, 8, 6);
     eyes3(head, [[-3.8, 28.5, 19.6], [3.8, 28.5, 19.6]], 1.6);
@@ -3872,24 +3894,48 @@ function animalModel3(kind) {
   }
   A.body = pack(body); A.legA = pack(la); A.legB = pack(lb); A.head = pack(head); A.tail = pack(tail); A.wings = pack(wings);
   A.hip = kind === 'horse' ? 34 : kind === 'cow' ? 24 : kind === 'goat' ? 20 : kind === 'lamb' ? 13 : kind === 'chicken' ? 5 : 12;
+  if (LEGS3.length === 4 && GAIT3[kind]) {
+    const trot = GAIT3[kind].trot;
+    A.legs4 = LEGS3.map((L) => {
+      const P = legParts3(L), front = L.z > 0, left = L.x < 0;
+      // walk: left hind, left front, right hind, right front, a quarter of a step apart; trot: diagonal pairs together
+      P.off = trot ? (front === left ? 0 : 0.5) : (left ? 0 : 0.5) + (front ? 0.25 : 0);
+      return P;
+    });
+  }
+  LEGS3 = null;
   ANIMAL3[kind] = A;
   return A;
 }
 /* st: { x, z, y, yaw, moving, phase, t, graze, peck, talk, scale } */
 function drawAnimal3(R, kind, st) {
-  const A = animalModel3(kind), t = st.t || 0;
+  const A = animalModel3(kind), t = st.t || 0, G = GAIT3[kind], mv = !!st.moving;
   const root = T3(st.x, st.y || 0, st.z); m4ry(root, st.yaw || 0); if (st.scale) m4s(root, st.scale, st.scale, st.scale);
-  const sw = st.moving ? Math.sin(st.phase) * 0.55 : 0, bob = st.moving ? Math.abs(Math.cos(st.phase)) * 1.4 : Math.sin(t * 3) * 0.3;
+  const th = G ? (st.phase || 0) / 0.13 * G.rate : 0;      // where each foot is in its step
+  const sw = mv ? Math.sin(st.phase) * 0.55 : 0;
+  let bob = mv ? Math.abs(Math.cos(st.phase)) * 1.4 : Math.sin(t * 3) * 0.3;
+  if (A.legs4 && mv) bob = (0.5 + 0.5 * Math.cos(2 * th)) * A.hip * 0.04;
   const base = m4t(new Float32Array(root), 0, bob, 0);
   R.draw(A.body, base);
-  const leg = (mesh, a) => { const m = m4t(new Float32Array(root), 0, A.hip, 0); m4rx(m, a); m4t(m, 0, -A.hip, 0); R.draw(mesh, m); };
-  leg(A.legA, sw); leg(A.legB, -sw);
+  if (A.legs4) {
+    for (const L of A.legs4) {
+      const a = th + L.off * TAU, swing = mv ? Math.sin(a) * G.amp : 0, bend = mv ? Math.max(0, -Math.cos(a)) * G.bend : 0;
+      const up = m4t(new Float32Array(root), L.x, A.hip, L.z); m4rx(up, swing); m4t(up, -L.x, -A.hip, -L.z);
+      R.draw(L.up, up);
+      const lo = m4t(new Float32Array(up), L.x, L.knee, L.z); m4rx(lo, bend); m4t(lo, -L.x, -L.knee, -L.z);
+      R.draw(L.lo, lo);
+    }
+  } else {
+    const leg = (mesh, a) => { const m = m4t(new Float32Array(root), 0, A.hip, 0); m4rx(m, a); m4t(m, 0, -A.hip, 0); R.draw(mesh, m); };
+    leg(A.legA, sw); leg(A.legB, -sw);
+  }
   if (A.head.n) {
     const hp = A.headPivot, m = m4t(new Float32Array(base), hp[0], hp[1], hp[2]);
     let dip = 0;
     if (st.graze) dip = 0.55 + Math.sin(t * 2) * 0.05;
     if (st.peck) dip = 0.9;
     if (st.talk) dip = Math.sin(t * 12) * 0.08;
+    if (mv && G && G.nod) dip += Math.sin(2 * th) * G.nod;        // horses nod their heads as they walk
     m4rx(m, dip); m4t(m, -hp[0], -hp[1], -hp[2]);
     R.draw(A.head, m);
   }
@@ -4099,7 +4145,7 @@ function g3Render(t, dt, tour) {
     if (!NPC[b.id].sleeping) continue;
     R.draw(ITEM3['bed_' + b.id], T3(b.x, 0, b.y));
     const L = LOOKS[b.id], P = personModel3(L), s = L.size || 1;
-    const hm = T3(b.x - 18, 24, b.y - 10); m4rx(hm, -Math.PI / 2 + 0.25); m4s(hm, s, s, s); m4t(hm, 0, -P.d.hy, 0);
+    const hm = T3(b.x - 18, 22, b.y - 10); m4ry(hm, Math.PI / 2); m4rx(hm, -Math.PI / 2 + 0.2); m4s(hm, s * 0.82, s * 0.82, s * 0.82); m4t(hm, 0, -P.d.hy, 0);
     drawHead3(R, P, hm, { t, closed: true });
   }
   // people and animals
@@ -4492,7 +4538,7 @@ function updateFollower(e, dist, dt) {
   if (dd > 320) { e.x = tp.x; e.y = tp.y; e.moving = false; return; }
   if (dd > 2.5) {
     const sp = Math.min(dd, SETTINGS.walkSpeed * dt * (dd > 30 ? 1.45 : 1));
-    e.x += dx / dd * sp; e.y += dy / dd * sp; e.moving = true; e.phase += sp * 0.09;
+    e.x += dx / dd * sp; e.y += dy / dd * sp; e.moving = true; e.phase += sp * 0.13;
     if (Math.abs(dx) > 0.4) e.face = dx < 0 ? -1 : 1;
     if (e.dir) e.dir = faceDir(dx, dy, e.dir);
   } else e.moving = false;
@@ -6663,7 +6709,7 @@ function resetProgress(settings) {
   player.x = MAP.start.x; player.y = MAP.start.y; player.dir = 'up';
   player.path = null; player.goal = null; player.moving = false; player.stuck = 0;
   resetTrail(0.4, 1);
-  sparky.x = player.x - 30; sparky.y = player.y + 14; sparky.moving = false;
+  sparky.x = player.x - 40; sparky.y = player.y + 46; sparky.moving = false;
   for (const n of NPCS) {
     n.x = n.home.x; n.y = n.home.y; n.path = null; n.pathI = 0; n.onArrive = null;
     n.follow = 0; n.wander = null; n.hidden = false; n.sleeping = false; n.moving = false; n.dir = 'down'; n.tries = 0;
@@ -7276,7 +7322,7 @@ function renderWorld(c, cx, cy, pr, vw, vh, t) {
 function update(dt, tour) {
   game.t += dt;
   updatePlayer(dt);
-  updateFollower(sparky, 40, dt);
+  updateFollower(sparky, 62, dt);
   if (!sparky.moving && game.mode === 'play' && !player.moving) sparky.face = player.x < sparky.x ? -1 : 1;
   updateNPCs(dt);
   updateAnimals(dt);
@@ -7434,7 +7480,7 @@ function boot() {
   document.body.classList.toggle('g3', G3.on);
   player.x = MAP.start.x; player.y = MAP.start.y; player.dir = 'up';
   resetTrail(0.4, 1);
-  sparky.x = player.x - 30; sparky.y = player.y + 14;
+  sparky.x = player.x - 40; sparky.y = player.y + 46;
   applyWorldState(true);
   UI.init();
   initInput();
@@ -7462,7 +7508,7 @@ window.SH = {
   step(dt, n = 1) { for (let i = 0; i < n; i++) { update(dt); Fx.update(dt); } this.render(); },
   render() { if (G3.on) g3Render(game.t, 1 / 60); else renderWorld(ctx, cam.x, cam.y, view.pr, view.w, view.h, game.t); Talk.update(); },
   G3, W3, CAM3, setView3,
-  tp(x, y) { player.x = x; player.y = y; player.path = null; resetTrail(0, 1); sparky.x = x - 30; sparky.y = y + 14; snapCamera(); },
+  tp(x, y) { player.x = x; player.y = y; player.path = null; resetTrail(0, 1); sparky.x = x - 40; sparky.y = y + 46; snapCamera(); },
   overview(k = 0.5) {
     const cv = document.createElement('canvas'); cv.width = W * k; cv.height = H * k;
     renderWorld(cv.getContext('2d'), 0, 0, k, W, H, game.t);
