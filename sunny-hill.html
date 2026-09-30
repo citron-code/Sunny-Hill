@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#9ddc6e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sunny Hill">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='30' fill='%23ffc21a' stroke='%23e89a12' stroke-width='5'/%3E%3Cg stroke='%23ffc21a' stroke-width='8' stroke-linecap='round'%3E%3Cpath d='M50 4v10M50 86v10M4 50h10M86 50h10M17 17l7 7M76 76l7 7M17 83l7-7M76 24l7-7'/%3E%3C/g%3E%3Ccircle cx='40' cy='46' r='4' fill='%234a3222'/%3E%3Ccircle cx='60' cy='46' r='4' fill='%234a3222'/%3E%3Cpath d='M38 58q12 10 24 0' fill='none' stroke='%234a3222' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Sunny Hill</title>
 <style>
 :root{
@@ -380,6 +385,17 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
   padding:12px 14px;display:flex;align-items:center;gap:12px;border-color:#ffb38a;font-size:20px;line-height:1.3}
 #vwText{flex:1 1 auto}
 #vwOk{flex:0 0 auto}
+.fsIcon{width:28px;height:28px;display:block;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.fsBtn .fsOut{display:none}
+body.fs .fsBtn .fsIn{display:none}
+body.fs .fsBtn .fsOut{display:inline}
+#tFull{display:flex;align-items:center;justify-content:center}
+#mFull{display:flex;align-items:center;justify-content:center;color:var(--ink)}
+#fsHelp{position:fixed;z-index:58;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);width:min(560px,calc(100vw - 20px));
+  padding:12px 14px;display:flex;align-items:center;gap:12px;border-color:#8fd0ff;font-size:20px;line-height:1.3}
+#fsHelpText{flex:1 1 auto}
+#fsHelpOk{flex:0 0 auto}
+@media (max-width:520px){ #fsHelp{flex-direction:column;align-items:stretch} }
 .vwBtns{display:flex;gap:8px;flex:0 0 auto;flex-wrap:wrap}
 #vwCopy,#pVoiceCopy{flex:0 0 auto;font-size:20px}
 @media (max-width:520px){ #voiceWarn,#pVoice{flex-direction:column;align-items:stretch} }
@@ -473,6 +489,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 
 <div id="toast" class="hidden"></div>
 
+<div id="fsHelp" class="card hidden" role="alert"><div id="fsHelpText"></div><button id="fsHelpOk" class="btn green"></button></div>
 <div id="voiceWarn" class="card hidden" role="alert"><div id="vwText"></div><div class="vwBtns"><button id="vwCopy" class="btn blue hidden"></button><button id="vwOk" class="btn green"></button></div></div>
 
 <div id="mg" class="overlay hidden">
@@ -493,6 +510,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
     <div class="pauseHead">
       <h2 id="mTitle">Menu</h2>
       <div class="headChips"><span id="mStars" class="chip"></span><span id="mSecrets" class="chip"></span></div>
+      <button id="mFull" class="btn round white fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button>
       <button id="mClose" class="btn round green" aria-label="Close">✖</button>
     </div>
     <div class="pauseBody">
@@ -570,7 +588,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
       <button id="tContinue" class="gbtn contBtn hidden"><canvas id="tMe" width="144" height="144"></canvas>
         <span class="contText"><span id="tContLbl" class="contLbl"></span><span id="tContInfo" class="contInfo"></span></span><span class="gi">▶</span></button>
       <button id="tNew" class="gbtn"><span class="gi">✨</span><span id="tNewLbl"></span></button>
-      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tView" class="pill"></button><button id="tInfo" class="pill"></button></div>
+      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tView" class="pill"></button><button id="tFull" class="pill fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button><button id="tInfo" class="pill"></button></div>
       <div id="titleCredit"></div>
     </div>
   </div>
@@ -626,7 +644,7 @@ const GAME_CONTENT = {
     slow: 'Slow', normal: 'Normal', myLook: 'My look', view: 'View', info: 'Info / Bilgi',
     restart: 'Restart game', close: 'Close',
     // ana menü ve oyun içi menü
-    newGame: 'New Game', continue: 'Continue', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
+    newGame: 'New Game', continue: 'Continue', fullScreen: 'Full screen', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
     unit: 'Unit 1 · What is a family?',
     newGameAsk: 'Start a new game? Your stars will be lost. / Yeni oyun başlasın mı? Yıldızlar silinir.',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
@@ -659,6 +677,8 @@ const GAME_CONTENT = {
     voiceFixAndroid: 'Linki ({link}) kopyalayıp Google Chrome’a yapıştırın. Yine konuşmazsa: Ayarlar › Metin okuma çıktısı › İngilizce sesi indirin.',
     voiceFixIOS: 'Linki ({link}) kopyalayıp Safari’ye yapıştırın. Yine konuşmazsa: Ayarlar › Erişilebilirlik › Seslendirilen İçerik › Sesler › İngilizce.',
     copyLink: '📋 Linki kopyala', copied: '✓ Kopyalandı',
+    // iPhone has no full-screen button for web pages: the way there is the home screen
+    fullIOS: 'iPhone’da tam ekran için: Safari’de Paylaş düğmesine (⬆️ kare ve ok) dokunun › “Ana Ekrana Ekle”. Oyun, ana ekrandaki ☀️ simgesinden tam ekran açılır.',
     voiceNoApi: 'Bu tarayıcı sesli okumayı desteklemiyor. Lütfen oyunu Google Chrome, Microsoft Edge veya Safari ile açın.',
     voiceTest: 'Dinle',
     voiceClose: 'Tamam',
@@ -6444,6 +6464,53 @@ const Talk = {
   },
 };
 
+/* ---- full screen ----
+   Phones and tablets go full screen when the game starts (it needs a tap, so it happens on New Game /
+   Continue); the ⛶ buttons switch it on and off. iPhones can't do it for web pages: their button explains
+   "Add to Home Screen", and the game opens full screen from there. */
+const FS = {
+  can() { const d = document.documentElement; return !!(d.requestFullscreen || d.webkitRequestFullscreen) && document.fullscreenEnabled !== false && document.webkitFullscreenEnabled !== false; },
+  on() { return !!(document.fullscreenElement || document.webkitFullscreenElement); },
+  // opened from the home screen (a browser in full screen also says "display-mode: fullscreen", so that alone is not enough)
+  app() {
+    try { const mq = (q) => window.matchMedia(q).matches; return navigator.standalone === true || mq('(display-mode: standalone)') || (mq('(display-mode: fullscreen)') && !this.on()); }
+    catch (e) { return false; }
+  },
+  enter() {
+    const d = document.documentElement, f = d.requestFullscreen || d.webkitRequestFullscreen;
+    if (!f || this.on()) return;
+    try { const p = f.call(d, { navigationUI: 'hide' }); if (p && p.catch) p.catch(() => {}); } catch (e) { /* the browser said no */ }
+  },
+  exit() {
+    const f = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!f || !this.on()) return;
+    try { const p = f.call(document); if (p && p.catch) p.catch(() => {}); } catch (e) { /* already out */ }
+  },
+  toggle() { if (this.on()) this.exit(); else if (this.can()) this.enter(); else this.help(); },
+  auto() { if (Device.touch && this.can() && !this.on() && !this.app()) this.enter(); },
+  help() {
+    $('fsHelpText').textContent = '📱 ' + GAME_CONTENT.parent.fullIOS;
+    $('fsHelpOk').textContent = GAME_CONTENT.parent.voiceClose;
+    $('fsHelp').classList.remove('hidden');
+  },
+  refresh() {
+    const on = this.on(), show = !this.app() && (this.can() || Device.os === 'ios');
+    document.body.classList.toggle('fs', on);
+    for (const id of ['tFull', 'mFull']) {
+      const b = $(id); if (!b) continue;
+      b.classList.toggle('hidden', !show);
+      b.setAttribute('aria-label', GAME_CONTENT.ui.fullScreen); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  },
+  init() {
+    for (const ev of ['fullscreenchange', 'webkitfullscreenchange']) document.addEventListener(ev, () => this.refresh());
+    // the home-screen app's description and icon only exist on the website, not next to a single downloaded file
+    if (/^https?:$/.test(location.protocol)) {
+      for (const [rel, href] of [['manifest', 'manifest.webmanifest'], ['apple-touch-icon', 'apple-touch-icon.png']]) { const l = document.createElement('link'); l.rel = rel; l.href = href; document.head.appendChild(l); }
+    }
+    this.refresh();
+  },
+};
 /* ---- which device: phone, tablet or computer ----
    A touch screen as the main pointer, or a phone/tablet browser, means touch controls. iPads say
    they are Macs, so a "Mac" with a touch screen is an iPad. Phone or tablet goes by the screen's short side. */
@@ -6621,6 +6688,9 @@ const UI = {
       [...s].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.12) + 's'; T.appendChild(sp); }); }
     tap('pVoiceTest', () => Parent.test());
     tap('vwOk', () => VoiceWarn.hide());
+    tap('tFull', () => { Sfx.unlock(); Sfx.play('tap'); FS.toggle(); });
+    tap('mFull', () => { Sfx.play('tap'); FS.toggle(); });
+    tap('fsHelpOk', () => $('fsHelp').classList.add('hidden'));
     tap('vwCopy', () => copyGameLink($('vwCopy')));
     tap('pVoiceCopy', () => copyGameLink($('pVoiceCopy')));
     Speech.onChange = (st) => { if (game.mode === 'parent') Parent.voiceLine(); else if (st === 'none') VoiceWarn.show(); };
@@ -7437,11 +7507,13 @@ const Title = {
     $('tInfo').textContent = 'ℹ️ ' + U.info;
   },
   resume() {
+    FS.auto();
     Sfx.unlock(); Sfx.play('tap');
     $('title').classList.add('hidden');
     enterWorld(false);
   },
   newGame() {
+    FS.auto();
     Sfx.unlock();
     const go = () => { resetProgress(state.settings); Parent.open(false); };
     if (state.created) Confirm.ask(GAME_CONTENT.ui.newGameAsk, go); else go();
@@ -7485,6 +7557,7 @@ function boot() {
   UI.init();
   initInput();
   Touch.init();
+  FS.init();
   resize();
   let rt = 0;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 120); });
@@ -7499,7 +7572,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');

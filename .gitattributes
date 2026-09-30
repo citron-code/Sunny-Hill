@@ -1,0 +1,3 @@
+# keep plain line endings on every computer (the game file is edited by scripts that expect them)
+* text=auto eol=lf
+*.png binary
