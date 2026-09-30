@@ -108,6 +108,7 @@ node tools/drive.mjs tools/recipes/people3d.mjs   # karakterler yakından: her s
 node tools/drive.mjs tools/recipes/people2d.mjs   # aynı karakterler 2D yedek görünümde
 node tools/drive.mjs tools/recipes/characters.mjs # karakter oluşturma gerçek tıklamalarla; konuşma penceresindeki resmin canlı olduğunu kontrol eder
 node tools/drive.mjs tools/recipes/touch.mjs      # telefon / tablet / bilgisayar algılama; joystick ve eylem düğmesi gerçek dokunuşlarla, iki başparmakla
+node tools/drive.mjs tools/recipes/walk3d.mjs     # at, keçi, kuzu ve Sparky'nin yürüyüş adımları yandan; Sparky'nin oyuncuya uzaklığı
 node tools/drive.mjs tools/recipes/restart.mjs    # baştan başlama gerçek tıklamalarla: Menu → Main menu → New Game, diyalog açıkken, sertifikadaki Play again; 3 ekran boyutunda
 node tools/drive.mjs tools/recipes/restart-inplace.mjs  # yarım kalmış karışık bir oyunu sıfırlayıp Görev 1'i yeniden oynar; yatay telefonda bütün butonlara erişim
 node tools/drive.mjs tools/recipes/photo.mjs      # aile fotoğrafı (küçük, kalabalık, yalnız çocuklar) 3D ve 2D: arka sıradakiler görünüyor mu
