@@ -36,10 +36,12 @@ export default async function ({ evaluate, shot, sleep, navigate, URL, viewport 
     if (!ok) fail('nothing to use: ' + id + ' ' + JSON.stringify(await S('SH.interactables().map(o => o.id + ":" + o.label)')));
     await sleep(150);
   }
-  async function walkTo(x, y, until, ms = 15000) {
+  // walk like a child: head for the spot, and re-aim now and then if it is something that moves
+  async function walkTo(x, y, until, ms = 15000, chase) {
     await S(`SH.walkTo(${x}, ${y})`);
     for (let t = 0; t < ms; t += 200) {
       if (until && await S(until)) return;
+      if (chase && t % 1400 === 0) await S(`(() => { const p = ${chase}; SH.walkTo(p[0], p[1] + 20); })()`);
       if (!until && !(await S('SH.player.path'))) return;
       await sleep(200);
     }
@@ -50,7 +52,7 @@ export default async function ({ evaluate, shot, sleep, navigate, URL, viewport 
   const prompt = () => S(`document.getElementById('mgPrompt').textContent`);
   const stars = () => S('SH.state.stars');
 
-  await S('SH.quickStart("Ayşe")');
+  await S('SH.quickStart("Ayşe"); SH.VoiceWarn.shown = true;');   // headless Chrome has no working voice
   await nextAll('intro');
 
   // ---------------- Quest 1
@@ -102,15 +104,16 @@ export default async function ({ evaluate, shot, sleep, navigate, URL, viewport 
   // ---------------- Quest 4: animals
   log('herd before:', await S(`JSON.stringify(SH.HERD.map(a => [a.id, a.st, Math.round(a.x), Math.round(a.y)]))`));
   await use('nomi'); await nextAll('Q4 intro');
+  const SH_GATE = await S(`[SH.PEN_GATE.x, SH.PEN_GATE.y]`);
   // the horse: walk there for real, then lead it home
   const horse = await S(`(() => { const a = SH.HERD.find(a => a.id === 'horse'); return [a.x, a.y]; })()`);
-  await walkTo(horse[0], horse[1] + 20, `SH.HERD.find(a => a.id === 'horse').st === 'follow'`);
+  await walkTo(horse[0], horse[1] + 20, `SH.HERD.find(a => a.id === 'horse').st === 'follow'`, 30000, `(() => { const a = SH.HERD.find(a => a.id === 'horse'); return [a.x, a.y]; })()`);
   for (const id of ['goat', 'lamb']) {
     const p = await S(`(() => { const a = SH.HERD.find(a => a.id === '${id}'); return [a.x, a.y]; })()`);
-    await walkTo(p[0], p[1] + 20, `SH.HERD.find(a => a.id === '${id}').st === 'follow'`, 20000);
+    await walkTo(p[0], p[1] + 20, `SH.HERD.find(a => a.id === '${id}').st === 'follow'`, 40000, `(() => { const a = SH.HERD.find(a => a.id === '${id}'); return [a.x, a.y]; })()`);
   }
   await sleep(600); await shot('47-q4-following');
-  await walkTo(360, 940, `SH.state.q.home.length >= 3`, 30000);
+  await walkTo(SH_GATE[0] + 40, SH_GATE[1], `SH.state.q.home.length >= 3`, 30000);
   await sleep(2500); await shot('48-q4-pen');
   await use('nomi'); await nextAll('Q4 finish');
   log('Q4 stars', await stars(), 'unlocked', await S('JSON.stringify(SH.state.unlocked)'));

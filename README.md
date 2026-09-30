@@ -25,6 +25,14 @@ Menüdeki **View** düğmesiyle sade 2D görünüme geçilebilir; seçim kaydedi
 - Tarayıcıda WebGL yoksa oyun kendiliğinden 2D açılır.
 - Cihaz 3D için yavaşsa oyun önce çözünürlüğü düşürür, yine yetmezse 2D'ye geçer.
 
+## Gizli sürprizler
+
+Köyde 8 gizli sürpriz var; bulmak isteğe bağlı, menüde ve sertifikada "Secrets x / 8" olarak sayılır:
+bankta uyuyan kedi, çeşmede gökkuşağı, meydandan göle giden renkli müzik taşları, göldeki
+ördek ailesi, nilüfer yaprağındaki kurbağa, tarladaki korkuluk, çiçek çayırındaki tavşan ve
+ormandaki patikanın sonunda bir hazine sandığı. Konuşan hayvanların cümleleri `GAME_CONTENT.secrets`
+içindedir. Haritada ayrıca yel değirmeni, piknik örtüsü, uçurtma ve elma bahçesi var.
+
 ## Sesler
 
 Oyun, cihazın kendi İngilizce seslerini kullanır ve her karaktere mümkünse ayrı bir ses verir
@@ -68,7 +76,9 @@ node tools/drive.mjs tools/recipes/nowebgl.mjs    # WebGL olmayan tarayıcı: oy
 node tools/drive.mjs tools/recipes/switchview.mjs # menüden 3D ↔ 2D geçişi ve seçimin kaydı
 node tools/drive.mjs tools/recipes/look3d.mjs     # köyün birkaç yerinden 3D ekran görüntüsü
 node tools/drive.mjs tools/recipes/scenes3d.mjs   # her görevin sahnesi 3D
-node tools/drive.mjs tools/recipes/gallery3d.mjs  # bütün karakter ve hayvan modelleri yakından
+node tools/drive.mjs tools/recipes/gallery3d.mjs  # bütün karakter, hayvan ve bina modelleri yakından
+node tools/drive.mjs tools/recipes/eggs.mjs       # 8 gizli sürprizi bir çocuk gibi bulur, sayacı kontrol eder
+node tools/drive.mjs tools/recipes/map3d.mjs      # köyün tamamı yukarıdan (3D; OVERVIEW2D=1 ile 2D harita da)
 node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi (2D harita)
 ```
 
