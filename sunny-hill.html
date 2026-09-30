@@ -329,6 +329,7 @@ body.g3 #gl{display:block}
     <button id="mSound" class="btn blue wide"></button>
     <div class="row"><button id="mSlow" class="btn wide"></button><button id="mNormal" class="btn wide"></button></div>
     <button id="mLook" class="btn yellow wide"></button>
+    <button id="mView" class="btn white wide"></button>
     <button id="mInfo" class="btn white wide"></button>
     <button id="mRestart" class="btn pink wide"></button>
     <button id="mClose" class="btn green wide"></button>
@@ -438,7 +439,7 @@ const GAME_CONTENT = {
     take: 'Take', put: 'Put', give: 'Give', open: 'Open', look: 'Look',
     greatJob: 'Great job!', tryAgain: 'Try again!', thankYou: 'Thank you!',
     menu: 'Menu', sound: 'Sound', on: 'On', off: 'Off',
-    slow: 'Slow', normal: 'Normal', myLook: 'My look', info: 'Info / Bilgi',
+    slow: 'Slow', normal: 'Normal', myLook: 'My look', view: 'View', info: 'Info / Bilgi',
     restart: 'Restart game', close: 'Close',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
     hi: 'Hi, {name}!',
@@ -2207,6 +2208,16 @@ class GLR {
     }
     return !(l === 8 || r === 8 || d === 8 || u === 8 || bk === 8);
   }
+  screenRect(bx) {            // css-pixel rectangle around a world box (null if behind the camera)
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (let i = 0; i < 8; i++) {
+      const p = m4apply(this.VP, i & 1 ? bx[3] : bx[0], i & 2 ? bx[4] : bx[1], i & 4 ? bx[5] : bx[2]);
+      if (p[3] <= 0) return null;
+      const sx = (p[0] / p[3] * 0.5 + 0.5) * this.cssW, sy = (0.5 - p[1] / p[3] * 0.5) * this.cssH;
+      if (sx < x0) x0 = sx; if (sx > x1) x1 = sx; if (sy < y0) y0 = sy; if (sy > y1) y1 = sy;
+    }
+    return { x0, y0, x1, y1 };
+  }
   project(x, y, z) {          // world → css pixels
     const p = m4apply(this.VP, x, y, z);
     if (p[3] <= 0) return null;
@@ -2552,7 +2563,11 @@ function standY3(x, z) {       // where feet rest: the dock is a little higher t
   if (x > D.x0 && x < D.x1 && z > D.y0 - 10 && z < D.y1) return 5;
   return 0;
 }
-const W3 = { chunks: [], shadows: null, water: null, texQuads: [], dyn: {} };
+const W3 = { chunks: [], tall: [], shadows: null, water: null, texQuads: [], dyn: {} };
+// tall things are drawn one by one, so they can fade when they stand between the camera and the player
+const TREE3 = { tree0: 1, tree1: 1, tree2: 1, apple: 1, pine0: 1, pine1: 1 };
+const TALL3 = Object.assign({ treehouse: 1, owltree: 1, houseMilo: 1, myHouse: 1, apartment: 1, barn: 1, silo: 1, cottage: 1, tent: 1 }, TREE3);
+const TALLMESH3 = {};
 function build3DWorld() {
   const CH = 420, chunks = new Map();
   const chunk = (x, z) => {
@@ -2657,7 +2672,17 @@ function build3DWorld() {
       continue;
     }
     if (!fn) continue;
-    mb.push(T3(o.x, 0, o.y)); fn(mb); mb.pop();
+    if (TALL3[k]) {
+      let mesh = TALLMESH3[k];
+      if (!mesh) { const tm = new MB(k.length * 7 + 3); fn(tm); mesh = TALLMESH3[k] = pack(tm); }
+      const tree = !!TREE3[k], Rr = rng((o.x * 3 + o.y * 7) | 0), yaw = tree ? Rr() * TAU : 0, sc = tree ? 0.9 + Rr() * 0.22 : 1;
+      const m = T3(o.x, 0, o.y); if (yaw) m4ry(m, yaw); if (sc !== 1) m4s(m, sc, sc, sc);
+      const b = mesh.box, r = Math.max(Math.abs(b[0]), Math.abs(b[3]), Math.abs(b[2]), Math.abs(b[5])) * sc;
+      const box = tree ? [o.x - r, 0, o.y - r, o.x + r, b[4] * sc, o.y + r] : [o.x + b[0], b[1], o.y + b[2], o.x + b[3], b[4], o.y + b[5]];
+      // what can hide the player: for a tree only its leafy top, not the thin trunk
+      const occ = tree ? [o.x - r * 0.8, b[4] * sc * 0.4, o.y - r * 0.8, o.x + r * 0.8, b[4] * sc, o.y + r * 0.8] : box;
+      W3.tall.push({ key: k, mesh, m, box, occ, z: o.y, fade: 1 });
+    } else { mb.push(T3(o.x, 0, o.y)); fn(mb); mb.pop(); }
     const sh = SHADOW3[k];
     if (sh) blob(o.x + sh[0], o.y + sh[1], sh[2], sh[3], sh[4]);
   }
@@ -2771,7 +2796,11 @@ function personModel3(L) {
     tb.color('#ffffff').box(-4, d.sh - 5, fz - 1.4, 4, d.sh + 0.5, fz + 0.4);
   }
   if (L.shawl) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.shawl).cyl(0, d.sh - 9, 0, d.bw + 3.5, 5, 13, 10); tb.pop(); }
-  if (L.cape) tb.color(L.cape).extrude([[-d.bw - 1, d.sh], [-d.bw - 8, d.hip - 9], [d.bw + 8, d.hip - 9], [d.bw + 1, d.sh]], -d.bz - 2.6, -d.bz - 1);
+  if (L.cape) {
+    const zt = -d.bz - 1.5, zb = -(d.bw + 8) * bzk - 3, TL = [-d.bw - 1, d.sh, zt], TR = [d.bw + 1, d.sh, zt], BR = [d.bw + 8, d.hip - 9, zb], BL = [-d.bw - 8, d.hip - 9, zb];
+    tb.color(L.cape).quad(TL, TR, BR, BL);
+    tb.color(shade3(L.cape, -0.25)).quad(TL, BL, BR, TR);
+  }
   P.torso = pack(tb);
   // arms
   for (const s of [-1, 1]) {
@@ -2969,12 +2998,17 @@ function animalModel3(kind) {
     const c = '#c98a52', m = '#5a3620';
     body.color(c).sphere(0, 44, 0, 13, 14, 28, 10, 7);
     legs3(la, [[-7, 18], [7, -18]], 3.6, 34, '#b77a45', '#3a2a20'); legs3(lb, [[7, 18], [-7, -18]], 3.6, 34, '#b77a45', '#3a2a20');
-    body.push(RX3(T3(0, 50, 22), -0.6)); body.color(c).cyl(0, 0, 0, 7.5, 6, 26, 8); body.pop();
-    body.push(RX3(T3(0, 52, 20), -0.6)); for (let k = 0; k < 5; k++) body.color(m).box(-2, 2 + k * 5, -8, 2, 7 + k * 5, -3); body.pop();
-    head.push(RX3(T3(0, 72, 33), 1.1)); head.color(c).box(-6, -4, -5, 6, 24, 7); head.color('#e6b081').box(-6.5, 16, -5.5, 6.5, 26, 7.5); head.pop();
-    for (const s of [-1, 1]) { head.color('#2b1d16').sphere(s * 6.2, 73, 36, 1.4, 1.6, 1, 5, 3); head.color(c).cone(s * 4, 79, 30, 2.2, 7, 4); }
+    body.push(RX3(T3(0, 48, 20), 0.55)); body.color(c).cyl(0, 0, 0, 8, 6.5, 30, 8);
+    for (let k = 0; k < 6; k++) body.color(m).box(-2.2, 2 + k * 5, -9.5, 2.2, 7.5 + k * 5, -4.5);
+    body.pop();
+    head.push(RX3(T3(0, 74, 34), 0.75));
+    head.color(c).box(-6, -6, -3, 6, 6, 20); head.color('#e6b081').box(-6.5, -6.5, 14, 6.5, 6.5, 24);
+    head.color('#2b1d16').sphere(-3, -2, 24.2, 1.2, 1.2, 0.6, 4, 2); head.sphere(3, -2, 24.2, 1.2, 1.2, 0.6, 4, 2);
+    for (const s of [-1, 1]) { head.color('#2b1d16').sphere(s * 6.3, 2, 6, 1.1, 1.6, 1.5, 5, 3); head.color('#ffffff').sphere(s * 6.7, 2.6, 6.8, 0.45, 0.45, 0.45, 4, 2); head.color(c).cone(s * 3.6, 6, -1, 2.3, 7, 4); }
+    head.color(m).box(-2, 5, -4, 2, 8, 6);
+    head.pop();
     tail.push(RX3(T3(0, 48, -27), 0.5)); tail.color(m).sphere(0, -12, 0, 4, 14, 4, 6, 5); tail.pop();
-    A.headPivot = [0, 60, 26]; A.tailPivot = [0, 48, -27];
+    A.headPivot = [0, 56, 24]; A.tailPivot = [0, 48, -27];
   }
   A.body = pack(body); A.legA = pack(la); A.legB = pack(lb); A.head = pack(head); A.tail = pack(tail); A.wings = pack(wings);
   A.hip = kind === 'horse' ? 34 : kind === 'cow' ? 24 : kind === 'goat' ? 20 : kind === 'lamb' ? 13 : kind === 'chicken' ? 5 : 12;
@@ -3101,6 +3135,7 @@ function face3(e, dt, look, keep) {
   return e._yaw;
 }
 function g3Init() {
+  G3.tried = true;
   try {
     let cv = $('gl');
     if (!cv) { cv = document.createElement('canvas'); cv.id = 'gl'; document.body.insertBefore(cv, $('game')); }
@@ -3126,7 +3161,9 @@ function setView3(on, lost) {
 }
 function g3Resize() {
   if (!G3.ok) return;
-  const cw = view.cw, ch = view.ch, dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+  const cw = view.cw, ch = view.ch;
+  let dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+  if (G3.low === 1) dpr = Math.min(dpr, 1); else if (G3.low >= 2) dpr = 0.7;
   const cv = G3.R.cv;
   cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
   CAM3.dpr = dpr; G3.R.cssW = cw; G3.R.cssH = ch;
@@ -3155,6 +3192,19 @@ function g3Render(t, dt) {
   R.begin(R.cv.width, R.cv.height, cam, game.ev, t);
   // the village
   for (const c of W3.chunks) if (R.visible(c.box)) R.draw(c);
+  const who = [{ x: player.x, z: player.y, h: -personTop(PLAYER_LOOK) * CS3 }];
+  if (Dialog.open && Dialog.focus) who.push({ x: Dialog.focus.x, z: Dialog.focus.y, h: (Dialog.focus.y - Dialog.focus.top) * CS3 });
+  const rects = who.map((p) => { const a = R.project(p.x, 0, p.z), b = R.project(p.x, p.h, p.z); if (!a || !b) return null; const hw = (a.y - b.y) * 0.3; return { x0: a.x - hw, x1: a.x + hw, y0: b.y - 6, y1: a.y, z: p.z }; });
+  const faded = [];
+  for (const o of W3.tall) {
+    o.vis = R.visible(o.box);
+    if (!o.vis) { o.fade = 1; continue; }
+    let hide = false;
+    const sr = R.screenRect(o.occ);
+    if (sr) for (const p of rects) if (p && o.z > p.z + 6 && sr.x0 < p.x1 && sr.x1 > p.x0 && sr.y0 < p.y1 && sr.y1 > p.y0) { hide = true; break; }
+    o.fade += ((hide ? 0.3 : 1) - o.fade) * Math.min(1, dt * 7);
+    if (o.fade > 0.97) R.draw(o.mesh, o.m); else faded.push(o);
+  }
   // moving and changing pieces
   const bm = T3(1348, 3 + Math.sin(t * 1.4) * 1.6, 990); m4rz(bm, Math.sin(t * 1.1) * 0.015); R.draw(W3.dyn.boat, bm);
   if (!LANDMARK.myHouse.unlocked) { const m = T3(1085, 34 + Math.sin(t * 3) * 1.2, 628); R.draw(W3.dyn.lock, m); }
@@ -3208,16 +3258,23 @@ function g3Render(t, dt) {
   // carried thing, Sparky's arrow
   if (q.carry) {
     const it = CHORE_ITEMS.concat(PAJAMAS).find((i) => i.id === q.carry);
-    if (it) { const m = T3(player.x, -personTop(PLAYER_LOOK) * CS3 + 14 + Math.sin(t * 4) * 2, player.y); m4ry(m, t * 2); R.draw(ITEM3[it.kind], m); }
+    if (it) { const m = T3(player.x, -personTop(PLAYER_LOOK) * CS3 + 16 + Math.sin(t * 4) * 2, player.y); m4ry(m, Math.sin(t * 2) * 0.35); m4rx(m, -0.55); m4s(m, 1.25, 1.25, 1.25); R.draw(ITEM3[it.kind], m); }
   }
   const tg = game.mode === 'play' ? Quests.target() : null;
   if (tg && Math.hypot(tg.x - player.x, tg.y - player.y) > 130) {
-    const m = T3(sparky.x, 66 + Math.sin(t * 5) * 3, sparky.y); m4ry(m, Math.atan2(-(tg.y - sparky.y), tg.x - sparky.x)); m4rx(m, -Math.PI / 2); m4s(m, 1.25, 1.25, 1.25);
+    // floats over Sparky, on the side away from the player so it never covers the player
+    const side = sparky.x >= player.x ? 1 : -1, ax = sparky.x + side * 24, az = sparky.y + 6;
+    const m = T3(ax, 58 + Math.sin(t * 5) * 4, az); m4ry(m, Math.atan2(-(tg.y - az), tg.x - ax)); m4rx(m, -Math.PI / 2); m4s(m, 1.5, 1.5, 1.5);
     R.setTint(1, 1, 1, 1, 0.45); R.draw(W3.dyn.arrow, m); R.setTint(1, 1, 1, 1, 0);
   }
   if (W3.texQuads.length) R.drawTexQuads(W3.texQuads, 1 - game.ev * 0.45);
-  // see-through layer: shadows, water, smoke, ripples
+  // see-through layer: faded trees and buildings, shadows, water, smoke, ripples
   R.mode('blend');
+  if (faded.length) {
+    R.gl.depthMask(true);
+    for (const o of faded) { R.setTint(1, 1, 1, o.fade, 0); R.draw(o.mesh, o.m); }
+    R.gl.depthMask(false); R.setTint(1, 1, 1, 1, 0);
+  }
   R.draw(W3.shadows);
   blob3(R, player.x, player.y, 15, 10, 0.24, standY3(player.x, player.y));
   blob3(R, sparky.x, sparky.y, 14, 9, 0.22);
@@ -3321,8 +3378,8 @@ const Snap = {
   figure(cv, L, o) {
     o = o || {};
     const L2 = Object.assign({}, L), d = dims3(L2), s = L2.size || 1, h = (d.hy + d.hr + 6) * s;
-    const W2 = cv.width, H2 = cv.height, fov = 0.5, dist = (h * 0.62) / Math.tan(fov / 2) / Math.min(1, W2 / H2) + 30;
-    const shot = this.shoot(W2, H2, { eye: [0, h * 0.62, dist], at: [0, h * 0.47, 0], fov }, (R) => {
+    const W2 = cv.width, H2 = cv.height, fov = 0.5, dist = (h * 0.56) / Math.tan(fov / 2) / Math.min(1, W2 / H2);
+    const shot = this.shoot(W2, H2, { eye: [0, h * 0.62, dist], at: [0, h * 0.5, 0], fov }, (R) => {
       R.mode('blend'); blob3(R, 0, 0, 16, 10, 0.25); R.mode('opaque'); R.setTint(1, 1, 1, 1, 0);
       drawPerson3(R, L2, { x: 0, z: 0, yaw: o.dir === 'up' ? Math.PI : 0, t: 0.3, seed: 1.5 });
     });
@@ -3346,8 +3403,8 @@ const Snap = {
     const half = Math.ceil(front.length / 2);
     const kids = front.slice(0, half).concat([PLAYER_LOOK], front.slice(half));
     const sp = 34, widest = Math.max(back.length, kids.length, 3) * sp + 30;
-    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 150);
-    const shot = this.shoot(W2, H2, { eye: [0, 70, dist], at: [0, 38, 0], fov }, (R) => {
+    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 66 / Math.tan(fov / 2));
+    const shot = this.shoot(W2, H2, { eye: [0, 80, dist], at: [0, 40, 0], fov }, (R) => {
       const place = (list, z) => list.forEach((L, i) => {
         const x = (i - (list.length - 1) / 2) * sp;
         R.mode('blend'); blob3(R, x, z, 14, 9, 0.22); R.mode('opaque'); R.setTint(1, 1, 1, 1, 0);
@@ -3377,11 +3434,11 @@ const Snap = {
 };
 const PLACE3 = new Map();
 // the UI's picture functions go through 3D when it is on
-function drawPortrait2D(cv, who) { if (G3.on) Snap.portrait(cv, who); else drawPortrait2D(cv, who); }
+function drawPortrait(cv, who) { if (G3.on) Snap.portrait(cv, who); else drawPortrait2D(cv, who); }
 function drawFigure(cv, L, o) { if (G3.on) Snap.figure(cv, L, o); else drawFigure2D(cv, L, o); }
 function drawBust(cv, L) { if (G3.on) Snap.bust(cv, L); else drawBust2D(cv, L); }
 function drawFamilyPhoto(cv, counts, members) { if (G3.on) Snap.group(cv, counts, members); else drawFamilyPhoto2D(cv, counts, members); }
-function drawSpriteFit(cv, key, water) { if (G3.on) Snap.place(cv, key === 'houseMilo' ? 'houseMilo' : key); else drawSpriteFit2D(cv, key, water); }
+function drawSpriteFit(cv, key, water) { if (G3.on) Snap.place(cv, key); else drawSpriteFit2D(cv, key, water); }
 // screen ↔ world for taps and the Talk button, in whichever view is on
 function worldToScreen(x, h, y) {
   if (G3.on) return G3.R.project(x, h, y) || { x: -999, y: -999 };
@@ -5061,7 +5118,7 @@ const Dialog = {
 
 /* ---- portraits ---- */
 const PORTRAIT_BG = { sparky: '#ffe7a8', milo: '#bfe6ff', leo: '#ffe0e0', mom: '#ffd6e6', dad: '#d6f5d6', rosa: '#eadcff', nomi: '#ffe0cc', bob: '#cfe0ff', max: '#fff0b8', lily: '#d6f5e0', pip: '#fff4b8', pop: '#d6f5d6', owl: '#e8dcc8', player: '#d8f3ff' };
-function drawPortrait(cv, who) {
+function drawPortrait2D(cv, who) {
   const g = cv.getContext('2d'), S = cv.width;
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
   g.lineJoin = 'round'; g.lineCap = 'round';
@@ -5165,6 +5222,10 @@ const UI = {
     tap('mSlow', () => { state.settings.slow = true; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
     tap('mNormal', () => { state.settings.slow = false; Save.save(); Menu.render(); Speech.speak('Hello!', { who: 'narrator' }); });
     tap('mLook', () => { Menu.close(); Wardrobe.open(); });
+    tap('mView', () => {
+      if (!G3.tried) g3Init();
+      setView3(!G3.on); state.settings.view = G3.on ? '3d' : '2d'; Save.save(); Menu.render();
+    });
     tap('mInfo', () => { Menu.close(); Parent.open(true); });
     tap('mRestart', restart);
     tap('askNo', () => Confirm.no());
@@ -5220,6 +5281,8 @@ const Menu = {
     $('mSlow').className = 'btn wide ' + (s.slow ? 'sel' : 'unsel');
     $('mNormal').className = 'btn wide ' + (s.slow ? 'unsel' : 'sel');
     $('mLook').textContent = '👕 ' + U.myLook;
+    $('mView').textContent = (G3.on ? '🧊 ' : '🖼️ ') + U.view + ': ' + (G3.on ? '3D' : '2D');
+    $('mView').classList.toggle('hidden', G3.tried && !G3.ok);
     $('mInfo').textContent = 'ℹ️ ' + U.info;
     $('mRestart').textContent = '🔄 ' + U.restart;
     $('mClose').textContent = '✖ ' + U.close;
@@ -5636,7 +5699,7 @@ function defaultState() {
     look: { body: 0, hair: 1, outfit: 0 },
     stars: 0, quest: 0, stage: 'available', q: {}, done: [], unlocked: [], wear: {},
     family: {}, age: 7, country: 'turkey', finished: false, finishedAt: '',
-    settings: { sound: true, slow: true },
+    settings: { sound: true, slow: true, view: '3d' },
   };
 }
 let state = defaultState();
@@ -5797,16 +5860,32 @@ function eveningTarget() {
   const C = Quests.content();
   return C && C.id === 'bedtime' && state.stage !== 'available' ? 0.8 : 0;
 }
+/* Slow device? First draw the 3D view at a lower resolution, then fall back to the flat 2D view. */
+const Perf = {
+  acc: 0, n: 0, step: 0,
+  tick(raw) {
+    if (window.SH_TEST || game.mode !== 'play' || raw > 0.5) return;   // tests and tab switches don't count
+    this.acc += raw; this.n++;
+    if (this.acc < 3) return;
+    const avg = this.acc / this.n;
+    this.acc = this.n = 0;
+    if (avg < 0.042) return;            // about 24 frames a second or better: fine
+    this.step++;
+    if (this.step <= 2) { G3.low = this.step; g3Resize(); g3Camera(0, true); }
+    else { setView3(false); state.settings.view = '2d'; Save.save(); }
+  },
+};
 let last = performance.now();
 function frame(now) {
   requestAnimationFrame(frame);
-  const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+  const raw = (now - last) / 1000;
+  const dt = Math.min(0.05, Math.max(0, raw));
   last = now;
   if (game.paused) return;
   Fx.update(dt);
   if (FROZEN[game.mode]) return;
   update(dt);
-  if (G3.on) g3Render(game.t, dt);
+  if (G3.on) { g3Render(game.t, dt); Perf.tick(raw); }
   else {
     const pr = view.pr;
     const cx = Math.round(cam.x * pr) / pr, cy = Math.round(cam.y * pr) / pr;
@@ -5852,7 +5931,7 @@ function boot() {
   initButterflies();
   initEntities();
   initHerd();
-  if (g3Init() && state.settings.view !== '2d') G3.on = true;
+  if (state.settings.view !== '2d' && g3Init()) G3.on = true;   // the 3D village is built only when it will be used
   document.body.classList.toggle('g3', G3.on);
   player.x = MAP.start.x; player.y = MAP.start.y; player.dir = 'up';
   resetTrail(0.4, 1);

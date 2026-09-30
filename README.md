@@ -17,6 +17,14 @@ gönderilir.
   gidip konuşmaya başlar.
 - İlerleme aynı cihazda, aynı tarayıcıda kaydedilir.
 
+## Görünüm: 3D ve 2D
+
+Köy low-poly 3D olarak çizilir. Oyuncunun önüne giren ağaç ve binalar yarı saydam olur.
+Menüdeki **View** düğmesiyle sade 2D görünüme geçilebilir; seçim kaydedilir.
+
+- Tarayıcıda WebGL yoksa oyun kendiliğinden 2D açılır.
+- Cihaz 3D için yavaşsa oyun önce çözünürlüğü düşürür, yine yetmezse 2D'ye geçer.
+
 ## Sesler
 
 Oyun, cihazın kendi İngilizce seslerini kullanır ve her karaktere mümkünse ayrı bir ses verir
@@ -39,9 +47,10 @@ yere çocuğun adı gelir.
 ## Geliştirici notları
 
 Dosya içindeki bölümler: Ayarlar, İçerik, Çizim, Oyuncu, Harita, NPC'ler,
-Görevler, Mini oyunlar, Arayüz, Ses, Kayıt, Ana döngü. Bütün görseller Canvas 2D
-ile kodla çiziliyor; ses tarayıcının Web Speech ve Web Audio API'leriyle
-üretiliyor.
+Görevler, Mini oyunlar, Arayüz, Ses, Kayıt, Ana döngü; 3D Çizim bölümü Çizim'in
+hemen ardından gelir. Bütün görseller kodla çiziliyor: 3D görünüm dosyanın içinde
+yazılmış küçük bir WebGL çizicisiyle, 2D yedek görünüm Canvas 2D ile. Ses
+tarayıcının Web Speech ve Web Audio API'leriyle üretiliyor.
 
 Değişiklikleri doğrulamak için headless Chrome ile çalışan bir test sürücüsü var
 (Node 22+ ve Chrome gerekir, npm paketi yok). Oyunu velinin açtığı gibi
@@ -55,13 +64,31 @@ node tools/drive.mjs tools/recipes/nostorage.mjs  # localStorage kapalıyken oyu
 node tools/drive.mjs tools/recipes/quest1.mjs     # yalnızca Görev 1
 node tools/drive.mjs tools/recipes/perf.mjs       # kare başına çizim süresi (üst sınır; headless yazılımla çizer)
 node tools/drive.mjs tools/recipes/voices.mjs     # hangi karaktere hangi ses düştü, sesler gerçekten konuşuyor mu
+node tools/drive.mjs tools/recipes/nowebgl.mjs    # WebGL olmayan tarayıcı: oyun 2D açılıp baştan sona oynanıyor mu
+node tools/drive.mjs tools/recipes/switchview.mjs # menüden 3D ↔ 2D geçişi ve seçimin kaydı
+node tools/drive.mjs tools/recipes/look3d.mjs     # köyün birkaç yerinden 3D ekran görüntüsü
+node tools/drive.mjs tools/recipes/scenes3d.mjs   # her görevin sahnesi 3D
+node tools/drive.mjs tools/recipes/gallery3d.mjs  # bütün karakter ve hayvan modelleri yakından
+node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi (2D harita)
 ```
 
-Sürücü varsayılan olarak Chrome'u kullanır. Edge ile denemek için (gerçek İngilizce seslerle):
+Sürücü Chrome'u yazılımsal WebGL ile çalıştırır: 3D görüntü alınır ama yavaştır, bu yüzden
+buradan ölçülen kare süreleri bir şey ifade etmez. Gerçek ekran kartıyla ölçmek için:
+
+```bash
+GL=gpu node tools/drive.mjs tools/recipes/fps3d.mjs
+```
+
+Tam oynanış testlerini 3D'de gerçek zamana yakın çalıştırmak için küçük bir pencere kullanın:
+
+```bash
+VIEW=640x400 node tools/drive.mjs tools/recipes/full.mjs
+```
+
+Edge ile denemek için (gerçek İngilizce seslerle):
 
 ```bash
 CHROME="C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" node tools/drive.mjs tools/recipes/full.mjs
-node tools/drive.mjs tools/recipes/overview.mjs   # köyün tamamının resmi
 ```
 
 Ekran görüntüleri `tools/shots/` klasörüne yazılır (git'e girmez). Sürücü,

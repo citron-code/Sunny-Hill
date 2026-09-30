@@ -32,8 +32,9 @@ const profile = mkdtempSync(join(tmpdir(), 'sh-chrome-'));
 const chrome = spawn(CHROME, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`,
   '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--mute-audio', '--hide-scrollbars',
   '--allow-file-access-from-files', '--window-size=1280,800',
-  // software WebGL so the 3D view renders headless (slowly: frame times from here mean nothing)
-  '--use-angle=swiftshader', '--enable-unsafe-swiftshader', 'about:blank'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  // software WebGL so the 3D view renders headless (slowly: frame times from here mean nothing).
+  // GL=gpu uses the real graphics card instead, for timing.
+  ...(process.env.GL === 'gpu' ? ['--use-angle=d3d11', '--ignore-gpu-blocklist', '--enable-gpu'] : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']), 'about:blank'], { stdio: ['ignore', 'pipe', 'pipe'] });
 let chromeErr = '';
 chrome.stderr.on('data', (d) => { chromeErr += d; });
 
@@ -86,6 +87,8 @@ listeners.push((m) => {
   }
 });
 await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable');
+// tell the game it is under test: software WebGL is slow, and the slow-device fallback must stay out of the way
+await send('Page.addScriptToEvaluateOnNewDocument', { source: 'window.SH_TEST = 1;' });
 
 /* ----------------------------------------------------------------- helpers */
 async function evaluate(expression) {

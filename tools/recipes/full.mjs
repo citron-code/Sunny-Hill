@@ -1,6 +1,8 @@
 // Plays the whole game, quests 1-8, then reloads and checks the save. Takes a screenshot at every step
 // worth looking at. Some answers are wrong on purpose so "Try again!" and the glowing hint are exercised.
-export default async function ({ evaluate, shot, sleep, navigate, URL }) {
+export default async function ({ evaluate, shot, sleep, navigate, URL, viewport }) {
+  // software WebGL is slow at full size; VIEW=640x400 keeps the 3D run close to real time
+  if (process.env.VIEW) { const [vw, vh] = process.env.VIEW.split("x").map(Number); await viewport(vw, vh); }
   const S = (e) => evaluate(e);
   const log = (...a) => console.log(...a);
   const t0 = Date.now();
