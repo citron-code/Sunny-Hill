@@ -8,6 +8,9 @@ hazırlandı; telefonda, tablette ve bilgisayarda çalışıyor.
 
 ## Oynamak
 
+Çevrimiçi oynamak için: **https://citron-code.github.io/Sunny-Hill/** (velilere bu link gönderilebilir;
+iPhone dahil her cihazda tarayıcıda açılır).
+
 `sunny-hill.html` tek başına oyunun kendisi. İnternet, kurulum veya başka dosya
 gerekmez; çift tıklayıp tarayıcıda açmak yeterli. Velilere yalnızca bu dosya
 gönderilir.
