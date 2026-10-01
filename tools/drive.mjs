@@ -120,7 +120,8 @@ async function navigate(url) {
     const t = setTimeout(ok, 20000);
     listeners.push((m) => { if (m.method === 'Page.loadEventFired') { clearTimeout(t); ok(); } });
   });
-  for (let i = 0; i < 100; i++) { try { if (await evaluate('!!window.SH')) break; } catch { /* parsing */ } await sleep(100); }
+  // the game builds its village just after the loading screen has been painted: wait until it is ready
+  for (let i = 0; i < 300; i++) { try { if (await evaluate('!!(window.SH && window.SH.booted)')) break; } catch { /* parsing */ } await sleep(100); }
 }
 
 /* ------------------------------------------------------------------ recipe */
