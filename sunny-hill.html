@@ -4,17 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#9ddc6e">
+<meta name="description" content="Sunny Hill: 2. sınıflar için ücretsiz İngilizce macera oyunu (Unit 1 · What is a family?). Köyü gez, karakterlerle İngilizce konuş, yıldızları topla!">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sunny Hill ☀️ İngilizce Macera Oyunu">
+<meta property="og:description" content="2. sınıflar için ücretsiz İngilizce oyun: What is a family? Köyü gez, karakterlerle İngilizce konuş, yıldızları topla!">
+<meta property="og:url" content="https://citron-code.github.io/Sunny-Hill/">
+<meta property="og:image" content="https://citron-code.github.io/Sunny-Hill/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sunny Hill">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='30' fill='%23ffc21a' stroke='%23e89a12' stroke-width='5'/%3E%3Cg stroke='%23ffc21a' stroke-width='8' stroke-linecap='round'%3E%3Cpath d='M50 4v10M50 86v10M4 50h10M86 50h10M17 17l7 7M76 76l7 7M17 83l7-7M76 24l7-7'/%3E%3C/g%3E%3Ccircle cx='40' cy='46' r='4' fill='%234a3222'/%3E%3Ccircle cx='60' cy='46' r='4' fill='%234a3222'/%3E%3Cpath d='M38 58q12 10 24 0' fill='none' stroke='%234a3222' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Sunny Hill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
 <style>
 :root{
   --ink:#4a3222; --cream:#fffdf6; --sun:#ffc93c; --orange:#ff8c42; --green:#4cc36a; --blue:#4aa3ff; --pink:#ff7aa2;
   --shadow:0 6px 18px rgba(74,50,34,.22);
-  --font:"Comic Sans MS","Chalkboard SE","Comic Neue","Trebuchet MS",sans-serif;
+  --font:"M PLUS Rounded 1c","Comic Sans MS","Chalkboard SE","Comic Neue","Trebuchet MS",sans-serif;
+  --logo:"Fredoka","M PLUS Rounded 1c","Comic Sans MS","Chalkboard SE",sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;font-family:var(--font);color:var(--ink);
@@ -24,6 +37,17 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 body.g3 #gl{display:block}
 #fx{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:60}
 .hidden{display:none!important}
+#splash{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .45s;
+  background:linear-gradient(#8fd6ff,#dff4ff 58%,#a8e07a 58.2%,#6cc45a)}
+#splash.gone{opacity:0;pointer-events:none}
+.spBox{display:flex;flex-direction:column;align-items:center;gap:6px}
+.spSun{font-size:72px;line-height:1;animation:spin 6s linear infinite}
+.spTitle{font-family:"Fredoka","Comic Sans MS","Chalkboard SE",sans-serif;font-weight:700;font-size:clamp(48px,12vw,92px);line-height:1.1;color:#ffe066;
+  -webkit-text-stroke:5px #5a2f14;paint-order:stroke fill;text-shadow:0 5px 0 #ff9f2b,0 9px 0 #5a2f14,0 16px 20px rgba(0,0,0,.3)}
+.spDots{display:flex;gap:12px;margin-top:18px}
+.spDots i{width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.15);animation:spDot 1s ease-in-out infinite}
+.spDots i:nth-child(2){animation-delay:.15s} .spDots i:nth-child(3){animation-delay:.3s}
+@keyframes spDot{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
 
 /* ---------- buttons ---------- */
 .btn{font-family:var(--font);font-weight:bold;font-size:22px;min-width:56px;min-height:56px;padding:0 18px;border:0;border-radius:20px;
@@ -170,7 +194,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 .sunFace{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:58px;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18))}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes sunBob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-6px) rotate(6deg)}}
-#titleText{position:relative;z-index:1;margin:0;font-size:clamp(54px,12.5vw,100px);line-height:1;font-weight:900;letter-spacing:2px;color:#ffe066;white-space:nowrap;
+#titleText{position:relative;z-index:1;margin:0;font-family:var(--logo);font-size:clamp(54px,12.5vw,100px);line-height:1;font-weight:900;letter-spacing:2px;color:#ffe066;white-space:nowrap;
   -webkit-text-stroke:5px #5a2f14;paint-order:stroke fill;
   text-shadow:0 5px 0 #ff9f2b,0 9px 0 #d9731f,0 12px 0 #5a2f14,0 22px 26px rgba(0,0,0,.4)}
 #titleText span{display:inline-block;animation:letterBob 2.8s ease-in-out infinite}
@@ -219,7 +243,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
   box-shadow:0 22px 50px rgba(0,0,0,.4);animation:cardPop .2s ease-out}
 @keyframes cardPop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 .pauseHead{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 22px;background:linear-gradient(#ffc94c,#ff9b3d);box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
-.pauseHead h2{margin:0;flex:1 1 auto;font-size:34px;color:#fff;-webkit-text-stroke:3px #7a3d12;paint-order:stroke fill;text-shadow:0 4px 0 #7a3d12}
+.pauseHead h2{margin:0;font-family:var(--logo);flex:1 1 auto;font-size:34px;color:#fff;-webkit-text-stroke:3px #7a3d12;paint-order:stroke fill;text-shadow:0 4px 0 #7a3d12}
 .headChips{display:flex;gap:8px}
 .chip{background:#fff;border-radius:16px;padding:6px 12px;font-size:20px;font-weight:bold;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.12)}
 .pauseBody{display:flex;gap:16px;padding:16px}
@@ -299,6 +323,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
   touch-action:manipulation;transition:transform .08s;min-width:56px;min-height:56px;position:relative;-webkit-appearance:none;appearance:none;outline:none}
 .pick:active{transform:scale(.94)}
 .pick canvas{display:block;width:100%;height:auto;pointer-events:none}
+.pick > span.fit{display:block;max-width:100%;overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:none}
 .pick.ok{border-color:var(--green);background:#e6ffe6}
 .pick.sel{border-color:var(--orange);background:#fff3e0}
 .pick.lock{opacity:.6;cursor:default}
@@ -325,7 +350,7 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 .tfBtn.ok{box-shadow:0 0 0 5px #fff,0 0 0 10px var(--green)}
 .say{font-size:clamp(22px,3vw,30px);font-weight:bold;background:#fff7d6;border-radius:18px;padding:10px 14px;text-align:center}
 .famPhoto{width:auto;height:auto;max-width:100%;max-height:36vh;margin:0 auto;display:block;border:10px solid #c98552;border-radius:16px;box-shadow:inset 0 0 0 3px #a8693a,var(--shadow)}
-.famGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;align-items:start}
+.famGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;align-items:start}
 .famGrid .pick canvas{width:auto;height:84px}
 .badge{position:absolute;top:-8px;right:-8px;min-width:32px;height:32px;border-radius:16px;background:var(--orange);color:#fff;font-size:20px;
   display:flex;align-items:center;justify-content:center;border:3px solid #fff;padding:0 4px}
@@ -390,6 +415,9 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 body.fs .fsBtn .fsIn{display:none}
 body.fs .fsBtn .fsOut{display:inline}
 #tFull{display:flex;align-items:center;justify-content:center}
+.musicBtn{position:relative;font-size:24px}
+.musicBtn.off{opacity:.55}
+.musicBtn.off::after{content:'';position:absolute;left:22%;right:22%;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:#e8503a;transform:rotate(-40deg)}
 #mFull{display:flex;align-items:center;justify-content:center;color:var(--ink)}
 #fsHelp{position:fixed;z-index:58;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);width:min(560px,calc(100vw - 20px));
   padding:12px 14px;display:flex;align-items:center;gap:12px;border-color:#8fd0ff;font-size:20px;line-height:1.3}
@@ -426,7 +454,7 @@ body.fs .fsBtn .fsOut{display:inline}
 #wdItems{flex:1 1 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 #cert{z-index:32}
 #certCard{width:min(720px,100%);max-height:100%;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border:8px solid #ffd23c}
-#certTitle{font-size:clamp(30px,6vw,46px);font-weight:bold;color:#fff;background:linear-gradient(#ffc23c,#ff8c42);border-radius:20px;padding:6px 22px;text-shadow:0 3px 0 rgba(0,0,0,.18)}
+#certTitle{font-family:var(--logo);white-space:nowrap;font-size:clamp(23px,6vw,46px);font-weight:bold;color:#fff;background:linear-gradient(#ffc23c,#ff8c42);border-radius:20px;padding:6px 22px;text-shadow:0 3px 0 rgba(0,0,0,.18)}
 #certPics{display:flex;gap:10px;align-items:flex-end;justify-content:center;width:100%}
 #certPlayer{width:100px;height:auto;flex:0 0 auto}
 #certPhoto{flex:0 1 auto;min-width:0;max-width:min(440px,calc(100% - 80px));max-height:34vh;width:auto;height:auto;border:8px solid #c98552;border-radius:14px}
@@ -441,7 +469,7 @@ body.fs .fsBtn .fsOut{display:inline}
 #pStart,#crOk,#wdOk{position:sticky;bottom:8px;z-index:2}
 @media (max-width:520px){
   #certPlayer{width:64px}
-  #certTitle{font-size:26px;padding:4px 14px}
+  #certTitle{font-size:23px;padding:4px 12px}
   #certName{font-size:30px}
   #certCard{padding:12px;gap:6px}
   #certCard .row{flex-direction:column;gap:8px}
@@ -459,6 +487,7 @@ body.fs .fsBtn .fsOut{display:inline}
 </style>
 </head>
 <body>
+<div id="splash"><div class="spBox"><div class="spSun">☀️</div><div class="spTitle">Sunny Hill</div><div class="spDots"><i></i><i></i><i></i></div></div></div>
 <canvas id="gl"></canvas>
 <canvas id="game"></canvas>
 
@@ -510,6 +539,7 @@ body.fs .fsBtn .fsOut{display:inline}
     <div class="pauseHead">
       <h2 id="mTitle">Menu</h2>
       <div class="headChips"><span id="mStars" class="chip"></span><span id="mSecrets" class="chip"></span></div>
+      <button id="mMusic" class="btn round white musicBtn">🎵</button>
       <button id="mFull" class="btn round white fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button>
       <button id="mClose" class="btn round green" aria-label="Close">✖</button>
     </div>
@@ -546,6 +576,7 @@ body.fs .fsBtn .fsOut{display:inline}
     <div id="certSecrets"></div>
     <div id="certDate"></div>
     <div id="certNote"></div>
+    <button id="certSave" class="btn blue wide"></button>
     <div class="row"><button id="certAgain" class="btn pink wide"></button><button id="certWalk" class="btn green wide"></button></div>
   </div>
 </div>
@@ -588,7 +619,7 @@ body.fs .fsBtn .fsOut{display:inline}
       <button id="tContinue" class="gbtn contBtn hidden"><canvas id="tMe" width="144" height="144"></canvas>
         <span class="contText"><span id="tContLbl" class="contLbl"></span><span id="tContInfo" class="contInfo"></span></span><span class="gi">▶</span></button>
       <button id="tNew" class="gbtn"><span class="gi">✨</span><span id="tNewLbl"></span></button>
-      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tView" class="pill"></button><button id="tFull" class="pill fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button><button id="tInfo" class="pill"></button></div>
+      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tMusic" class="pill musicBtn">🎵</button><button id="tView" class="pill"></button><button id="tFull" class="pill fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button><button id="tInfo" class="pill"></button></div>
       <div id="titleCredit"></div>
     </div>
   </div>
@@ -644,7 +675,7 @@ const GAME_CONTENT = {
     slow: 'Slow', normal: 'Normal', myLook: 'My look', view: 'View', info: 'Info / Bilgi',
     restart: 'Restart game', close: 'Close',
     // ana menü ve oyun içi menü
-    newGame: 'New Game', continue: 'Continue', fullScreen: 'Full screen', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
+    newGame: 'New Game', continue: 'Continue', fullScreen: 'Full screen', music: 'Music', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
     unit: 'Unit 1 · What is a family?',
     newGameAsk: 'Start a new game? Your stars will be lost. / Yeni oyun başlasın mı? Yıldızlar silinir.',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
@@ -722,8 +753,11 @@ const GAME_CONTENT = {
   final: {
     title: 'Sunny Hill Hero',
     say: 'You are a Sunny Hill Hero, {name}!',
-    note: 'Bu ekranın fotoğrafını çekip öğretmeninize gönderebilirsiniz.',
+    note: '“Kaydet” ile sertifikayı resim olarak kaydedip öğretmeninize gönderebilirsiniz.',
     again: 'Play again', walk: 'Walk around',
+    save: 'Save / Kaydet', saved: 'Sertifika kaydedildi.',
+    // on the certificate picture
+    for: 'This certificate is for', done: 'finished Sunny Hill and learned about families!',
   },
 
   // Oyunun başında Sparky'nin söyledikleri
@@ -962,7 +996,8 @@ const GAME_CONTENT = {
 const W = SETTINGS.worldW, H = SETTINGS.worldH;
 const TAU = Math.PI * 2;
 const INK = '#4a3222';
-const FONT = '"Comic Sans MS","Chalkboard SE","Comic Neue","Trebuchet MS",sans-serif';
+const FONT = '"M PLUS Rounded 1c","Comic Sans MS","Chalkboard SE","Comic Neue","Trebuchet MS",sans-serif';
+const LOGO_FONT = '"Fredoka","M PLUS Rounded 1c","Comic Sans MS",sans-serif';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -2748,28 +2783,61 @@ function signBoard3(mb, w, h, big) {
 /* ---- the models, by the same keys the 2D map uses (origin = the 2D anchor, facing +Z) ---- */
 const B3 = {};
 function house3(mb, o) {
-  const w = 86, z0 = -70, z1 = -2, h = 64;
+  const w = 86, z0 = -70, z1 = -2, h = 64, trim = '#ffffff', stone = '#cdbfae';
+  // chimney with a cap
   mb.color('#d9745a').box(30, h + 12, z0 + 16, 50, h + 62, z0 + 34);
   mb.color('#b85a44').box(27, h + 58, z0 + 13, 53, h + 66, z0 + 37);
+  mb.color('#8f4636').box(33, h + 66, z0 + 19, 47, h + 69, z0 + 31);
+  // walls of wooden boards on a stone foundation, with white corner posts
   mb.color(o.wall).box(-w, 0, z0, w, h, z1);
-  mb.color(shade3(o.wall, -0.14)).box(-w - 1.5, 0, z0 - 1.5, w + 1.5, 9, z1 + 1.5);
+  for (let y = 18; y < h - 4; y += 8) {
+    mb.color(shade3(o.wall, -0.09)).box(-w, y, z1, w, y + 1.1, z1 + 0.7);
+    mb.box(-w - 0.7, y, z0, -w, y + 1.1, z1); mb.box(w, y, z0, w + 0.7, y + 1.1, z1);
+  }
+  mb.color(stone).box(-w - 2, 0, z0 - 2, w + 2, 10, z1 + 2);
+  const R = rng(11);
+  for (let k = 0; k < 14; k++) { const x = -w + 4 + R() * (2 * w - 8); if (Math.abs(x) < 24) continue; mb.color(shade3(stone, -0.08 - R() * 0.08)).box(x - 5, 2 + R() * 2, z1 + 2, x + 5, 6 + R() * 3, z1 + 2.8); }
+  for (const sx of [-1, 1]) for (const z of [z1, z0]) mb.color(trim).box(sx * w - 3, 9, z - 3, sx * w + 3, h, z + 3);
+  mb.color(trim).box(-w - 3, h - 4, z1, w + 3, h, z1 + 3.5);
   roofHip3(mb, -w - 13, h - 3, z0 - 12, w + 13, z1 + 13, 56, 42, o.roof);
+  // windows with shutters
+  for (const x of [-56, 56]) {
+    win3(mb, x, 24, 32, 26, z1, { curtain: o.curtain });
+    for (const s of [-1, 1]) {
+      const sx = x + s * 23.5;
+      mb.color(o.shutter).box(sx - 4, 21, z1, sx + 4, 53, z1 + 2.2);
+      for (let k = 0; k < 4; k++) mb.color(shade3(o.shutter, -0.16)).box(sx - 2.8, 25 + k * 7, z1 + 2.2, sx + 2.8, 26.4 + k * 7, z1 + 2.8);
+    }
+  }
+  // the door under a little porch roof on two posts, with steps
   door3(mb, 0, z1, 30, 50, o.door);
-  mb.color('#d7ccc0').box(-22, 0, z1, 22, 2.5, z1 + 12);
-  win3(mb, -56, 24, 32, 26, z1, { curtain: o.curtain });
-  win3(mb, 56, 24, 32, 26, z1, { curtain: o.curtain });
+  mb.color('#d7ccc0').box(-24, 0, z1, 24, 5, z1 + 22); mb.color('#e6ddd2').box(-20, 0, z1 + 22, 20, 2.5, z1 + 30);
+  for (const s of [-1, 1]) mb.color(trim).box(s * 21 - 2, 5, z1 + 17, s * 21 + 2, 56, z1 + 21);
+  mb.push(RX3(T3(0, 59, z1 + 11), 0.32)); mb.color(o.roof).box(-28, -1.8, -13, 28, 1.8, 13); mb.color(shade3(o.roof, -0.28)).box(-28, -3, 11, 28, -1.8, 13.5); mb.pop();
+  mb.color('#ffd23c').sphere(-24, 44, z1 + 3, 2.6, 3.2, 2.6, 8, 6); mb.color('#5a4a44').box(-25, 47, z1, -23, 49, z1 + 3);
+  // a dormer: wall-coloured gable, a roof that overhangs it, and a window (or a heart)
   const dz = 6;
   mb.color(o.wall).box(-17, h + 6, -30, 17, h + 30, dz);
-  mb.color(o.roof).extrude([[-22, h + 27], [22, h + 27], [0, h + 44]], -34, dz + 5, shade3(o.roof, -0.2).concat(1));
+  mb.color(o.wall).extrude([[-17, h + 27], [17, h + 27], [0, h + 41]], -30, dz, rgb3(o.wall).concat(1));
+  for (const s of [-1, 1]) { mb.push(RZ3(T3(s * 11.5, h + 35, -12), s * -0.68)); mb.color(o.roof).box(-14, 0, -20, 14, 3, dz + 15); mb.pop(); }
+  mb.color(trim).box(-18.5, h + 4, dz, 18.5, h + 7, dz + 1.5);
   if (o.heart) {
     const H = [[0, -8]];
     for (let k = 0; k <= 10; k++) { const a = -0.35 + k / 10 * Math.PI * 1.12; H.push([5.4 + Math.cos(a) * 5.4, 1.6 + Math.sin(a) * 5.4]); }
     for (let k = 0; k <= 10; k++) { const a = Math.PI * 0.23 + k / 10 * Math.PI * 1.12; H.push([-5.4 + Math.cos(a) * 5.4, 1.6 + Math.sin(a) * 5.4]); }
     mb.push(T3(0, h + 18, dz)); mb.color('#ff7aa2').extrude(H, 0, 2.5); mb.pop();
   } else win3(mb, 0, h + 11, 16, 14, dz, { box: false });
+  // a mailbox and flowering bushes at the corners
+  mb.color('#8a5a3a').box(w - 8, 0, z1 + 34, w - 5, 26, z1 + 37);
+  mb.color(o.mail).box(w - 13, 26, z1 + 30, w, 34, z1 + 42); mb.push(RX3(T3(w - 6.5, 34, z1 + 36), Math.PI / 2)); mb.color(o.mail).cyl(0, -6, 0, 6.5, 6.5, 12, 10); mb.pop();
+  mb.color('#ff5a5a').box(w - 1, 30, z1 + 34, w + 0.8, 40, z1 + 36);
+  for (const s of [-1, 1]) {
+    mb.color('#5cbf5a').ico(s * (w + 8), 9, z1 + 6, 12, { jit: 0.25, seed: 30 + s });
+    for (let k = 0; k < 4; k++) mb.color(k % 2 ? '#ff7aa2' : '#ffffff').sphere(s * (w + 8) + Math.cos(k * 1.7) * 8, 13 + (k % 2) * 4, z1 + 6 + Math.sin(k * 1.7) * 8, 2.4, 2.4, 2.4, 6, 4);
+  }
 }
-B3.houseMilo = (mb) => house3(mb, { wall: '#fff0c4', roof: '#f0645a', door: '#9c6440', curtain: '#ffb3c6' });
-B3.myHouse = (mb) => house3(mb, { wall: '#e6f5ff', roof: '#4d9de0', door: '#ff6b5b', heart: true, curtain: '#ffe38a' });
+B3.houseMilo = (mb) => house3(mb, { wall: '#fff0c4', roof: '#f0645a', door: '#9c6440', curtain: '#ffb3c6', shutter: '#5fae57', mail: '#4aa3ff' });
+B3.myHouse = (mb) => house3(mb, { wall: '#e6f5ff', roof: '#4d9de0', door: '#ff6b5b', heart: true, curtain: '#ffe38a', shutter: '#ffb238', mail: '#ff7aa2' });
 B3.apartment = (mb) => {
   const w = 114, z0 = -98, z1 = -2, h = 246;
   mb.color('#ffc9a3').box(-w, 0, z0, w, h, z1);
@@ -2804,6 +2872,13 @@ B3.tent = (mb) => {
   for (let i = 0; i < 18; i++) { const a = i / 18 * TAU; mb.color('#ffd23c').sphere(Math.cos(a) * (r + 1.6), 44, cz + Math.sin(a) * (r + 1.6), 2.2, 2.2, 1.4, 4, 3); }
   mb.cyl(0, 56, cz, r + 9, 11, 46, 18, { cols: [rgb3('#ffffff').concat(1), rgb3('#ffc2a0').concat(1)] });
   mb.color('#e8503a').cyl(0, 100, cz, 13, 10, 6, 10);
+  mb.color('#8a5a3a').cyl(0, 106, cz, 1.2, 1.2, 26, 6);
+  mb.push(T3(0, 124, cz)); mb.color('#ffd23c').extrude([[0, -6], [18, -1], [0, 4]], -0.8, 0.8); mb.pop();
+  const flags = ['#ff5a5a', '#ffd23c', '#4cc36a', '#4aa3ff', '#ff7aa2'];
+  for (let i = 0; i < 24; i++) {
+    const a = (i + 0.5) / 24 * TAU, x = Math.cos(a) * (r + 10), z = cz + Math.sin(a) * (r + 10);
+    mb.push(RY3(T3(x, 56, z), Math.PI / 2 - a)); mb.color(flags[i % flags.length]).extrude([[-3.4, 0], [3.4, 0], [0, -8]], -0.5, 0.5); mb.pop();
+  }
   mb.color('#ff8c42').box(-15, 0, cz + r - 4, 15, 44, cz + r + 3);
   mb.color('#ffd23c').box(-11, 6, cz + r + 3, 11, 8, cz + r + 3.6); mb.box(-11, 36, cz + r + 3, 11, 38, cz + r + 3.6);
   mb.box(-11, 6, cz + r + 3, -9, 38, cz + r + 3.6); mb.box(9, 6, cz + r + 3, 11, 38, cz + r + 3.6);
@@ -2829,6 +2904,11 @@ B3.barn = (mb) => {
   trim(-34, 4, -2, 80); trim(-2, 4, -34, 80); trim(2, 4, 34, 80); trim(34, 4, 2, 80);
   mb.color('#ffffff').box(-22, 106, z1, 22, 142, z1 + 1.5); mb.color('#6b3a22').box(-17, 110, z1 + 1.5, 17, 137, z1 + 2);
   for (let k = 0; k < 7; k++) mb.color('#f2cf6b').box(-15 + k * 5, 110, z1 + 2, -12 + k * 5, 116 + (k % 3) * 4, z1 + 3);
+  for (let x = -84; x <= 84; x += 12) { if (Math.abs(x) < 42) continue; mb.color('#c43e31').box(x - 0.6, 6, z1, x + 0.6, 92, z1 + 0.8); }
+  mb.color('#cfc4b6').box(-98, 0, z0 - 2, 98, 6, z1 + 2);
+  mb.color('#5a4a44').cyl(0, 168, (z0 + z1) / 2, 1.2, 1.2, 30, 6);
+  mb.color('#ffd23c').box(-14, 186, (z0 + z1) / 2 - 1, 14, 188, (z0 + z1) / 2 + 1);
+  mb.push(T3(0, 194, (z0 + z1) / 2)); mb.color('#3a3434').extrude([[-8, -4], [6, -4], [9, 2], [6, 8], [3, 6], [2, 1], [-4, 3], [-9, 9], [-8, 1]], -1, 1); mb.color('#e24a3b').sphere(6, 8.5, 0, 1.6, 1.6, 1.2, 6, 4); mb.pop();
 };
 B3.silo = (mb) => {
   mb.color('#bcd6ea').cyl(0, 0, -24, 25, 25, 150, 14);
@@ -2837,14 +2917,32 @@ B3.silo = (mb) => {
   mb.color('#ffd23c').sphere(0, 178, -24, 4, 4, 4, 6, 4);
 };
 B3.cottage = (mb) => {
-  const w = 72, z0 = -58, z1 = -2, h = 62;
-  mb.color('#b9b2a8').box(28, h + 30, z0 + 20, 46, h + 96, z0 + 38); mb.color('#948b80').box(25, h + 92, z0 + 17, 49, h + 100, z0 + 41);
+  const w = 72, z0 = -58, z1 = -2, h = 60, cz = (z0 + z1) / 2, rh = 44, ov = 10, ex = 10;
+  const straw = '#e2b45c', darkStraw = '#c8913c', roll = '#d9a24a';
+  // the thatch's outline from the front eave over the top to the back eave: steep near the eaves, round on top
+  const N = 16, half = (z1 + ov) - cz, prof = [];
+  for (let i = 0; i <= N; i++) { const t = -1 + 2 * i / N; prof.push([cz + t * half, h - 6 + rh * (1 - Math.pow(Math.abs(t), 1.7))]); }
+  const inner = prof.map(([z, y], i) => { const t = -1 + 2 * i / N; return [cz + t * (half - 5), y - 7]; });
+  // stone walls, with gables that follow the underside of the thatch
   mb.color('#f2e4c8').box(-w, 0, z0, w, h, z1);
+  const gable = [[-z1, h]].concat(inner.filter(([z]) => z <= z1 && z >= z0).map(([z, y]) => [-z, Math.max(h, y)]).reverse()).concat([[-z0, h]]);
+  mb.push(RY3(m4(), Math.PI / 2)); mb.color('#f2e4c8').extrude(gable.reverse(), -w, w); mb.pop();
   const R = rng(3);
-  for (let k = 0; k < 16; k++) { const x = -w + 8 + R() * (2 * w - 16), y = 8 + R() * (h - 14); mb.color('#e0cfae').box(x - 5, y - 3, z1, x + 5, y + 3, z1 + 1.2); }
-  const pr = [];
-  for (let k = 0; k <= 10; k++) { const a = k / 10 * Math.PI; pr.push([Math.cos(a) * 88, h - 6 + Math.sin(a) * 90]); }
-  mb.color('#c98a4b').extrude(pr, z0 - 12, z1 + 12, rgb3('#b77838').concat(1));
+  for (let k = 0; k < 18; k++) { const x = -w + 8 + R() * (2 * w - 16), y = 8 + R() * (h - 14); if (Math.abs(x) < 20 && y < 54) continue; mb.color(R() < 0.5 ? '#e0cfae' : '#d8c4a0').box(x - 5, y - 3, z1, x + 5, y + 3, z1 + 1.2); }
+  // chimney of stones
+  mb.color('#b9b2a8').box(28, h + 14, cz - 8, 46, h + rh + 10, cz + 8); mb.color('#948b80').box(25, h + rh + 6, cz - 11, 49, h + rh + 14, cz + 11);
+  // the thatch: a thick bulging shell with bands of darker straw, rolled at the eaves
+  const X0 = -w - ex, X1 = w + ex, cS = rgb3(straw).concat(1), cD = rgb3(darkStraw).concat(1), cU = shade3(darkStraw, -0.25).concat(1);
+  for (let i = 0; i < N; i++) {
+    const a = prof[i], b = prof[i + 1], ia = inner[i], ib = inner[i + 1], band = i % 4 === 1 || i % 4 === 2 ? cS : (i % 2 ? cD : cS);
+    mb.quad([X0, a[1], a[0]], [X0, b[1], b[0]], [X1, b[1], b[0]], [X1, a[1], a[0]], i === 3 || i === 12 ? cD : band === cD ? cS : cS);
+    mb.quad([X0, ia[1], ia[0]], [X1, ia[1], ia[0]], [X1, ib[1], ib[0]], [X0, ib[1], ib[0]], cU);
+    mb.quad([X0, ia[1], ia[0]], [X0, ib[1], ib[0]], [X0, b[1], b[0]], [X0, a[1], a[0]], cD);
+    mb.quad([X1, a[1], a[0]], [X1, b[1], b[0]], [X1, ib[1], ib[0]], [X1, ia[1], ia[0]], cD);
+  }
+  for (const [z, y] of [prof[0], prof[N]]) { mb.push(RZ3(T3(X0, y - 2, z), -Math.PI / 2)); mb.color(roll).cyl(0, 0, 0, 5.5, 5.5, X1 - X0, 14); mb.pop(); }
+  for (const f of [0.3, 0.7]) { const i = Math.round(f * N), p = prof[i]; mb.push(RZ3(T3(X0, p[1] + 0.5, p[0]), -Math.PI / 2)); mb.color(darkStraw).cyl(0, 0, 0, 2.2, 2.2, X1 - X0, 8); mb.pop(); }
+  // round windows, a green door, flower boxes and rose bushes
   door3(mb, 0, z1, 30, 50, '#5fae57');
   for (const x of [-44, 44]) {
     mb.push(RX3(T3(x, 36, z1), -Math.PI / 2));
@@ -2852,22 +2950,103 @@ B3.cottage = (mb) => {
     mb.pop();
     mb.color('#ffffff').box(x - 10, 35, z1 + 2.8, x + 10, 37, z1 + 3.4); mb.box(x - 1, 26, z1 + 2.8, x + 1, 46, z1 + 3.4);
     mb.color('#c98552').box(x - 15, 18, z1, x + 15, 23, z1 + 6);
+    for (let k = 0; k < 3; k++) mb.color(['#ff5a8a', '#ffd23c', '#ff5a5a'][k]).sphere(x - 9 + k * 9, 25, z1 + 3.5, 3, 2.8, 3, 6, 4);
   }
   mb.color('#c9c0b4').box(-22, 0, z1, 22, 2.5, z1 + 12);
+  for (const s of [-1, 1]) {
+    mb.color('#4fa64a').ico(s * (w + 6), 10, z1 + 4, 13, { jit: 0.3, seed: 50 + s });
+    for (let k = 0; k < 5; k++) mb.color(k % 2 ? '#ff5a8a' : '#ff9fc0').sphere(s * (w + 6) + Math.cos(k * 1.3) * 9, 12 + (k % 3) * 4, z1 + 4 + Math.sin(k * 1.3) * 9, 2.6, 2.6, 2.6, 6, 4);
+  }
 };
 function houseboat3(mb) {
-  mb.color('#2f7fd6').extrude([[-80, -14], [80, -14], [104, 8], [-104, 8]], -27, 27);
-  mb.color('#ffffff').box(-100, -2, 26, 100, 3, 27.5); mb.box(-100, -2, -27.5, 100, 3, -26);
-  mb.color('#c98f55').box(-104, 8, -29, 104, 11, 29);
-  mb.color('#ffd35c').box(-62, 11, -20, 48, 64, 20);
-  mb.push(RY3(m4(), Math.PI / 2)); mb.color('#e8503a').extrude([[-30, 62], [30, 62], [0, 86]], -72, 58, rgb3('#c73f2c').concat(1)); mb.pop();
-  for (const x of [-38, -8]) {
-    mb.push(RX3(T3(x, 40, 20), -Math.PI / 2)); mb.color('#ffffff').cyl(0, 0, 0, 9, 9, 2, 10); mb.color('#9fdcf7').cyl(0, 2, 0, 6.5, 6.5, 0.5, 10); mb.pop();
+  // ---- the hull, ring by ring from the stern (x = -104) to the tip of the bow (x = 106)
+  const half = (x) => (x > 30 ? 29 * Math.sqrt(Math.max(0, 1 - Math.pow((x - 30) / 76, 2))) : 29 - 6 * Math.pow(Math.max(0, (-60 - x) / 44), 2));
+  const top = (x) => 10 + 8 * Math.pow(Math.max(0, (x - 30) / 76), 2) + 2 * Math.max(0, (-70 - x) / 34);
+  const bot = (x) => -13 + 8 * Math.pow(Math.max(0, (x - 30) / 76), 1.5);
+  const XS = [-104, -98, -88, -76, -62, -46, -30, -14, 2, 18, 30, 44, 58, 70, 80, 88, 94, 99, 103, 106];
+  const VS = [-1, -0.97, -0.88, -0.7, -0.4, 0, 0.4, 0.7, 0.88, 0.97, 1];
+  const P = (x, v) => { const w = half(x), t = top(x), b = bot(x); return [x, t - (t - b) * (1 - Math.pow(Math.abs(v), 3)), w * v]; };
+  const paint = (y) => (y < -1.5 ? '#d9483b' : y < 6.5 ? '#2f7fd6' : '#ffffff');
+  for (let i = 0; i < XS.length - 1; i++) for (let j = 0; j < VS.length - 1; j++) {
+    const a = P(XS[i], VS[j]), b = P(XS[i + 1], VS[j]), c = P(XS[i + 1], VS[j + 1]), d = P(XS[i], VS[j + 1]);
+    mb.quad(a, b, c, d, rgb3(paint((a[1] + c[1]) / 2)).concat(1));
   }
-  mb.color('#9c6440').box(16, 11, 20, 38, 58, 22.5);
-  mb.color('#ff4d4d').torus(-68, 36, 8, 8, 2.6, 12, 5, 'z');
-  mb.color('#6b4430').cyl(72, 11, 0, 1.6, 1.6, 96, 6);
-  mb.push(T3(73, 88, 0)); mb.color('#ff5a5a').extrude([[0, 0], [30, 8], [0, 16]], -0.8, 0.8); mb.pop();
+  // the flat stern
+  const sx = XS[0], sc = [sx, (top(sx) + bot(sx)) / 2, 0];
+  for (let j = 0; j < VS.length - 1; j++) { const p = P(sx, VS[j]), q = P(sx, VS[j + 1]); mb.tri(sc, p, q, rgb3(paint((p[1] + q[1]) / 2)).concat(1)); }
+  mb.tri(sc, P(sx, 1), P(sx, -1), rgb3('#ffffff').concat(1));
+  mb.color('#ffd23c').box(sx - 0.6, top(sx) - 6, -12, sx, top(sx) - 4.5, 12);            // a gold line across the stern
+  // ---- the deck: planks running bow to stern, and a wooden rail along the top of the hull
+  const planks = ['#c98f55', '#b97f47', '#d39b60', '#be844b', '#c98f55'];
+  for (let i = 0; i < XS.length - 2; i++) {
+    const x0 = XS[i], x1 = XS[i + 1], w0 = half(x0) - 1.6, w1 = Math.max(0.5, half(x1) - 1.6), y0 = top(x0) - 0.6, y1 = top(x1) - 0.6;
+    for (let k = 0; k < 5; k++) {
+      const f0 = -1 + 2 * k / 5, f1 = -1 + 2 * (k + 1) / 5;
+      mb.quad([x0, y0, w0 * f1], [x1, y1, w1 * f1], [x1, y1, w1 * f0], [x0, y0, w0 * f0], rgb3(planks[k]).concat(1));
+    }
+  }
+  for (const s of [-1, 1]) for (let i = 0; i < XS.length - 1; i++) {
+    const x0 = XS[i], x1 = XS[i + 1], a = [x0, top(x0) + 0.9, s * half(x0)], b = [x1, top(x1) + 0.9, s * half(x1)], l = Math.hypot(x1 - x0, b[2] - a[2]);
+    mb.push(RY3(T3((x0 + x1) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), Math.atan2(-(b[2] - a[2]), x1 - x0)));
+    mb.color('#8a5a3a').box(-l / 2 - 0.4, -1.2, -1.3, l / 2 + 0.4, 1.2, 1.3);
+    mb.pop();
+  }
+  // ---- the cabin: cream walls, wooden corners, windows with curtains and flower boxes, a blue door
+  const cx0 = -66, cx1 = 36, cz = 19, fy = 10, h = 56;
+  mb.color('#fff3d6').box(cx0, fy, -cz, cx1, h, cz);
+  for (const x of [cx0, cx1]) for (const z of [-cz, cz]) mb.color('#a8693a').box(x - 2.2, fy, z - 2.2, x + 2.2, h, z + 2.2);
+  mb.color('#a8693a').box(cx0 - 2, h - 3, cz, cx1 + 2, h, cz + 2.4); mb.box(cx0 - 2, fy, cz, cx1 + 2, fy + 3, cz + 2.4);
+  win3(mb, -48, 26, 18, 16, cz, { curtain: '#ff9fc0' });
+  win3(mb, -18, 26, 18, 16, cz, { curtain: '#ffe38a' });
+  mb.push(T3(0, fy, 0)); door3(mb, 16, cz, 18, 36, '#4aa3ff'); mb.pop();
+  mb.color('#3a3a40').box(14, fy + 38, cz, 18, fy + 39.5, cz + 4); mb.color('#ffe38a').box(14.5, fy + 33.5, cz + 2, 17.5, fy + 38, cz + 5);
+  mb.push(RY3(T3(cx1, 34, 0), Math.PI / 2)); mb.color('#ffffff').torus(0, 0, 0.8, 7.5, 1.6, 16, 6, 'z'); mb.push(RX3(m4(), Math.PI / 2)); mb.color('#9fdcf7').cyl(0, 0, 0, 6.5, 6.5, 0.6, 14); mb.pop(); mb.pop();
+  // gable ends and a red roof that overhangs, with shingle lines, a ridge and a stovepipe
+  mb.push(RY3(m4(), Math.PI / 2)); mb.color('#fff3d6').extrude([[-cz, h], [cz, h], [0, h + 17]], cx0, cx1); mb.pop();
+  const run = cz + 6, rise = 19, L = Math.hypot(run, rise), ang = Math.atan2(rise, run), xm = (cx0 + cx1) / 2, xl = (cx1 - cx0) / 2 + 6;
+  for (const s of [1, -1]) {
+    mb.push(RX3(T3(xm, h - 1 + rise / 2, s * run / 2), s > 0 ? ang : Math.PI - ang));
+    mb.color('#e8503a').box(-xl, 0, -L / 2, xl, 3, L / 2);
+    for (const f of [-0.2, 0.15]) mb.color('#c73f2c').box(-xl, 3, f * L - 0.8, xl, 3.6, f * L + 0.8);
+    mb.color('#a8322a').box(-xl, -0.6, L / 2 - 1.6, xl, 3.2, L / 2 + 0.4);
+    mb.pop();
+  }
+  mb.push(RZ3(T3(xm - xl, h + rise + 1.4, 0), -Math.PI / 2)); mb.color('#b83a2e').cyl(0, 0, 0, 2.6, 2.6, 2 * xl, 10); mb.pop();
+  mb.color('#4a4a52').cyl(-40, h + 8, -4, 2.4, 2.4, 30, 10); mb.color('#3a3a40').cyl(-40, h + 38, -4, 4.2, 3, 3, 10);
+  // the life ring: red and white quarters
+  for (let k = 0; k < 4; k++) mb.color(k % 2 ? '#ffffff' : '#ff4d4d').torus(-60, 38, cz + 2.2, 6.4, 2.1, 4, 6, 'z', k * Math.PI / 2, (k + 1) * Math.PI / 2);
+  // railings on the bow and stern decks
+  const posts = (xs, s) => xs.map((x) => [x, top(x) - 0.6, s * (half(x) - 2.2)]);
+  for (const s of [-1, 1]) for (const [xs] of [[[42, 54, 66, 76, 85, 92, 98]], [[-100, -90, -80, -70]]]) {
+    const pts = posts(xs, s);
+    for (const [x, y, z] of pts) mb.color('#ffffff').cyl(x, y, z, 0.8, 0.8, 9, 5);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1], l = Math.hypot(b[0] - a[0], b[2] - a[2]);
+      mb.push(RY3(T3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 9, (a[2] + b[2]) / 2), Math.atan2(-(b[2] - a[2]), b[0] - a[0])));
+      mb.color('#ffffff').box(-l / 2, -0.7, -0.7, l / 2, 0.7, 0.7);
+      mb.pop();
+    }
+  }
+  // flower pots and a lantern on the bow, a coil of rope on the stern, fenders on the side
+  for (const [x, z, fl] of [[50, -9, '#ff5a8a'], [58, 8, '#ffd23c'], [-84, 9, '#b58cff']]) {
+    mb.color('#e0795a').cyl(x, top(x) - 0.6, z, 4, 5, 7, 8);
+    mb.color('#5cbf5a').ico(x, top(x) + 9, z, 5.5, { jit: 0.3, seed: x });
+    for (let k = 0; k < 3; k++) mb.color(fl).sphere(x + Math.cos(k * 2.1) * 3.5, top(x) + 12, z + Math.sin(k * 2.1) * 3.5, 1.8, 1.8, 1.8, 6, 4);
+  }
+  mb.color('#5a4a44').cyl(88, top(88), 0, 1, 1, 22, 6);
+  mb.color('#3a3a40').box(85.5, top(88) + 22, -2.5, 90.5, top(88) + 23.5, 2.5); mb.color('#ffe38a').box(86, top(88) + 23.5, -2, 90, top(88) + 29, 2); mb.color('#3a3a40').cone(88, top(88) + 29, 0, 3.4, 3, 4, { rot: Math.PI / 4 });
+  mb.color('#d9c28e').torus(-92, top(-92) + 0.8, -8, 4.5, 1.4, 14, 5, 'y'); mb.torus(-92, top(-92) + 2.6, -8, 3.6, 1.3, 14, 5, 'y');
+  for (const x of [-30, 4]) { mb.color('#ffffff').sphere(x, 1, half(x) + 1.6, 2.6, 5, 2.6, 8, 6); mb.color('#8a5a3a').cyl(x, 5, half(x) + 1.4, 0.4, 0.4, 6, 4); }
+  // the mast with a flag, and bunting down to the cabin roof
+  const mx = -94, my0 = top(mx) - 0.6, my1 = 102;
+  mb.color('#6b4430').cyl(mx, my0, 0, 1.6, 1.4, my1 - my0, 8);
+  mb.color('#ffd23c').sphere(mx, my1, 0, 2.2, 2.2, 2.2, 8, 5);
+  mb.push(T3(mx + 1, my1 - 14, 0)); mb.color('#ff5a5a').extrude([[0, 0], [26, 6], [0, 12]], -0.8, 0.8); mb.pop();
+  const flags = ['#ff5a5a', '#ffd23c', '#4cc36a', '#4aa3ff', '#ff7aa2'], ex = cx0 - 4, ey = h + rise - 2;
+  for (let k = 1; k < 8; k++) {
+    const f = k / 8, x = mx + (ex - mx) * f, y = my1 - 4 + (ey - (my1 - 4)) * f - Math.sin(f * Math.PI) * 6;
+    mb.push(T3(x, y, 0)); mb.color(flags[k % flags.length]).extrude([[-2.6, 0], [2.6, 0], [0, -6]], -0.5, 0.5); mb.pop();
+  }
 }
 B3.fountain = (mb) => {
   const cz = -12;
@@ -3110,6 +3289,74 @@ function build3DWorld() {
       const col = FL[(R2() * FL.length) | 0];
       mb.color('#5cb84a').cyl(x, 0, z, 0.8, 0.8, 6, 3, { top: false });
       mb.color(col).sphere(x, 7, z, 3.4, 1.8, 3.4, 5, 3); mb.color(col === '#ffd23c' ? '#ff8c42' : '#ffd23c').sphere(x, 8.2, z, 1.4, 1, 1.4, 4, 2);
+    }
+  }
+  // more life on the ground (3D only): clumps of grass, clover, daisies and tulips, pebbles by the paths, leaves under trees
+  const R3 = rng(31), freeAt = (x, z, pad) => x > 30 && z > 30 && x < W - 30 && z < H - 30 && !inKeep(x, z, pad) && !blockedAt(x, z);
+  const GRASS = ['#6dbb4b', '#7cc955', '#5fae45', '#8ad460'];
+  for (let i = 0; i < 2200; i++) {
+    const x = R3() * W, z = R3() * H;
+    if (!freeAt(x, z, 4)) continue;
+    const mb = chunk(x, z), gy = groundH3(x, z), n = 4 + ((R3() * 4) | 0), tall = 6 + R3() * 6;
+    mb.color(GRASS[(R3() * GRASS.length) | 0]);
+    for (let k = 0; k < n; k++) {
+      const a = R3() * TAU, r = R3() * 2.6, bx = x + Math.cos(a) * r, bz = z + Math.sin(a) * r, hgt = tall * (0.6 + R3() * 0.6), lean = (R3() - 0.3) * 3;
+      const la = R3() * TAU, dx = Math.cos(la) * 1.1, dz = Math.sin(la) * 1.1, tip = [bx + lean * Math.cos(a), gy + hgt, bz + lean * Math.sin(a)];
+      mb.tri([bx - dx, gy, bz - dz], [bx + dx, gy, bz + dz], tip); mb.tri([bx + dx, gy, bz + dz], [bx - dx, gy, bz - dz], tip);
+    }
+  }
+  for (let i = 0; i < 420; i++) {                  // clover: little three-leaf patches, some with a white flower
+    const x = R3() * W, z = R3() * H;
+    if (!freeAt(x, z, 6)) continue;
+    const mb = chunk(x, z), gy = groundH3(x, z);
+    mb.color(R3() < 0.5 ? '#58a843' : '#67b84d');
+    for (let k = 0; k < 4; k++) {
+      const cx = x + (R3() - 0.5) * 12, cz = z + (R3() - 0.5) * 12, rot = R3() * TAU;
+      for (let l = 0; l < 3; l++) { const a = rot + l * 2.094; mb.disc(cx + Math.cos(a) * 1.7, gy + 0.8 + l * 0.05, cz + Math.sin(a) * 1.7, 1.9, 6); }
+    }
+    if (R3() < 0.35) { mb.color('#5cb84a').cyl(x, gy, z, 0.4, 0.4, 3.5, 3, { top: false }); mb.color('#ffffff').sphere(x, gy + 4.2, z, 1.6, 1.4, 1.6, 6, 3); }
+  }
+  const TULIP = ['#ff5a6e', '#ffd23c', '#ff8fc0', '#b58cff', '#ff9f43'];
+  for (let i = 0; i < 520; i++) {                  // daisies and tulips, in little groups
+    const x = R3() * W, z = R3() * H;
+    if (!freeAt(x, z, 6)) continue;
+    const mb = chunk(x, z), gy = groundH3(x, z), n = 2 + ((R3() * 3) | 0), tulip = R3() < 0.42, col = TULIP[(R3() * TULIP.length) | 0];
+    for (let k = 0; k < n; k++) {
+      const fx = x + (R3() - 0.5) * 11, fz = z + (R3() - 0.5) * 11, h = 6 + R3() * 4;
+      mb.color('#4fa83f').cyl(fx, gy, fz, 0.6, 0.5, h, 3, { top: false });
+      if (tulip) {
+        mb.color(col).lathe(fx, gy + h - 0.6, fz, [[0.7, 0], [2.6, 1.3], [2.8, 3.7], [1.5, 5.2]], 6, { cap: false, rot: R3() });
+        mb.color('#4fa83f').push(RZ3(T3(fx, gy + 2, fz), 0.6)).sphere(1.4, 2, 0, 0.7, 2.6, 1.5, 4, 2).pop();
+      } else {
+        const pts = [], rot = R3();
+        for (let p = 0; p < 12; p++) { const a = rot + p * TAU / 12, r = p % 2 ? 1.1 : 2.9; pts.push([fx + Math.cos(a) * r, fz + Math.sin(a) * r]); }
+        mb.color('#ffffff');
+        for (let p = 0; p < 12; p++) { const q = pts[p], s = pts[(p + 1) % 12]; mb.triUp([fx, gy + h + 0.2, fz], [q[0], gy + h, q[1]], [s[0], gy + h, s[1]]); }
+        mb.color('#ffd23c').cyl(fx, gy + h, fz, 1.1, 0.9, 0.9, 5);
+      }
+    }
+  }
+  for (const p of PATHS) {                         // pebbles along the edges of the paths
+    const w = (p.w || 42) / 2;
+    for (let i = 1; i < p.length; i++) {
+      const [x0, z0] = p[i - 1], [x1, z1] = p[i], l = Math.hypot(x1 - x0, z1 - z0), nx = -(z1 - z0) / l, nz = (x1 - x0) / l;
+      for (let d = 6; d < l; d += 9) {
+        if (R3() > 0.28) continue;
+        const s = R3() < 0.5 ? -1 : 1, off = w + 2 + R3() * 6, x = x0 + (x1 - x0) * d / l + nx * off * s, z = z0 + (z1 - z0) * d / l + nz * off * s;
+        if (blockedAt(x, z) || KEEP.some((k) => inShape(k, x, z, 2))) continue;
+        const r = 1.6 + R3() * 2.2;
+        chunk(x, z).color(['#d9d2c5', '#c9c1b2', '#e6e0d4'][(R3() * 3) | 0]).ico(x, groundH3(x, z) + r * 0.3, z, r, { jit: 0.35, sy: 0.55, detail: 0, seed: i * 31 + d });
+      }
+    }
+  }
+  const LEAF = ['#f2a33c', '#e8743a', '#f7c548', '#d9603b'];
+  for (const o of STATIC) {                        // a few fallen leaves under the trees
+    if (!TREE3[o.key]) continue;
+    for (let k = 0; k < 4; k++) {
+      const a = R3() * TAU, r = 22 + R3() * 18, x = o.x + Math.cos(a) * r, z = o.y + Math.sin(a) * r * 0.7;
+      if (blockedAt(x, z) || inKeep(x, z, 0)) continue;
+      const mb = chunk(x, z);
+      mb.push(RY3(T3(x, groundH3(x, z) + 0.6, z), R3() * TAU)); mb.color(LEAF[(R3() * LEAF.length) | 0]).sphere(0, 0, 0, 3, 0.35, 1.7, 6, 2); mb.pop();
     }
   }
   for (const f of MAP.meadowFlowers || []) {
@@ -3786,31 +4033,76 @@ function animalModel3(kind) {
     tail.push(RX3(T3(0, 19, -13), -0.8)); tail.color(c).lathe(0, 0, 0, [[2.2, 0], [1.6, 8], [0.8, 12], [0.01, 12.6]], 8); tail.pop();
     A.headPivot = [0, 22, 10]; A.tailPivot = [0, 19, -13];
   } else if (kind === 'owl') {
-    const c = '#a8703f';
-    body.color(c).sphere(0, 17, 0, 13, 16, 12, 16, 12); body.color('#f1d7a8').sphere(0, 13, 6, 9, 11, 7, 12, 8);
-    for (const s of [-1, 1]) { body.push(RZ3(T3(s * 8, 30, 0), s * -0.35)); body.color(c).cone(0, 0, 0, 3.4, 9, 8); body.pop(); }
-    eyes3(body, [[-5.8, 22, 12.4], [5.8, 22, 12.4]], 2.2, true);
-    for (const s of [-1, 1]) body.color('#ffae2b').torus(s * 5.8, 22, 11.8, 3.2, 0.9, 14, 5, 'z');
-    body.push(RX3(T3(0, 18, 11), 0.35)); body.color('#ff9f2b').cone(0, 0, 0, 2, 4, 8); body.pop();
-    body.color('#ff9f2b').sphere(-4, 1.5, 3, 2.6, 1.6, 3, 8, 5); body.sphere(4, 1.5, 3, 2.6, 1.6, 3, 8, 5);
-    for (const s of [-1, 1]) wings.color('#8a5530').sphere(s * 12, 16, -1, 4, 11, 8, 10, 8);
-    A.wing = true;
-  } else if (kind === 'cow') {
-    body.color('#ffffff').sphere(0, 36, 0, 17, 15, 31, 18, 12);
-    for (const p of [[-10, 44, -8, 9], [12, 32, 12, 7], [6, 46, 20, 6], [-14, 30, 16, 5]]) body.color('#3d3535').sphere(p[0], p[1], p[2], p[3], p[3] * 0.8, p[3] * 1.2, 12, 8);
-    body.color('#ffb3c6').sphere(0, 22, -6, 6, 4, 7, 10, 6);
-    legs3(la, [[-10, 20], [10, -20]], 4, 24, '#f2f2f2', '#6b5a50'); legs3(lb, [[10, 20], [-10, -20]], 4, 24, '#f2f2f2', '#6b5a50');
-    head.color('#ffffff').sphere(0, 46, 34, 9.5, 10, 10, 16, 12);
-    head.color('#ffb3c6').sphere(0, 39, 42, 10, 7, 7, 14, 10);
-    head.color('#8a4a5a').sphere(-3.8, 40, 48.6, 1.3, 1.6, 0.8, 6, 4); head.sphere(3.8, 40, 48.6, 1.3, 1.6, 0.8, 6, 4);
-    eyes3(head, [[-5.2, 49, 41.6], [5.2, 49, 41.6]], 1.6);
-    for (const s of [-1, 1]) {
-      head.push(RZ3(T3(s * 6, 55, 32), s * -0.5)); head.color('#fff3c9').cone(0, 0, 0, 2.2, 7, 8); head.pop();
-      head.color('#ffffff').sphere(s * 12, 50, 32, 5.5, 2.5, 3.2, 10, 6);
+    const c = '#a8703f', dk = '#7f4f2b', lt = '#f3dcb0', face = '#f8e8c8';
+    // an egg of a body with a pale, feathery belly
+    body.color(c).lathe(0, 0, 0, [[0.01, 2], [9, 3.2], [13, 9], [13.6, 17], [12.2, 25], [8.6, 30.5], [0.01, 32.5]], 18);
+    body.color(lt).sphere(0, 12.5, 5.6, 9, 10, 7.4, 14, 10);
+    for (let r = 0; r < 3; r++) for (let k = -1; k <= 1; k++) {
+      const x = k * 4.2 + (r % 2) * 2.1 - (r % 2 ? 1 : 0), y = 16 - r * 4.4, z = 5.6 + 7.4 * Math.sqrt(Math.max(0, 1 - (x / 9) ** 2 - ((y - 12.5) / 10) ** 2)) + 0.2;
+      for (const s of [-1, 1]) { body.push(RZ3(T3(x + s * 0.9, y, z), s * 0.7)); body.color('#c9a070').box(-1.3, -0.35, -0.3, 1.3, 0.35, 0.3); body.pop(); }
     }
-    head.color('#3d3535').sphere(-3, 52, 38, 4, 3, 3, 8, 6);
-    tail.push(RX3(T3(0, 44, -30), 0.3)); tail.color('#ffffff').cyl(0, -24, 0, 1.2, 1.2, 24, 8); tail.color('#4a3a3a').sphere(0, -25, 0, 2.4, 4, 2.4, 8, 6); tail.pop();
-    A.headPivot = [0, 44, 28]; A.tailPivot = [0, 44, -30];
+    for (const s of [-1, 1]) for (let k = -1; k <= 1; k++) body.color('#ff9f2b').sphere(s * 4 + k * 1.6, 1.3, 4.8 + (k === 0 ? 1 : 0), 1, 1, 2.3, 6, 4);
+    // the face turns on the round body: a pale heart-shaped mask, big orange-ringed eyes, a little beak, feathery tufts
+    for (const s of [-1, 1]) {
+      head.push(T3(s * 4.7, 22.5, 10.8)); head.color(face).sphere(0, 0, 0, 6.4, 6.8, 2.6, 16, 8); head.pop();
+      head.push(T3(s * 4.8, 23, 12.9));
+      head.color('#ffae2b').sphere(0, 0, 0, 4.1, 4.1, 1.4, 14, 8);
+      head.color('#2b1d16').sphere(0, 0, 0.9, 2.7, 2.7, 1, 12, 8);
+      head.color('#ffffff').sphere(0.9, 1.1, 1.8, 0.95, 0.95, 0.4, 6, 4); head.sphere(-0.9, -0.9, 1.7, 0.45, 0.45, 0.3, 5, 3);
+      head.pop();
+      head.push(RZ3(T3(s * 5.2, 28.6, 11.2), s * 0.22)); head.color(dk).sphere(0, 0, 0, 3.8, 1.1, 1.2, 10, 5); head.pop();
+      head.push(RZ3(T3(s * 7.4, 30, 1.5), s * -0.55)); head.color(c).cone(0, 0, 0, 2.8, 7.5, 6); head.color(dk).cone(s * -0.8, 0, 0.9, 1.5, 5.5, 5); head.pop();
+    }
+    head.push(RX3(T3(0, 20.6, 13.4), Math.PI * 0.82)); head.color('#ff9f2b').cone(0, 0, 0, 1.9, 4.4, 6); head.pop();
+    // wings folded against its sides, with three feather tips
+    for (const s of [-1, 1]) {
+      wings.push(RZ3(T3(s * 12, 15.5, -1), s * 0.12));
+      wings.color(dk).sphere(0, 0, 0, 3.4, 11.5, 8.6, 12, 10);
+      for (let k = -1; k <= 1; k++) wings.color(shade3(dk, -0.12)).sphere(0, -10.5, k * 3.2, 2.4, 2.6, 1.9, 8, 5);
+      wings.pop();
+    }
+    A.wing = true; A.turn = true; A.headPivot = [0, 20, 0];
+  } else if (kind === 'cow') {
+    const W = '#fbfaf5', K = '#3a3434', P = '#ffb8c8';
+    // a soft barrel of a body with black patches painted on it
+    const spots = [[-16, 42, -10, 10], [16, 32, 8, 9], [5, 51, 14, 8], [-13, 30, 17, 7], [2, 49, -21, 9], [15, 45, -14, 6]];
+    // how much of a patch a point is in (0..1): wobbly round edges, blended between neighbouring corners
+    const spotK = (p) => {
+      let m = 0;
+      for (const [x, y, z, r] of spots) {
+        const dy = (p[1] - y) / (r * 0.85), dz = (p[2] - z) / (r * 1.2), d = Math.sqrt(((p[0] - x) / r) ** 2 + dy * dy + dz * dz) * (1 + 0.16 * Math.sin(Math.atan2(dy, dz) * 3 + x));
+        m = Math.max(m, clamp((1 - d) * 6 + 0.5, 0, 1));
+      }
+      return m;
+    };
+    const BX = 16, BY = 14.5, BZ = 28, CY = 37, NU = 40, NV = 22, G = [];
+    for (let j = 0; j <= NV; j++) {
+      const v = -Math.PI / 2 + Math.PI * j / NV, row = [];
+      for (let i = 0; i <= NU; i++) { const u = TAU * i / NU; row.push([BX * spow3(Math.cos(v), 0.8) * spow3(Math.sin(u), 0.8), CY + BY * spow3(Math.sin(v), 0.8), BZ * spow3(Math.cos(v), 0.8) * spow3(Math.cos(u), 0.8)]); }
+      G.push(row);
+    }
+    const cW = rgb3(W), cK = rgb3(K), col = (p) => { const k = spotK(p); return [cW[0] + (cK[0] - cW[0]) * k, cW[1] + (cK[1] - cW[1]) * k, cW[2] + (cK[2] - cW[2]) * k, 1]; };
+    const C = G.map((row) => row.map(col));
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) {
+      body.triC(G[j][i], G[j][i + 1], G[j + 1][i + 1], C[j][i], C[j][i + 1], C[j + 1][i + 1]);
+      body.triC(G[j][i], G[j + 1][i + 1], G[j + 1][i], C[j][i], C[j + 1][i + 1], C[j + 1][i]);
+    }
+    body.color(P).sphere(0, 23.5, -8, 6.5, 4.5, 7, 12, 8);
+    for (const [x, z] of [[-2.4, -10], [2.4, -10], [-2.4, -5.5], [2.4, -5.5]]) body.color(P).sphere(x, 19.6, z, 1, 1.9, 1, 6, 4);
+    legs3(la, [[-8.5, 17], [8.5, -17]], 3.9, 24, '#f4f1ea', '#5a4a44'); legs3(lb, [[8.5, 17], [-8.5, -17]], 3.9, 24, '#f4f1ea', '#5a4a44');
+    // a big friendly head: wide pink nose, ears out to the sides, little horns, a bell on a collar
+    head.color(W).sphere(0, 47, 32, 10.5, 10.5, 10, 16, 12);
+    head.color(P).sphere(0, 41, 40, 10, 6.8, 6.4, 16, 10);
+    head.color('#c26a7e').sphere(-3.8, 41.5, 46, 1.4, 1.9, 0.8, 6, 4); head.sphere(3.8, 41.5, 46, 1.4, 1.9, 0.8, 6, 4);
+    eyes3(head, [[-5, 50, 41], [5, 50, 41]], 1.9);
+    for (const s of [-1, 1]) {
+      head.push(RZ3(T3(s * 11.5, 50.5, 30), s * 0.35)); head.color(W).sphere(0, 0, 0, 6, 2.6, 3.8, 12, 6); head.color(P).sphere(0, 0.6, 0.8, 3.8, 1.4, 2.2, 10, 5); head.pop();
+      head.push(RZ3(T3(s * 6, 56, 29), s * -0.45)); head.color('#fff3c9').cone(0, 0, 0, 2, 6, 8); head.pop();
+    }
+    head.color('#e05a4a').torus(0, 38.5, 28.5, 7.6, 1.5, 18, 6, 'z');
+    head.color('#ffd23c').lathe(0, 29.5, 33.5, [[0.01, 0], [3.2, 0.4], [2.8, 3], [1.6, 6], [0.01, 6.4]], 12); head.color('#c9962a').sphere(0, 29.6, 33.5, 1.2, 1.2, 1.2, 6, 4);
+    tail.push(RX3(T3(0, 45, -28), 0.3)); tail.color(W).cyl(0, -24, 0, 1.2, 1.2, 24, 8); tail.color(K).sphere(0, -25, 0, 2.4, 4, 2.4, 8, 6); tail.pop();
+    A.headPivot = [0, 44, 27]; A.tailPivot = [0, 45, -28];
   } else if (kind === 'chicken') {
     body.color('#ffffff').sphere(0, 10, 0, 7, 7, 9, 14, 10); body.push(RX3(T3(0, 13, -7), -0.7)); body.color('#ffffff').cone(0, 0, 0, 4, 9, 8); body.pop();
     legs3(la, [[-2.5, 1]], 0.8, 5, '#ff9f2b'); legs3(lb, [[2.5, 1]], 0.8, 5, '#ff9f2b');
@@ -3956,6 +4248,7 @@ function drawAnimal3(R, kind, st) {
     if (st.peck) dip = 0.9;
     if (st.talk) dip = Math.sin(t * 12) * 0.08;
     if (mv && G && G.nod) dip += Math.sin(2 * th) * G.nod;        // horses nod their heads as they walk
+    if (A.turn) m4ry(m, (Math.sin(t * 0.55) * 0.5 + Math.sin(t * 1.7) * 0.08) * (st.talk ? 0.35 : 1));
     m4rx(m, dip); m4t(m, -hp[0], -hp[1], -hp[2]);
     R.draw(A.head, m);
   }
@@ -4348,7 +4641,7 @@ const Snap = {
     const sp = 36, nb = back.length, nk = kids.length;
     const shift = nb && (nb % 2) === (nk % 2) ? sp / 2 : 0, STEP = nb ? 24 : 0;
     const widest = Math.max(nb * sp + shift * 2, nk * sp, 3 * sp) + 40;
-    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 100 / Math.tan(fov / 2));
+    const fov = 0.5, dist = Math.max(widest / 2 / Math.tan(fov / 2) / (W2 / H2), 86 / Math.tan(fov / 2));
     const shot = this.shoot(W2, H2, { eye: [0, 110, dist], at: [0, 56, -6], fov }, (R) => {
       if (nb) {
         const w = nb * sp + shift * 2 + 26, mb = new MB(4);
@@ -5704,6 +5997,13 @@ function applyWorldState(instant) {
    Yeni bir ünite için mini oyunu olduğu gibi bırakıp yalnızca GAME_CONTENT'i değiştirmek yeterli.
    Ortak parçalar: MG (açılır pencere), pickBtn (resimli buton), sayThen (konuş, bitince devam et). */
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+// a label that is wider than its card (one long word) gets a slightly smaller font, never a broken word
+function fitText(s) {
+  if (!s.isConnected) return;
+  s.style.fontSize = '';
+  let f = parseFloat(getComputedStyle(s).fontSize) || 22;
+  while (s.scrollWidth > s.clientWidth + 1 && f > 14) { f -= 1; s.style.fontSize = f + 'px'; }
+}
 function cnv(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 function fmt(s, vars) { return fillName(String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m))); }
@@ -5720,7 +6020,7 @@ function sayThen(text, who, cb) {
 function pickBtn(draw, label, cw, ch, cls) {
   const b = el('button', 'pick' + (cls ? ' ' + cls : ''));
   if (draw) { const c = cnv(cw || 180, ch || 200); draw(c); b.appendChild(c); }
-  if (label) b.appendChild(el('span', null, String(label).replace(/^grand(?=\w)/, 'grand​')));   // "grand|mother" may wrap
+  if (label) { const s = el('span', 'fit', String(label)); b.appendChild(s); requestAnimationFrame(() => fitText(s)); }
   return b;
 }
 const MG = {                      // the mini game window
@@ -6658,6 +6958,8 @@ const UI = {
     const tap = (id, fn) => $(id).addEventListener('click', (e) => { e.stopPropagation(); e.currentTarget.blur && e.currentTarget.blur(); fn(e); });
     tap('tContinue', () => Title.resume());
     tap('tNew', () => Title.newGame());
+    tap('tMusic', () => { Sfx.unlock(); Music.toggle(); Title.small(); Sfx.play('tap'); });
+    tap('mMusic', () => { Music.toggle(); Menu.render(); Sfx.play('tap'); });
     tap('tSound', () => { state.settings.sound = !state.settings.sound; if (!state.settings.sound) Speech.stop(); Save.save(); Title.small(); Sfx.unlock(); Sfx.play('tap'); });
     tap('tView', () => { setView(!G3.on); Title.small(); if (state.created) drawPortrait($('tMe'), 'player'); });
     tap('tInfo', () => { Sfx.unlock(); Parent.open(true); });
@@ -6683,6 +6985,7 @@ const UI = {
     tap('wdOk', () => Wardrobe.close());
     tap('certAgain', () => Title.newGame());
     tap('certWalk', () => Cert.close());
+    tap('certSave', () => { Sfx.play('tap'); Cert.save(); });
     tap('pStart', () => Parent.start());
     { const T = $('titleText'), s = T.textContent; T.textContent = '';
       [...s].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.12) + 's'; T.appendChild(sp); }); }
@@ -6746,6 +7049,7 @@ const Menu = {
     $('mName').textContent = state.name; $('mName').setAttribute('data-stats', stars + '  ' + secrets);
     if (me) drawFigure($('mMe'), PLAYER_LOOK);
     $('mSoundLbl').textContent = (s.sound ? '🔊 ' : '🔇 ') + U.sound;
+    Music.button($('mMusic'));
     $('mSound').classList.toggle('on', !!s.sound); $('mSound').setAttribute('aria-checked', s.sound ? 'true' : 'false');
     $('mSpeedLbl').textContent = '🗣️ ' + U.speed;
     segLabel($('mSlow'), '🐢', U.slow); segLabel($('mNormal'), '🐇', U.normal);
@@ -6964,6 +7268,7 @@ const Cert = {
     $('certNote').textContent = '📸 ' + F.note;
     $('certAgain').textContent = '🔄 ' + F.again;
     $('certWalk').textContent = '🚶 ' + F.walk;
+    $('certSave').textContent = '📷 ' + F.save;
     drawFigure($('certPlayer'), PLAYER_LOOK, { k: 240 / 100 });
     drawFamilyPhoto($('certPhoto'), state.family || {}, C8.members);
     $('cert').classList.remove('hidden'); $('certCard').scrollTop = 0;
@@ -6971,6 +7276,54 @@ const Cert = {
     Speech.speak(fmt(F.say), { who: 'narrator' });
   },
   close() { $('cert').classList.add('hidden'); setMode('play'); Hud.cardKey = ''; Hud.refresh(); },
+  // a proper certificate picture: name, character, family photo, stars, secrets, date
+  image() {
+    const F = GAME_CONTENT.final, C8 = GAME_CONTENT.quests[Quests.index('final')];
+    const W2 = 1600, H2 = 1130, cv = cnv(W2, H2), g = cv.getContext('2d');
+    g.lineJoin = 'round'; g.lineCap = 'round'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const bg = g.createLinearGradient(0, 0, 0, H2); bg.addColorStop(0, '#fffaf0'); bg.addColorStop(1, '#fff1d6');
+    g.fillStyle = bg; g.fillRect(0, 0, W2, H2);
+    g.beginPath(); rrPath(g, 28, 28, W2 - 56, H2 - 56, 46); g.lineWidth = 22; g.strokeStyle = '#ffb238'; g.stroke();
+    g.beginPath(); rrPath(g, 58, 58, W2 - 116, H2 - 116, 30); g.lineWidth = 5; g.strokeStyle = '#e8803a'; g.stroke();
+    for (const [x, y] of [[96, 96], [W2 - 96, 96], [96, H2 - 96], [W2 - 96, H2 - 96]]) { starPath(g, x, y, 30, 0); g.fillStyle = '#ffd23c'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#c98a12'; g.stroke(); }
+    const ribbon = g.createLinearGradient(0, 110, 0, 230); ribbon.addColorStop(0, '#ffc23c'); ribbon.addColorStop(1, '#ff8c42');
+    g.beginPath(); rrPath(g, 380, 110, W2 - 760, 120, 36); g.fillStyle = ribbon; g.fill();
+    g.font = 'bold 76px ' + LOGO_FONT; g.fillStyle = '#ffffff'; g.lineWidth = 10; g.strokeStyle = 'rgba(122,61,18,.55)';
+    g.strokeText('🏆 ' + F.title + ' 🏆', W2 / 2, 172); g.fillText('🏆 ' + F.title + ' 🏆', W2 / 2, 172);
+    g.font = 'bold 40px ' + FONT; g.fillStyle = '#8a6a50'; g.fillText(GAME_CONTENT.ui.unit, W2 / 2, 278);
+    g.font = '38px ' + FONT; g.fillText(F.for, W2 / 2, 352);
+    g.font = 'bold 104px ' + FONT; g.fillStyle = '#4a3222'; g.fillText(state.name || GAME_CONTENT.defaultName, W2 / 2, 448);
+    g.font = '36px ' + FONT; g.fillStyle = '#8a6a50'; g.fillText(fillName(F.done), W2 / 2, 530);
+    // the child's character and the family photo
+    const fig = cnv(300, 360); drawFigure(fig, PLAYER_LOOK, { k: 360 / 100 });
+    g.drawImage(fig, 190, 560, 300, 360);
+    const photo = cnv(820, 384); drawFamilyPhoto(photo, state.family || {}, C8.members);
+    g.save(); g.beginPath(); rrPath(g, 560, 570, 820, 384, 26); g.clip(); g.drawImage(photo, 560, 570); g.restore();
+    g.beginPath(); rrPath(g, 560, 570, 820, 384, 26); g.lineWidth = 16; g.strokeStyle = '#c98552'; g.stroke();
+    // stars, secrets, date and who made the game
+    const n = SETTINGS.totalStars;
+    for (let i = 0; i < n; i++) { starPath(g, W2 / 2 - (n - 1) * 34 + i * 68, 994, 26, 0); g.fillStyle = i < state.stars ? '#ffd23c' : '#eadfce'; g.fill(); g.lineWidth = 4; g.strokeStyle = i < state.stars ? '#c98a12' : '#cdbfae'; g.stroke(); }
+    g.font = 'bold 34px ' + FONT; g.fillStyle = '#4a3222';
+    g.textAlign = 'left'; g.fillText('🔍 ' + GAME_CONTENT.secrets.label + ': ' + EGGS.count() + ' / ' + EGGS.ids.length, 140, 994);
+    g.textAlign = 'right'; g.fillText('📅 ' + (state.finishedAt || new Date().toLocaleDateString('tr-TR')), W2 - 140, 994);
+    g.textAlign = 'center'; g.font = '26px ' + FONT; g.fillStyle = '#a08a74'; g.fillText('☀️ Sunny Hill · ' + GAME_CONTENT.parent.credit, W2 / 2, 1042);
+    return cv;
+  },
+  // phones and tablets share it (WhatsApp, Photos...); computers download it
+  save() {
+    const F = GAME_CONTENT.final;
+    let url;
+    try { url = this.image().toDataURL('image/png'); } catch (e) { return; }
+    const name = 'Sunny-Hill-' + String(state.name || 'sertifika').replace(/[^0-9A-Za-zÇĞİÖŞÜçğıöşü-]+/g, '_') + '.png';
+    try {
+      const bin = atob(url.split(',')[1]), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const file = typeof File === 'function' ? new File([bytes], name, { type: 'image/png' }) : null;
+      if (file && Device.touch && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Sunny Hill' }).catch(() => {}); return; }
+    } catch (e) { /* fall back to a download */ }
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    Toast.show('📷 ' + F.saved);
+  },
 };
 
 /* ---- input ---- */
@@ -7207,12 +7560,192 @@ const VoiceWarn = {
   },
   hide() { $('voiceWarn').classList.add('hidden'); },
 };
+/* Background music, made on the spot (no files): a relaxed jazzy tune in the spirit of cosy village games.
+   Electric piano chords with jazz colours (maj9, m9, 13), a walking upright bass, a vibraphone and a soft flute
+   taking turns with the melody, brushed shaker and rim clicks, a gentle swing, a little room reverb.
+   Form A–A'–B, 24 bars (about a minute) before it repeats. Quiet, and quieter still whenever someone speaks. */
+const Music = {
+  gain: null, bus: null, noise: null, next: 0, step: 0, timer: 0,
+  BPM: 92, SW: 0.16,
+  get EIGHTH() { return 60 / this.BPM / 2; },
+  // chord voicings around middle C (rootless, with 9ths and 13ths) and the bass root under them
+  CH: {
+    F: { v: [57, 60, 64, 67], r: 41 }, Em: { v: [55, 59, 62, 66], r: 40 }, A7: { v: [55, 61, 64, 66], r: 45 }, Dm: { v: [53, 57, 60, 64], r: 38 },
+    Cm: { v: [51, 55, 58, 62], r: 36 }, F7: { v: [57, 62, 63, 67], r: 41 }, Bb: { v: [57, 60, 62, 65], r: 46 }, Bbm: { v: [53, 55, 58, 61], r: 46 },
+    Eb9: { v: [55, 58, 61, 65], r: 39 }, Am: { v: [55, 60, 64, 67], r: 45 }, D9: { v: [54, 57, 60, 64], r: 38 }, Gm: { v: [53, 57, 58, 62], r: 43 },
+    C9: { v: [52, 57, 58, 62], r: 36 },
+  },
+  BARS: [
+    ['F'], ['Em', 'A7'], ['Dm'], ['Cm', 'F7'], ['Bb'], ['Bbm', 'Eb9'], ['Am', 'D9'], ['Gm', 'C9'],
+    ['F'], ['Em', 'A7'], ['Dm'], ['Cm', 'F7'], ['Bb'], ['Bbm', 'Eb9'], ['Am', 'D9'], ['Gm', 'C9'],
+    ['Bb'], ['Am'], ['Gm'], ['C9'], ['Bb'], ['Am', 'D9'], ['Gm'], ['C9'],
+  ],
+  // the tune: per bar, [eighth it starts on, note, length in eighths]
+  MEL: [
+    [[0, 72, 2], [2, 74, 1], [3, 76, 3], [6, 74, 1], [7, 72, 1]], [[0, 74, 2], [2, 71, 1], [3, 69, 2], [6, 73, 2]],
+    [[0, 74, 3], [3, 77, 1], [4, 76, 2], [6, 72, 2]], [[1, 70, 1], [2, 72, 1], [3, 74, 1], [4, 75, 2], [6, 74, 2]],
+    [[0, 74, 2], [2, 72, 1], [3, 69, 3], [6, 65, 2]], [[0, 73, 2], [2, 72, 2], [4, 70, 2], [6, 67, 2]],
+    [[0, 72, 1], [1, 76, 2], [3, 74, 1], [4, 72, 1], [5, 69, 1], [6, 66, 2]], [[0, 67, 1], [1, 69, 1], [2, 70, 1], [3, 74, 3], [6, 70, 2]],
+    [[0, 72, 2], [2, 74, 1], [3, 76, 3], [6, 74, 1], [7, 72, 1]], [[0, 74, 2], [2, 71, 1], [3, 69, 2], [6, 73, 2]],
+    [[0, 74, 3], [3, 77, 1], [4, 76, 2], [6, 72, 2]], [[1, 70, 1], [2, 72, 1], [3, 74, 1], [4, 75, 2], [6, 74, 2]],
+    [[0, 77, 2], [2, 76, 1], [3, 74, 2], [5, 72, 1], [6, 69, 2]], [[0, 72, 1], [1, 73, 2], [3, 72, 1], [4, 70, 2], [6, 67, 2]],
+    [[0, 69, 1], [1, 72, 1], [2, 76, 2], [4, 74, 1], [5, 72, 1], [6, 69, 2]], [[0, 70, 2], [2, 69, 1], [3, 67, 5]],
+    [[0, 69, 4], [4, 74, 4]], [[0, 72, 3], [3, 76, 5]], [[0, 74, 2], [2, 70, 2], [4, 69, 4]], [[0, 67, 6], [6, 70, 2]],
+    [[0, 74, 2], [2, 77, 2], [4, 76, 4]], [[0, 72, 4], [4, 74, 2], [6, 72, 2]], [[0, 70, 3], [3, 69, 1], [4, 67, 4]], [[0, 64, 4], [4, 67, 2], [6, 70, 2]],
+  ],
+  wanted() { return !!(state.settings.sound && state.settings.music !== false && !document.hidden); },
+  start() {
+    const a = Sfx.ctx;
+    if (!a || this.timer) return;
+    try {
+      this.gain = a.createGain(); this.gain.gain.value = 0;
+      const comp = a.createDynamicsCompressor();
+      comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 3; comp.attack.value = 0.012; comp.release.value = 0.3;
+      const warm = a.createBiquadFilter(); warm.type = 'lowpass'; warm.frequency.value = 6500; warm.Q.value = 0.5;
+      this.bus = a.createGain();
+      const room = a.createConvolver(), wet = a.createGain();
+      room.buffer = this.impulse(a, 1.7, 3); wet.gain.value = 0.3;
+      this.bus.connect(warm); warm.connect(comp);
+      this.bus.connect(room); room.connect(wet); wet.connect(comp);
+      comp.connect(this.gain); this.gain.connect(a.destination);
+      // one channel per instrument (its place left or right), and one shared shimmer for the vibraphone
+      const pan = (p) => { if (!a.createStereoPanner) return this.bus; const s = a.createStereoPanner(); s.pan.value = p; s.connect(this.bus); return s; };
+      const filt = (type, freq, to) => { const b = a.createBiquadFilter(); b.type = type; b.frequency.value = freq; b.Q.value = 0.6; b.connect(to); return b; };
+      this.ch = { ep: pan(-0.25), vib: a.createGain(), fl: pan(0.2), mid: this.bus, bass: filt('lowpass', 650, this.bus), sh: filt('highpass', 6000, pan(0.25)), rim: pan(-0.2) };
+      this.ch.vib.gain.value = 0.82; this.ch.vib.connect(pan(0.3));
+      const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = 5.2; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(this.ch.vib.gain); lfo.start();
+      this.noise = a.createBuffer(1, Math.round(a.sampleRate * 0.12), a.sampleRate);
+      const nd = this.noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    } catch (e) { this.gain = null; return; }
+    this.next = a.currentTime + 0.25; this.step = 0;
+    this.timer = setInterval(() => this.tick(), 100);
+  },
+  impulse(a, secs, decay) {       // a soft room: decaying noise, a little different in each ear
+    const n = Math.round(a.sampleRate * secs), b = a.createBuffer(2, n, a.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, decay); }
+    return b;
+  },
+  toggle() { state.settings.music = state.settings.music === false; Save.save(); },
+  button(b) {
+    const on = state.settings.music !== false;
+    b.classList.toggle('off', !on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', GAME_CONTENT.ui.music);
+  },
+  tick() {
+    const a = Sfx.ctx;
+    if (!a || !this.gain || a.state !== 'running') return;
+    const talking = (window.speechSynthesis && speechSynthesis.speaking) || !!Dialog.mouth;
+    this.gain.gain.setTargetAtTime(this.wanted() ? (talking ? 0.2 : 0.62) : 0, a.currentTime, 0.35);
+    if (this.next < a.currentTime) this.next = a.currentTime + 0.05;
+    if (!this.wanted()) return;
+    while (this.next < a.currentTime + 0.6) { this.play(this.step, this.next); this.step++; this.next += this.EIGHTH; }
+  },
+  // ---- instruments
+  mf(m) { return 440 * Math.pow(2, (m - 69) / 12); },
+  out(name) { return (this.ch && this.ch[name]) || this.bus; },
+  env(g, t, peak, attack, hold, decay, end) {
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + attack);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, hold), t + attack + decay);
+    g.gain.exponentialRampToValueAtTime(0.0001, Math.max(end, t + attack + decay + 0.05));
+  },
+  ep(t, m, vel, dur) {         // electric piano: a sine bent by a fading FM partner, and a small bell "tine"
+    const a = Sfx.ctx, f = this.mf(m), o = this.out('ep'), end = t + dur + 0.35;
+    const car = a.createOscillator(), mod = a.createOscillator(), md = a.createGain(), g = a.createGain();
+    car.frequency.value = f; mod.frequency.value = f;
+    md.gain.setValueAtTime(f * 1.3, t); md.gain.exponentialRampToValueAtTime(f * 0.07, t + 0.55);
+    mod.connect(md); md.connect(car.frequency); car.connect(g); g.connect(o);
+    this.env(g, t, vel, 0.006, vel * 0.32, 0.8, end);
+    const tine = a.createOscillator(), tg = a.createGain(); tine.frequency.value = f * 7; tine.connect(tg); tg.connect(o);
+    this.env(tg, t, vel * 0.1, 0.002, vel * 0.006, 0.07, t + 0.2);
+    car.start(t); mod.start(t); tine.start(t); car.stop(end + 0.1); mod.stop(end + 0.1); tine.stop(t + 0.25);
+  },
+  bass(t, m, vel, dur) {            // upright bass: a round pluck, warm and short
+    const a = Sfx.ctx, f = this.mf(m), o = this.out('bass'), end = t + dur + 0.08;
+    const s = a.createOscillator(), tr = a.createOscillator(), g = a.createGain(), tg = a.createGain();
+    s.frequency.value = f; tr.type = 'triangle'; tr.frequency.value = f; tg.gain.value = 0.35;
+    s.connect(g); tr.connect(tg); tg.connect(g); g.connect(o);
+    this.env(g, t, vel, 0.01, vel * 0.42, 0.3, end);
+    s.start(t); tr.start(t); s.stop(end + 0.1); tr.stop(end + 0.1);
+  },
+  vibes(t, m, vel, dur) {            // vibraphone: soft bar and a bright "ting" (its shimmer is on the shared channel)
+    const a = Sfx.ctx, f = this.mf(m), o = this.out('vib'), end = t + Math.max(dur, 0.5) + 0.9;
+    const s = a.createOscillator(), g = a.createGain();
+    s.frequency.value = f; s.connect(g); g.connect(o);
+    this.env(g, t, vel, 0.004, vel * 0.22, 1.3, end);
+    const h = a.createOscillator(), hg = a.createGain(); h.frequency.value = f * 4; h.connect(hg); hg.connect(o);
+    this.env(hg, t, vel * 0.16, 0.003, vel * 0.01, 0.22, t + 0.35);
+    s.start(t); h.start(t); s.stop(end + 0.1); h.stop(t + 0.4);
+  },
+  flute(t, m, vel, dur) {      // a soft flute: slow breath in, a little vibrato once the note settles
+    const a = Sfx.ctx, f = this.mf(m), o = this.out('fl'), end = t + dur + 0.18;
+    const s = a.createOscillator(), g = a.createGain(), vib = a.createOscillator(), vg = a.createGain();
+    s.frequency.value = f; vib.frequency.value = 5; vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * 0.007, t + 0.25);
+    vib.connect(vg); vg.connect(s.frequency); s.connect(g); g.connect(o);
+    const o2 = a.createOscillator(), g2 = a.createGain(); o2.type = 'triangle'; o2.frequency.value = f * 2; g2.gain.value = 0.08; o2.connect(g2); g2.connect(g);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vel, t + 0.07);
+    g.gain.setValueAtTime(vel * 0.86, t + Math.max(0.08, dur - 0.05)); g.gain.exponentialRampToValueAtTime(0.0001, end);
+    s.start(t); vib.start(t); o2.start(t); s.stop(end + 0.05); vib.stop(end + 0.05); o2.stop(end + 0.05);
+  },
+  shaker(t, vel) {
+    const a = Sfx.ctx, n = a.createBufferSource(), g = a.createGain();
+    n.buffer = this.noise; n.connect(g); g.connect(this.out('sh'));
+    this.env(g, t, vel, 0.008, vel * 0.1, 0.04, t + 0.08);
+    n.start(t); n.stop(t + 0.12);
+  },
+  rim(t, vel) {
+    const a = Sfx.ctx, s = a.createOscillator(), g = a.createGain();
+    s.type = 'triangle'; s.frequency.value = 1750; s.connect(g); g.connect(this.out('rim'));
+    this.env(g, t, vel, 0.002, vel * 0.05, 0.025, t + 0.06);
+    s.start(t); s.stop(t + 0.08);
+  },
+  kick(t, vel) {
+    const a = Sfx.ctx, s = a.createOscillator(), g = a.createGain();
+    s.frequency.setValueAtTime(110, t); s.frequency.exponentialRampToValueAtTime(46, t + 0.12);
+    s.connect(g); g.connect(this.out('mid'));
+    this.env(g, t, vel, 0.004, vel * 0.2, 0.12, t + 0.25);
+    s.start(t); s.stop(t + 0.3);
+  },
+  // ---- one eighth note of the song
+  play(step, t0) {
+    try {
+      const E = this.EIGHTH, nb = this.BARS.length, bar = (step >> 3) % nb, e = step & 7, B = bar >= 16, A2 = bar >= 8 && bar < 16;
+      const R = rng(step * 97 + 13), human = () => (R() - 0.5) * 0.016, vel = (v) => v * (0.9 + R() * 0.2);
+      const at = (slot) => t0 + (slot - e) * E + (slot % 2 ? this.SW * E : 0);     // swung off-beats
+      const t = at(e) + human();
+      const lite = typeof Device !== 'undefined' && Device.touch, names = this.BARS[bar], chordAt = (s) => this.CH[names[names.length > 1 && s >= 4 ? 1 : 0]];
+      // electric piano: syncopated chord hits, gently rolled from the bottom up
+      const comp = B ? (names.length > 1 ? [[0, 3.5, 0], [4, 3.5, 1]] : [[0, 5, 0], [6, 2, 0]])
+        : names.length > 1 ? [[0, 2.6, 0], [3, 1.6, 1], [6, 1.8, 1]] : [[0, 2.6, 0], [3, 1.4, 0], [5, 2.8, 0]];
+      for (const [s, len, ci] of comp) if (s === e) {
+        const ch = this.CH[names[Math.min(ci, names.length - 1)]];
+        // phones and tablets play three-note chords (small speakers, smaller processors)
+        (lite ? ch.v.slice(1) : ch.v).forEach((m, i) => this.ep(t + i * 0.014, m, vel(B ? 0.04 : 0.05) * (lite ? 1.15 : 1), len * E));
+      }
+      // walking bass: root, fifth, root (or the second chord), then a step towards the next bar
+      if (e % 2 === 0) {
+        const ch = chordAt(e), nextRoot = this.CH[this.BARS[(bar + 1) % nb][0]].r;
+        let m = e === 0 ? ch.r : e === 2 ? ch.r + 7 : e === 4 ? (names.length > 1 ? this.CH[names[1]].r : ch.r + 12) : nextRoot + (R() < 0.5 ? -1 : 1);
+        while (m > 52) m -= 12; while (m < 33) m += 12;
+        this.bass(t, m, vel(0.17), 1.7 * E);
+      }
+      // the melody: vibraphone first, the flute answers in A', the vibes return softly in B
+      for (const [s, m, len] of this.MEL[bar]) if (s === e) {
+        if (A2) this.flute(t, m, vel(0.075), len * E);
+        else this.vibes(t, m, vel(B ? 0.085 : 0.11), len * E);
+      }
+      // brushes: shaker on every eighth, rim on 2 and 4, a soft kick (not in the bridge)
+      if (!lite || e % 2) this.shaker(t, vel(e % 2 ? 0.016 : 0.009));
+      if (!B && (e === 2 || e === 6)) this.rim(t, vel(0.018));
+      if (!B && (e === 0 || e === 5)) this.kick(t, vel(0.09));
+    } catch (err) { /* music is optional */ }
+  },
+};
 const Sfx = {
   ctx: null,
   unlock() {
     try {
       if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) this.ctx = new AC(); }
       if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      Music.start();
     } catch (e) { this.ctx = null; }
   },
   tone(f, d, type, vol, delay, f2) {
@@ -7246,7 +7779,7 @@ function defaultState() {
     look: { body: 0, hair: 1, outfit: 0 },
     stars: 0, quest: 0, stage: 'available', q: {}, done: [], unlocked: [], wear: {},
     family: {}, age: 7, country: 'turkey', finished: false, finishedAt: '', eggs: {},
-    settings: { sound: true, slow: true, view: '3d' },
+    settings: { sound: true, slow: true, view: '3d', music: true },
   };
 }
 let state = defaultState();
@@ -7502,6 +8035,7 @@ const Title = {
   small() {
     const U = GAME_CONTENT.ui;
     $('tSound').textContent = state.settings.sound ? '🔊' : '🔇'; $('tSound').setAttribute('aria-label', U.sound);
+    Music.button($('tMusic'));
     $('tView').textContent = (G3.on ? '🧊' : '🖼️') + ' ' + (G3.on ? '3D' : '2D');
     $('tView').classList.toggle('hidden', !!G3.tried && !G3.ok);
     $('tInfo').textContent = 'ℹ️ ' + U.info;
@@ -7572,7 +8106,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, Wardrobe, Parent, Creator, Toast,
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
@@ -7588,7 +8122,22 @@ window.SH = {
     return cv.toDataURL('image/png');
   },
 };
-boot();
+// the lettering comes from the web: wait a moment for it (never long, and not at all without internet)
+function fontsReady() {
+  try {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    const T = 'AaBbĞğŞşİıÇçÖöÜü 0123!?';
+    return Promise.all(['500 20px "M PLUS Rounded 1c"', '700 20px "M PLUS Rounded 1c"', '800 20px "M PLUS Rounded 1c"', '700 20px "Fredoka"']
+      .map((f) => document.fonts.load(f, T).catch(() => null)));
+  } catch (e) { return Promise.resolve(); }
+}
+// the loading screen gets painted first, then the village is built (that takes a moment on phones)
+requestAnimationFrame(() => Promise.race([fontsReady(), new Promise((ok) => setTimeout(ok, 2500))]).then(() => setTimeout(() => {
+  try { boot(); } finally {
+    window.SH.booted = true;
+    const s = $('splash'); if (s) { s.classList.add('gone'); setTimeout(() => s.remove(), 600); }
+  }
+}, 30)));
 </script>
 </body>
 </html>

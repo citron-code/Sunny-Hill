@@ -28,6 +28,11 @@ gönderilir.
 - Oyun açıldığı cihazı kendisi anlar (telefon, tablet, bilgisayar); veli ekranında yazar.
   Dokunmatik ekranlı bir bilgisayarda ekrana ilk dokunuşta joystick ve düğme belirir.
 - İlerleme aynı cihazda, aynı tarayıcıda kaydedilir.
+- Oyunda hafif bir arka plan müziği çalar; karakterler konuşurken kısılır. Ana menüdeki ve oyun
+  menüsündeki 🎵 düğmesiyle kapatılır (ses kapalıyken müzik de susar).
+- Sertifikadaki "📷 Save / Kaydet" düğmesi; ad, karakter, aile fotoğrafı, yıldızlar ve tarihle
+  bir sertifika resmi üretir: telefonda doğrudan paylaşılır (WhatsApp vb.), bilgisayarda iner.
+- Link paylaşıldığında (WhatsApp vb.) başlık, açıklama ve köy resmi (og-image.jpg) görünür.
 
 Oyun açılınca köyün üzerinde ana menü gelir: kayıtlı oyun varsa **Continue** (çocuğun adı,
 yıldızları ve bulduğu sürprizlerle), her zaman **New Game**. New Game kayıtlı ilerlemeyi silmeden
@@ -48,6 +53,11 @@ etek), 6 kıyafet rengi ve 5 ten rengi arasından seçer. Seçilen her şeyin İ
 okunur. Eski kayıtlar kendiliğinden yeni seçeneklere çevrilir.
 
 ## Görünüm: 3D ve 2D
+
+Yazılar yuvarlak hatlı "M PLUS Rounded 1c", logo "Fredoka" yazı tipiyle görünür (ikisi de açık lisanslı,
+Google Fonts'tan yüklenir). İnternet yokken oyun kendi yedek yazı tipiyle çalışır; tabelalar oyun
+kurulmadan önce yazı tipinin gelmesini en fazla 2,5 saniye bekler.
+
 
 Köy low-poly 3D olarak çizilir. Oyuncunun önüne giren ağaç ve binalar yarı saydam olur.
 Oyun menüsündeki **View** anahtarıyla veya ana menüdeki 🧊 3D düğmesiyle sade 2D görünüme geçilebilir; seçim kaydedilir.
@@ -114,6 +124,10 @@ node tools/drive.mjs tools/recipes/characters.mjs # karakter oluşturma gerçek 
 node tools/drive.mjs tools/recipes/touch.mjs      # telefon / tablet / bilgisayar algılama; joystick ve eylem düğmesi gerçek dokunuşlarla, iki başparmakla
 node tools/drive.mjs tools/recipes/walk3d.mjs     # at, keçi, kuzu ve Sparky'nin yürüyüş adımları yandan; Sparky'nin oyuncuya uzaklığı
 node tools/drive.mjs tools/recipes/fullscreen.mjs # tam ekran: telefonda New Game ile açılır, menüden kapanır; bilgisayarda kendiliğinden açılmaz; iPhone'da ana ekran açıklaması
+node tools/drive.mjs tools/recipes/polish.mjs     # yükleme ekranı, kartlarda kelimelerin bölünmemesi, sertifika başlığı ve resmi, müzik
+node tools/drive.mjs tools/recipes/houses3d.mjs   # evler oyun kamerası açısından yakından
+node tools/drive.mjs tools/recipes/fontlook.mjs   # yazı tipinin her ekranda yüklendiğini kontrol eder, ana ekranların görüntüsünü alır
+GL=gpu node tools/drive.mjs tools/recipes/og-image.mjs # paylaşım önizleme resmi (tools/shots/og-image.png; JPEG olarak og-image.jpg yapılır)
 node tools/drive.mjs tools/recipes/restart.mjs    # baştan başlama gerçek tıklamalarla: Menu → Main menu → New Game, diyalog açıkken, sertifikadaki Play again; 3 ekran boyutunda
 node tools/drive.mjs tools/recipes/restart-inplace.mjs  # yarım kalmış karışık bir oyunu sıfırlayıp Görev 1'i yeniden oynar; yatay telefonda bütün butonlara erişim
 node tools/drive.mjs tools/recipes/photo.mjs      # aile fotoğrafı (küçük, kalabalık, yalnız çocuklar) 3D ve 2D: arka sıradakiler görünüyor mu
