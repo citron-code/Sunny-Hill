@@ -194,6 +194,8 @@ export default async function ({ evaluate, shot, sleep, navigate, URL, viewport 
   log('FINAL stars', await stars(), 'finished', await S('SH.state.finished'), 'date', await S('SH.state.finishedAt'), 'unlocked', await S('JSON.stringify(SH.state.unlocked)'));
   await S(`document.getElementById('certWalk').click()`); await sleep(300);
   log('card after:', await S(`document.getElementById('qcText').textContent`));
+  // the house is open: after a moment Sparky hears Dr. Fizz calling (level 2)
+  await waitFor(`!!(SH.state.lab && SH.state.lab.told) && SH.Dialog.open`, 8000, "Sparky's call"); await nextAll('Sparky hears Dr. Fizz');
   await use('mirror'); await sleep(300); await shot('65-wardrobe');
   await S(`document.getElementById('wdOk').click()`);
   log('total time (s):', ((Date.now() - t0) / 1000).toFixed(0));

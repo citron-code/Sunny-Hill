@@ -39,6 +39,117 @@ yıldızları ve bulduğu sürprizlerle), her zaman **New Game**. New Game kayı
 önce sorar. Oyun sırasında ⚙️ menüsünden ses, konuşma hızı, 3D/2D, kıyafetler, bilgi ekranı ve
 **Main menu** (oyunu kaydedip ana menüye döner) seçilebilir.
 
+## 2. bölüm: Dr. Fizz'in laboratuvarı
+
+Haritanın sağında, nehrin öbür yakasında Dr. Fizz'in laboratuvarı var. Köprünün kapısı ilk 8 görev
+bitip ev açılana kadar kilitli. Ev açılınca Sparky "Dr. Fizz bizi çağırıyor!" der ve köprü açılır.
+
+- Dr. Fizz laboratuvarın kapısında bekler. Yardımcısı goril Bongo acıktığı için kontrolden çıkmıştır;
+  Bongo sakinleşirse Dr. Fizz'in çok önemli bir sırrı vardır.
+- Dr. Fizz'le konuşunca kapı açılır. Laboratuvar içeriden dışarıdan göründüğünden çok daha büyüktür:
+  kapıdan girince ayrı, kocaman bir salona geçilir (haritada köyün altında durur, girince yalnız o çizilir).
+- İlk girişte Bongo büyük, kırmızı harflerle bağırır (`I AM HUNGRY!!!`), salon sallanır, müzik susar;
+  sonra boss müziği başlar. Müzik oyunun kendi bestesidir: Re minör, 160 BPM, 8-bit tarzı.
+  - İki ölçülük bir yükselişle açılır: hızlanan trampet ve yükselen siren.
+  - Sonra yankılı ana melodi, koşan arpej, dörtnala bas, zil ve trampet dolguları gelir.
+  - Savaş ilerledikçe büyür. 3 muzdan sonra melodi bir oktav aşağıdan ikilenir ve davullar sıklaşır.
+    6 muzdan sonra müzik biraz hızlanır ve çift bas davul girer.
+- Bongo'nun hareketleri birbirine yumuşakça geçer; kolları dirseklidir.
+  - Kızgınken öne eğik durur, iki yana sallanır, ara ara burnundan solur.
+  - Arada göğsünü yumruklar ve ağzını kocaman açıp kükrer.
+  - Varili önce yerden alır, başının üstüne kaldırır, sonra fırlatır. Yuvarlanan varilleri yere çarparak gönderir.
+  - Tavandan varil yağdırırken zıplayıp yere vurur; her inişte salon sallanır ve toz halkası çıkar.
+  - Göz kırpar, muzunu çiğneyerek yer. Sakinleşince sallanır ve karnını sıvazlar.
+- Muzlar birer birer, salonun uzak bir yerinde çıkar. Çocuk muza koşup dokununca 3 am / is / are sorusu
+  gelir; bitince muz kendiliğinden uçarak Bongo'ya gider. Muzları ona taşımaya gerek yoktur.
+- Bongo her muzla daha sert saldırır: kafasının üstünden fırlattığı variller (önce 1, sonra 2-3 tane),
+  yerde yuvarlanan varil dalgaları (her dalgada bir boşluk kalır) ve tavandan yağan variller. Varilin
+  düşeceği yerde önce kırmızı bir alan görünür. Havadan düşen varil yere çarpınca kırılır: tahtaları ve
+  çemberleri saçılır, kıymıklar uçar, toz kalkar, çatırdama sesi gelir. Yuvarlanan variller büyüktür; zıplaya
+  zıplaya, yalpalayıp takla atarak gelir, duvara (ya da çocuğa) çarpınca onlar da kırılır. Varil isabet ederse karakter bir an sersemler, sonra
+  kısa bir süre yanıp söner (bu sırada vurulmaz). Hiçbir şey kaybedilmez.
+- 8 muzdan sonra Bongo sakinleşir, köy müziği geri gelir. Teşekkür edip kırmızı kravatını hediye eder: çocuk onu hemen takar, gardıropta da (kilitliyken 🦍) beşinci süs olarak durur. Salonda üstte Bongo'nun 8 muz yuvası
+  görünür; dışarıda muz sayacı (🍌 x/8) yıldızların yanındadır. Çıkış salonun altındaki kapıdır.
+- Sorular `GAME_CONTENT.lab.questions` içinde: cümlede boşluk yerine ___ yazılır, sonra | ve doğru
+  cevap gelir (ör. `She ___ my sister. | is`). Kaç soru yazılırsa aralarından karışık sırayla sorulur.
+  24 soru öğretmenin "Grade 2 Verb to be" çalışma kâğıdına göre yazıldı: yaşlar, ülkeler, aile ve arkadaşlar,
+  `___ this your mom? | Is` gibi sorular.
+
+## 3. bölüm: Mühendis Tess ve gemi
+
+Sunny Hill okyanusun ortasında bir ada.
+- Kenarlarda kumsal, palmiyeler ve köpüklü dalgalar var.
+
+Bölümün akışı:
+- **Dr. Fizz'in sırrı.** Bongo sakinleşince Dr. Fizz büyük sırrını söyler: okyanusta başka adalar var, ama oralara
+  gitmek için bir gemi lazım. Arkadaşı mühendis **Tess**'e gönderir.
+- **Tess.** Laboratuvarın güneyindeki çayırda, kızağın başında çalışır: koruyucu gözlük, alet kemeri, elinde İngiliz
+  anahtarı. Atölyesinin yanında küçük bir liman ve deniz feneri vardır.
+- **Tess'in listesi.** Gemi için 8 şey lazımdır ve bunlar adadaki dostlarımızdadır:
+
+  | Kim | Ne verir |
+  |---|---|
+  | Uncle Max | tahta |
+  | Milo'nun babası | çekiç ve çivi |
+  | Milo'nun annesi | boya |
+  | Nomi | halat |
+  | Aunt Lily | yelken bezi |
+  | Captain Bob | çapa |
+  | Mr. Owl | pusula |
+  | Granny Rosa | bayrak |
+
+  Liste ekranın üstündeki ⚙️ x/8 düğmesinden açılır. Bir kişiye dokununca nerelerde dolaştığı sesli söylenir.
+- **İşteki köylüler.** Bu bölümde herkes işiyle meşguldür ve adada dolaşır:
+  - Uncle Max tarlada çapa yapar, bahçede elma toplar.
+  - Milo'nun babası çitleri ve bankları çekiçler.
+  - Milo'nun annesi şövalede resim yapar.
+  - Nomi hayvanları besler, mantar toplar.
+  - Aunt Lily çiçek sular.
+  - Captain Bob iskelede ve nehirde balık tutar.
+  - Granny Rosa örgü örer.
+  - Mr. Owl ağaçtan ağaca uçar.
+
+  Çocuk yaklaşınca dururlar. Uzun süre kimse bulunamazsa Sparky yolu göstermeye başlar.
+- **Parçalar.** Her kişi parçayı vermeden önce 3 soru sorar (üç seçenekten doğru kelime).
+- **Gemi.** Her parçada kızaktaki gemi biraz daha tamamlanır:
+  1. iskelet
+  2. tahta gövde
+  3. boyalı gövde
+  4. direk ve halatlar
+  5. yelken
+  6. dümen, çapa ve korkuluk
+  7. kamara ve pusula
+  8. bayrak
+- **Kızak.** Gemi, atölyenin önünden limana doğru inen bir kanalın içindeki kızakta yapılır. Kanalın iki yanında tahta
+  duvarlar var; kızağın tahtaları, iki çelik rayı ve geminin omurgasının oturduğu takozlar zeminin üstünde görünür.
+- **Suya iniş.** 8 parça tamamlanınca Tess'le konuşulur. Gemi kızaktan kayıp limana iner (su sıçrar, konfeti patlar).
+  Limanın kapısı açılır, iskele tahtasından güverteye çıkılabilir.
+- **Büyük gemi.** Gemi çocukların içinde dolaşabileceği büyüklükte: güvertede yan yana üç çocuk yürüyebilir. Direk
+  ve dümen etrafından dolaşılır, kıçta kamara var. Dümen direğin hemen arkasında; arkasındaki pirinç kenarlı yuvarlak
+  tahta platform, kaptanın dümeni çevirirken duracağı yer. Gemi iskeleye bağlı durur, pruvası limanın ağzından denize uzanır.
+- **Kaptan Bob.** Gemi suya inerken Kaptan Bob iskeleden izler, sonra güverteye çıkıp bekler (başında ! işareti).
+  Dümene ya da Bob'a gidince "Ahoy, Captain!" der ve eski **kaptan şapkasını** hediye eder. Şapka hemen takılır;
+  gardıropta 6. süs olarak durur (şapka, taç ve kaptan şapkasından aynı anda yalnız biri takılır).
+- **Genç Kaptan sertifikası.** Şapkadan biraz sonra eski bir deniz haritası gibi çizilmiş sertifika açılır:
+  - parşömen kâğıt ve "Junior Captain" kurdelesi;
+  - bir takımada haritası: ortada Sunny Hill (köy, göl, nehir, evler), çevresinde oyundaki yönlerinde 6 ada.
+    Adalar Sunny Hill'le aşağı yukarı aynı büyüklükte ama henüz keşfedilmedi: kıyıları kesik çizgili, üstlerinde
+    bulutlar ve kırmızı "?" var. Limandaki gemiden her adaya kesik çizgili bir rota gider
+    ("New islands... See you next time!"). Pusula gülü ve bir balina da var;
+  - pirinç bir lombozda kaptan şapkalı çocuk ve adı;
+  - madalyalar: Bongo'ya 8 muz, 8 gemi parçası, doğru cevap sayısı (48), Bongo'nun kravatı;
+  - Dr. Fizz, Tess ve Kaptan Bob'un imzaları, kırmızı mühür ve tarih.
+
+  "📷 Save / Kaydet" düğmesi resmi telefonda paylaşır, bilgisayarda indirir. Sertifika sonra dümenden tekrar açılır.
+- **Henüz yolculuk yok.** Dümende "We can sail to the islands soon!" denir.
+
+Sorular `GAME_CONTENT.ship.questions` içinde. 24 soru öğretmenin "Grade 2 Verb to be" çalışma kâğıdına göre:
+- isn't / aren't / am not (`Lucy ___ from France. | isn't | aren't | am not`);
+- Is this / Are these soruları ve kısa cevaplar (`Is this your mom? Yes, it ___. | is | are | am`);
+- I'm / He's / They're, kâğıttaki okuma parçasındaki Defne, Noah, Ana ve Pedro ile.
+- Biçim: `cümle ___ | doğru | yanlış | yanlış`. Uzun cevaplar (am not, They're) düğmede küçük yazıyla sığar.
+- Bir kişiye özel sorular `GAME_CONTENT.ship.people.<kişi>.questions` olarak yazılabilir.
+
 ## Karakterler
 
 Karakterler büyük parlak gözlü, yuvarlak kafalı low-poly figürler. Göz, yanak ve ağız kafanın
@@ -127,6 +238,10 @@ node tools/drive.mjs tools/recipes/fullscreen.mjs # tam ekran: telefonda New Gam
 node tools/drive.mjs tools/recipes/polish.mjs     # yükleme ekranı, kartlarda kelimelerin bölünmemesi, sertifika başlığı ve resmi, müzik
 node tools/drive.mjs tools/recipes/houses3d.mjs   # evler oyun kamerası açısından yakından
 node tools/drive.mjs tools/recipes/fontlook.mjs   # yazı tipinin her ekranda yüklendiğini kontrol eder, ana ekranların görüntüsünü alır
+node tools/drive.mjs tools/recipes/level2.mjs     # 2. bölüm baştan sona: kapalı köprü, Sparky'nin çağrısı, Dr. Fizz, büyük salon, kükreme, saldırılar, sersemleme, 8 muz ve sorular, çıkış
+node tools/drive.mjs tools/recipes/level2-2d.mjs  # aynısı 2D görünümde (WebGL yokken)
+node tools/drive.mjs tools/recipes/level3.mjs     # 3. bölüm baştan sona: sır, Tess ve listesi, işteki köylüler, 8 parça ve sorular, gemi, suya iniş, güverte, Kaptan Bob'un şapkası, Genç Kaptan sertifikası
+node tools/drive.mjs tools/recipes/level3-2d.mjs  # aynısı 2D görünümde
 GL=gpu node tools/drive.mjs tools/recipes/og-image.mjs # paylaşım önizleme resmi (tools/shots/og-image.png; JPEG olarak og-image.jpg yapılır)
 node tools/drive.mjs tools/recipes/restart.mjs    # baştan başlama gerçek tıklamalarla: Menu → Main menu → New Game, diyalog açıkken, sertifikadaki Play again; 3 ekran boyutunda
 node tools/drive.mjs tools/recipes/restart-inplace.mjs  # yarım kalmış karışık bir oyunu sıfırlayıp Görev 1'i yeniden oynar; yatay telefonda bütün butonlara erişim
