@@ -3885,14 +3885,15 @@ function hairEdge3(S, u) {
   }
   return [v, tooth];
 }
-function capBand3(d) {
-  const yb = d.hy + d.hr * 0.28, vOf = (y) => Math.asin(Math.pow(clamp((y - d.hy) / d.hyr, 0, 1), 1 / 0.84)), vb = vOf(yb);
+const CAP_K3 = 0.42;
+function capBand3(d, k) {          // k: how high the band sits on the head (a cap sits higher than the captain's hat)
+  const yb = d.hy + d.hr * (k || 0.28), vOf = (y) => Math.asin(Math.pow(clamp((y - d.hy) / d.hyr, 0, 1), 1 / 0.84)), vb = vOf(yb);
   return { yb, vb, ecb: Math.pow(Math.cos(vb), 0.84), vcut: vOf(yb + d.hr * 0.12) };
 }
 function hair3(mb, d, L, P) {
   const S = HAIR3[L.hairStyle];
   if (!S) return;
-  const cut = L.hat === 'captain' ? capBand3(d).vcut : null;          // under a captain's hat: no hair on top
+  const cut = L.hat === 'captain' || L.hat === 'cap' ? capBand3(d, L.hat === 'cap' ? CAP_K3 : 0).vcut : null;          // under a captain's hat or a cap: no hair on top
   const hair = L.hair, base = rgb3(hair);
   const tone = (a) => shade3(hair, a).concat(1);
   // columns: even steps around the head plus each tooth's tip and gap, so points stay sharp
@@ -4125,11 +4126,14 @@ function personModel3(L) {
   hair3(hb, d, L, P);
   const h = L.hat;
   const visor = (y, z, w, depth, col) => { hb.color(col).sphere(0, y, z, w, 1.3, depth, 16, 6, { l1: 0.5, cap: true }); };
-  if (h === 'cap') {
-    const c = L.hatColor || '#ff4d4d';
-    hb.color(c).sphere(0, hy + hr * 0.14, -hr * 0.03, hr * 1.12, hr * 1.02, hr * 1.1, 18, 12, { l1: 0.5, cap: true });
-    hb.color(c).sphere(0, hy + hr * 1.16, 0, 2.4, 2.4, 2.4, 8, 5);
-    visor(hy + hr * 0.18, hr * 0.8, hr * 0.8, hr * 0.62, shade3(c, -0.22));
+  if (h === 'cap') {          // a shell over the head from the forehead up, a button on top, the visor above the eyes
+    const c = L.hatColor || '#ff4d4d', { yb, vb, ecb } = capBand3(d, CAP_K3), NU = 28, NV = 7, F = 1.09;
+    const rows = [];
+    for (let j = 0; j <= NV; j++) { const v = vb + (Math.PI / 2 - vb) * j / NV, r = []; for (let i = 0; i <= NU; i++) r.push(headPt(d, -Math.PI + TAU * i / NU, v, F)); rows.push(r); }
+    const col = C(c), rim = shade3(c, -0.1).concat(1);          // (shade3 gives [r, g, b])
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) hb.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], j === 0 ? rim : col);
+    hb.color(c).sphere(0, d.hy + d.hyr * F + 0.6, 0, 2.4, 2, 2.4, 8, 5);
+    visor(yb + 1.6, d.hz * ecb * 1.02, d.hx * ecb * 0.8, hr * 0.42, shade3(c, -0.22));          // a short visor: the face stays in sight from the game's camera
   } else if (h === 'captain') {          // sized to this head (the hair inside it is left out, see hair3)
     const { yb, ecb } = capBand3(d), NU = 32, ax = d.hx * ecb, az = d.hz * ecb;
     const ring = (y, F) => { const r = []; for (let i = 0; i <= NU; i++) { const u = -Math.PI + TAU * i / NU; r.push([ax * F * spow3(Math.sin(u), 0.84), y, az * F * spow3(Math.cos(u), 0.84)]); } return r; };
@@ -5396,7 +5400,7 @@ function initMap() {
   // camera). [key, text, x, y, big, where it used to stand]: the ground round its old place stays free of trees, so
   // that moving a sign moves no tree.
   const signs = [
-    ['village', S.village, 1352, 1196, true, AT('square', 185, 162)], ['milo', S.milo, 904, 620, false, [820, 700]], ['apartment', S.apartment, ...AT('apt', 182, 22)],
+    ['village', S.village, 1352, 1196, true, AT('square', 185, 162)], ['milo', S.milo, 926, 622, false, [820, 700]], ['apartment', S.apartment, ...AT('apt', 182, 22)],
     ['farm', S.farm, 1652, 786, false, [1640, 770]], ['myHouse', S.myHouse, 1800, 995, false, AT('mine', 120, 51)], ['tent', S.tent, 634, 1156, false, AT('tent', 200, 50)],
     ['houseboat', S.houseboat, 1600, 1336, false, [1690, 1310]], ['cottage', S.cottage, ...AT('forest', -105, 60)],
   ];
@@ -5409,7 +5413,7 @@ function initMap() {
   }
   EGGS.place();
   // ---- keep NPC standing spots clear of trees
-  for (const d of NPC_DEFS) KEEP.push(C_(d.x, d.y, 46));
+  for (const d of NPC_DEFS) KEEP.push(C_(...(d.planted || [d.x, d.y]), 46));          // (planted: where it was when the trees were planted)
   KEEP.push(C_(MAP.start.x, MAP.start.y, 60), R_(...AT('milo', -110, -190), ...AT('milo', 110, 10)), R_(...AT('apt', -125, -280), ...AT('apt', 125, 10)), R_(...AT('farm', -130, -200), ...AT('farm', 170, 110)));
   KEEP.push(R_(MAP.dock.x0 - 20, MAP.dock.y0 - 30, MAP.dock.x1 + 20, MAP.dock.y1));
 
@@ -5420,9 +5424,9 @@ function initMap() {
   const okTreeNow = (x, y, pad) => !inKeep(x, y, pad) && spaced(x, y);          // (the new land: the paths as they are)
   const pickTree = () => { const r = R(); return r < 0.34 ? 'tree0' : r < 0.6 ? 'tree1' : r < 0.8 ? 'tree2' : r < 0.9 ? 'bush0' : 'bush1'; };
   // the first village (x < OLD_W) keeps exactly the trees it always had: a tree that would now stand on the river,
-  // the bridge or a path (as the paths are now), or just in front of a sign (hiding it from the camera), is left out,
+  // the bridge or a path (as the paths are now), or just in front of or behind a sign (hiding it), is left out,
   // but still counted, so every other tree stays where it was
-  const signFront = STATIC.filter((o) => o.key && o.key.startsWith('sign_')).map((o) => { const w = SIGN_TEXT[o.key].w; return R_(o.x - w / 2 - 24, o.y + 4, o.x + w / 2 + 24, o.y + 120); });
+  const signFront = STATIC.filter((o) => o.key && o.key.startsWith('sign_')).flatMap((o) => { const w = SIGN_TEXT[o.key].w; return [R_(o.x - w / 2 - 24, o.y + 4, o.x + w / 2 + 24, o.y + 120), R_(o.x - w / 2 - 10, o.y - 50, o.x + w / 2 + 10, o.y - 4)]; });
   const addT = (k, x, y) => { if (LAB.blocks(x, y) || nearPath(x, y, 4) || signFront.some((r) => inShape(r, x, y))) TREES.push({ x, y }); else addTree(k, x, y); };
   for (let x = 12; x < OLD_W; x += 50 + R() * 16) { const y = 44 + R() * 34; if (okTree(x, y, 0)) addT(R() < 0.5 ? 'tree2' : 'tree0', x, y); }
   for (let y = 130; y < H - 30; y += 52 + R() * 16) {
@@ -5811,7 +5815,7 @@ const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad'
 const VOICE = { narrator: 1, cat: 1.45, frog: 1.15, rabbit: 1.5, duck: 1.2, scarecrow: 0.95, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3, fizz: 1.15, bongo: 0.6, tess: 1.2 };
 const NPC_DEFS = [
   Object.assign({ id: 'milo' }, ATP('milo', 104, 37)),
-  Object.assign({ id: 'leo' }, ATP('milo', 146, 45)),
+  Object.assign({ id: 'leo', planted: AT('milo', 146, 45) }, ATP('milo', 64, 40)),     // beside Milo (he used to stand where the sign is now)
   Object.assign({ id: 'mom' }, ATP('milo', -70, 43)), Object.assign({ id: 'dad' }, ATP('milo', -34, 46)),
   Object.assign({ id: 'rosa' }, ATP('apt', 0, 38)),
   Object.assign({ id: 'nomi' }, ATP('tent', 88, 22)),
@@ -8021,13 +8025,14 @@ const SHIP = {
   K: 2,                                       // the ship is twice the size of its model (HULL), so children can walk about on it
   SLIP: { x0: 2808, x1: 3290, y: 1476, hw: 60, h0: 2, h1: -16 },  // the slipway: in a channel from the yard down into the harbour
   ON_SLIP: 3010, SLIDE_END: 3200, AFLOAT: 3352, PLANK_X: 3300,    // built here, slides to here, floats here; the gangplank
+  FLOAT_Y: 1510,                              // afloat it lies this far out from the quay (a long, gentle gangplank)
   QUAY: { x0: 3130, y0: 1290, x1: 3400, y1: 1385, gate0: 1318, gate1: 1362 },
   LIGHT: { x: 3352, y: 1312 },
   TESS: { x: 3012, y: 1386 }, TESS2: { x: 3252, y: 1356 },
-  BOB_QUAY: { x: 3218, y: 1352 }, BOB_DECK: { x: 3452, y: 1484 },     // Captain Bob watches the launch, then waits on the deck (at the bow)
+  BOB_QUAY: { x: 3218, y: 1352 }, BOB_DECK: { x: 3452, y: 1518 },     // Captain Bob watches the launch, then waits on the deck (at the bow)
   BOLLARDS: [3196, 3248, 3380],
   WHEEL_X: -10, HELM_X: -19,                  // (in the model) the wheel, just behind the mast, and where you stand to steer
-  helmSpot() { return { x: this.AFLOAT + this.HELM_X * this.K, y: this.SLIP.y }; },
+  helmSpot() { return { x: this.AFLOAT + this.HELM_X * this.K, y: this.FLOAT_Y }; },
   PEOPLE: ['max', 'dad', 'mom', 'nomi', 'lily', 'bob', 'owl', 'rosa'],
   PROP: { max: 'hoe', dad: 'hammer', mom: 'brush', nomi: 'basket', lily: 'can', bob: 'rod', rosa: 'yarn', tess: 'wrench' },
   // where everyone goes while they are busy, and what they do there (seconds), in order, round and round
@@ -8035,9 +8040,9 @@ const SHIP = {
     max: [{ x: 1840, y: 700, act: 'hoe', t: 24, dir: 'down' }, { x: 2112, y: 985, act: 'pick', t: 20, dir: 'right' }, { x: 1965, y: 545, act: 'hoe', t: 16, dir: 'down' }, { x: 2235, y: 395, t: 12, dir: 'up' }],
     dad: [{ x: 478, y: 572, act: 'hammer', t: 22, dir: 'down' }, { x: 1152, y: 955, act: 'hammer', t: 18, dir: 'left' }, { x: 2330, y: 660, act: 'hammer', t: 20, dir: 'right' }, { x: 452, y: 1352, act: 'hammer', t: 18, dir: 'left' }],
     mom: [{ x: 382, y: 905, act: 'paint', t: 28, dir: 'right' }, { x: 1560, y: 1452, act: 'paint', t: 24, dir: 'right' }, { x: 1290, y: 1080, t: 10, dir: 'down' }, { x: 640, y: 655, act: 'paint', t: 20, dir: 'down' }],
-    nomi: [{ x: 470, y: 1335, act: 'feed', t: 18, dir: 'left' }, { x: 960, y: 1615, act: 'pick', t: 20, dir: 'down' }, { x: 1625, y: 1372, act: 'pick', t: 16, dir: 'down' }, { x: 300, y: 820, act: 'pick', t: 18, dir: 'down' }],
+    nomi: [{ x: 470, y: 1335, act: 'feed', t: 18, dir: 'left' }, { x: 1040, y: 1660, act: 'pick', t: 20, dir: 'down' }, { x: 1490, y: 1380, act: 'pick', t: 16, dir: 'down' }, { x: 300, y: 820, act: 'pick', t: 18, dir: 'down' }],
     lily: [{ x: 1985, y: 565, act: 'water', t: 18, dir: 'down' }, { x: 2165, y: 1045, act: 'pick', t: 18, dir: 'up' }, { x: 1133, y: 545, act: 'water', t: 18, dir: 'down' }, { x: 1250, y: 1085, t: 10, dir: 'down' }],
-    bob: [{ x: 1782, y: 1442, act: 'fish', t: 30, dir: 'down' }, { x: 2342, y: 1150, act: 'fish', t: 26, dir: 'right' }, { x: 1360, y: 1745, t: 16, dir: 'down' }, { x: 1690, y: 1335, t: 10, dir: 'down' }],
+    bob: [{ x: 1782, y: 1442, act: 'fish', t: 30, dir: 'down' }, { x: 2342, y: 1150, act: 'fish', t: 26, dir: 'right' }, { x: 1360, y: 1745, t: 16, dir: 'down' }, { x: 1712, y: 1310, t: 10, dir: 'down' }],
     rosa: [{ x: 1296, y: 985, act: 'knit', t: 30, dir: 'down' }, { x: 1232, y: 525, act: 'knit', t: 20, dir: 'down' }, { x: 1000, y: 1632, act: 'knit', t: 20, dir: 'down' }, { x: 1200, y: 1070, t: 10, dir: 'down' }],
   },
   OWL: [[1010 + 97, 1560 - 6, 104], [2140, 1000, 0], [700, 905, 0], [1500, 320, 0]],     // trees to sit in ([x, y, height]; 0: the nearest tree's)
@@ -8064,10 +8069,10 @@ const SHIP = {
     if (this.launchT > 0 && this.launchT < 4.6) {
       const tau = this.launchT;
       if (tau < 2.2) { const x = this.ON_SLIP + (E0 - this.ON_SLIP) * (tau / 2.2) ** 2; return { x, y: this.slipH(x) + up, z: S.y, pitch: slope, roll: 0 }; }
-      const u = tau - 2.2, x = E0 + (this.AFLOAT - E0) * (1 - (1 - u / 2.4) ** 2), y0 = this.slipH(E0) + up;
-      return { x, y: (y0 + 9) * Math.exp(-6 * u) - 9 * Math.exp(-1.6 * u) * Math.cos(4.2 * u), z: S.y, pitch: slope * Math.exp(-3 * u) + 0.06 * Math.exp(-1.6 * u) * Math.sin(5 * u), roll: 0.03 * Math.exp(-u) * Math.sin(3 * u) };
+      const u = tau - 2.2, e = 1 - (1 - u / 2.4) ** 2, x = E0 + (this.AFLOAT - E0) * e, y0 = this.slipH(E0) + up;
+      return { x, y: (y0 + 9) * Math.exp(-6 * u) - 9 * Math.exp(-1.6 * u) * Math.cos(4.2 * u), z: S.y + (this.FLOAT_Y - S.y) * e, pitch: slope * Math.exp(-3 * u) + 0.06 * Math.exp(-1.6 * u) * Math.sin(5 * u), roll: 0.03 * Math.exp(-u) * Math.sin(3 * u) };
     }
-    return { x: this.AFLOAT, y: Math.sin(t * 1.2) * 0.8, z: S.y, pitch: Math.sin(t * 0.9) * 0.012, roll: Math.sin(t * 1.1) * 0.012 };
+    return { x: this.AFLOAT, y: Math.sin(t * 1.2) * 0.8, z: this.FLOAT_Y, pitch: Math.sin(t * 0.9) * 0.012, roll: Math.sin(t * 1.1) * 0.012 };
   },
   // ---- the map: called from initMap, after Dr. Fizz's land
   place() {
@@ -8094,9 +8099,10 @@ const SHIP = {
     for (const x of this.BOLLARDS) addStatic({ x, y: Q.y1 - 4, b: [-8, -16, 8, 4], draw(c) { rrect(c, this.x - 6, this.y - 13, 12, 13, 4, '#3a3a44', 2); ell(c, this.x, this.y - 13, 7.5, 3.5, '#4a4a55', 2); } });
     addStatic({ x: this.PLANK_X, y: Q.y1 - 2, b: [-24, -14, 24, 110], draw(c) { if (SHIP.launched() && !SHIP.launchT) SHIP.drawPlank2D(c); } });
     // the deck and the gangplank become ground once the ship floats (see apply)
-    this.solid.deck = R_(this.AFLOAT - 116, S.y - 50, this.AFLOAT + 146, S.y + 50);
-    this.solid.plank = R_(this.PLANK_X - 22, Q.y1 - 8, this.PLANK_X + 22, S.y - 46);
-    this.solid.onDeck = [C_(this.AFLOAT + 18 * this.K, S.y, 9), C_(this.AFLOAT + this.WHEEL_X * this.K, S.y, 6)];     // the mast and the wheel
+    const FY = this.FLOAT_Y;
+    this.solid.deck = R_(this.AFLOAT - 116, FY - 50, this.AFLOAT + 146, FY + 50);
+    this.solid.plank = R_(this.PLANK_X - 22, Q.y1 - 8, this.PLANK_X + 22, FY - 46);
+    this.solid.onDeck = [C_(this.AFLOAT + 18 * this.K, FY, 9), C_(this.AFLOAT + this.WHEEL_X * this.K, FY, 6)];     // the mast and the wheel
     KEEP.push(R_(Wk.x - 150, Wk.y - 150, Wk.x + 160, Wk.y + 110), R_(S.x0 - 30, S.y - 104, ISLE.BASIN.x0 + 30, S.y + 104), R_(Q.x0 - 30, Q.y0 - 40, W, ISLE.BASIN.y1 + 40));
     const p = [[Wk.x + 20, Wk.y + 6], [Wk.x + 40, Wk.y + 80], [3060, Q.gate0 + 20], [Q.x0 + 40, (Q.gate0 + Q.gate1) / 2]]; p.w = 34; PATHS.push(p);
     // palm trees along the beach (their own random numbers)
@@ -8256,7 +8262,7 @@ const SHIP = {
   launch() {
     const s = this.st();
     s.stage = 'ready'; Save.save();
-    this.launchT = 0.0001; this.cut = true; this.camFocus = { x: 3200, y: this.SLIP.y };
+    this.launchT = 0.0001; this.cut = true; this.camFocus = { x: 3220, y: (this.SLIP.y + this.FLOAT_Y) / 2 };
     this.bobWait(this.BOB_QUAY, true); if (NPC.bob) NPC.bob.dir = 'down';      // Captain Bob comes to watch
     Sfx.tone(392, 0.2, 'triangle', 0.12); Sfx.tone(523, 0.25, 'triangle', 0.12, 0.2); Sfx.tone(659, 0.3, 'triangle', 0.12, 0.45);
     Hud.refresh();
@@ -8346,16 +8352,16 @@ const SHIP = {
     // in the flat view the ship is drawn before you while you stand on its deck
     const aboard = (p) => !!p && (this.onDeck(p.x, p.y) || this.deckY(p.x, p.y) != null);
     const on = this.launched() && (aboard(player) || aboard(NPC.bob));
-    if (LANDMARK.ship) { LANDMARK.ship.x = this.pose(game.t).x; LANDMARK.ship.y = this.SLIP.y + (on ? -70 : 64); }
+    if (LANDMARK.ship) { const p = this.pose(game.t); LANDMARK.ship.x = p.x; LANDMARK.ship.y = p.z + (on ? -70 : 64); }
     void s;
   },
   // standing on the ship: its deck, and the gangplank up to it from the quay
   onDeck(x, y) { const D = this.solid.deck; return !!D && x > D.x0 && x < D.x1 && y > D.y0 && y < D.y1; },
   // the flat view draws the ship from the side: people on its deck are drawn up at the deck's rail
-  rail2D() { return this.SLIP.y + 34 - this.pose(game.t).y * 0.9; },
+  rail2D() { const p = this.pose(game.t); return p.z + 5 - p.y * 0.9; },
   lift2D(x, y) {
     if (!this.launched() || this.launchT || !this.solid.deck) return 0;
-    const S = this.SLIP, rail = this.rail2D(), at = (yy) => rail - 3 - (S.y + 50 - yy) * 0.3;
+    const rail = this.rail2D(), at = (yy) => rail - 3 - (this.FLOAT_Y + 50 - yy) * 0.3;
     if (this.onDeck(x, y)) return at(y) - y;
     const Pk = this.solid.plank;
     if (x > Pk.x0 && x < Pk.x1 && y > Pk.y0 && y < Pk.y1) return (at(Pk.y1) - Pk.y1) * clamp((y - Pk.y0) / (Pk.y1 - Pk.y0), 0, 1);
@@ -8551,7 +8557,8 @@ Object.assign(SHIP, {
     }
     const posts = (xs, s) => xs.map((x) => [x, HULL.deck(x), s * (HULL.half(x) - 2.2)]);
     for (const s of [-1, 1]) {
-      const xs = []; for (let x = -88; x <= 86; x += 11) { if (s < 0 && Math.abs(x - 0) < 10) continue; xs.push(x); }
+      const gap = (this.PLANK_X - this.AFLOAT) / this.K;          // an opening in the rail where the gangplank comes aboard
+      const xs = []; for (let x = -88; x <= 86; x += 11) { if (s < 0 && Math.abs(x - gap) < 10) continue; xs.push(x); }
       const pts = posts(xs, s);
       for (const [x, y, z] of pts) ft.color('#ffffff').cyl(x, y, z, 0.8, 0.8, 10, 5);
       for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; if (b[0] - a[0] > 14) continue; ft.color('#ffffff'); rod3(ft, [a[0], a[1] + 10, a[2]], [b[0], b[1] + 10, b[2]], 0.8, 5); }
@@ -8597,7 +8604,7 @@ Object.assign(SHIP, {
     const post = new MB(97); post.color('#8a5a30').cyl(0, 0, 0, 3.2, 3, 42, 8); post.color('#ffd23c').sphere(0, 43, 0, 3.6, 3.6, 3.6, 8, 5); M.post = pack(post);
     const ln = new MB(98); ln.color('#f4f1e8').cyl(0, 0, 0, 0.35, 0.35, 1, 4); M.line = pack(ln);
     // the gangplank from the quay up to the deck: planks on two beams, with rope rails
-    const gp = new MB(102), z0 = this.QUAY.y1 - 6, z1 = this.SLIP.y - 46, y0 = 1.6, y1 = 17.4 * this.K + 0.8, gl = Math.hypot(z1 - z0, y1 - y0), ga = Math.atan2(y1 - y0, z1 - z0);
+    const gp = new MB(102), z0 = this.QUAY.y1 - 6, z1 = this.FLOAT_Y - 46, y0 = 1.6, y1 = 17.4 * this.K + 0.8, gl = Math.hypot(z1 - z0, y1 - y0), ga = Math.atan2(y1 - y0, z1 - z0);
     gp.push(RX3(T3(0, y0, z0), -ga));
     for (let k = 0; k * 5 < gl; k++) gp.color(k % 2 ? '#c99a62' : '#b98a55').box(-15, 0, k * 5, 15, 1.8, k * 5 + 4.4);
     for (const s of [-1, 1]) { gp.color('#8a5a30').box(s * 13 - 1.5, -2, 0, s * 13 + 1.5, 0, gl); gp.color('#8a5a30').cyl(s * 15, 0, 1, 1, 1, 14, 6); gp.cyl(s * 15, 0, gl - 1, 1, 1, 14, 6); gp.color('#c8a878'); rod3(gp, [s * 15, 13, 1], [s * 15, 13, gl - 1], 0.6, 5); }
@@ -8829,7 +8836,7 @@ Object.assign(SHIP, {
   // the ship from the side, as much of it as is built
   drawShip2D(c, t) {
     const n = this.built(); if (!n) return;
-    const p = this.pose(t), bx = p.x, by = this.SLIP.y + 109 - p.y * 0.9, K2 = 1.7;
+    const p = this.pose(t), bx = p.x, by = p.z + 80 - p.y * 0.9, K2 = 1.7;
     c.save(); c.translate(bx, by); c.rotate(-p.pitch * 0.9); c.scale(K2, K2);
     const hullPts = [[-95, -42], [-70, -40], [0, -38], [70, -42], [96, -52], [80, -20], [40, -4], [-60, -4], [-90, -16]];
     const path = () => { c.beginPath(); c.moveTo(hullPts[0][0], hullPts[0][1]); for (const q of hullPts.slice(1)) c.lineTo(q[0], q[1]); c.closePath(); };
@@ -8888,7 +8895,7 @@ Object.assign(SHIP, {
     rrect(c, x - 6, y - 34, 12, 22, 5, '#4aa3ff', 2);
   },
   drawPlank2D(c) {
-    const x = this.PLANK_X, y0 = this.QUAY.y1 - 6, y1 = this.rail2D() - 3 - 96 * 0.3;
+    const x = this.PLANK_X, y0 = this.QUAY.y1 - 6, y1 = this.rail2D() - 3 - 96 * 0.3;          // (to where the deck begins)
     rrect(c, x - 15, y0, 30, y1 - y0, 3, '#c99a62', 2.2);
     for (let y = y0 + 5; y < y1; y += 5) seg(c, x - 14, y, x + 14, y, '#a8703f', 1.2);
     for (const s of [-1, 1]) seg(c, x + s * 15, y0 - 12, x + s * 15, y1 - 14, '#c8a878', 1.6);
