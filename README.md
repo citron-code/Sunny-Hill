@@ -140,8 +140,9 @@ Bölümün akışı:
   - madalyalar: Bongo'ya 8 muz, 8 gemi parçası, doğru cevap sayısı (48), Bongo'nun kravatı;
   - Dr. Fizz, Tess ve Kaptan Bob'un imzaları, kırmızı mühür ve tarih.
 
-  "📷 Save / Kaydet" düğmesi resmi telefonda paylaşır, bilgisayarda indirir. Sertifika sonra dümenden tekrar açılır.
-- **Henüz yolculuk yok.** Dümende "We can sail to the islands soon!" denir.
+  "📷 Save / Kaydet" düğmesi resmi telefonda paylaşır, bilgisayarda indirir. Sertifika sonra Kaptan Bob'la konuşunca
+  tekrar açılır.
+- **Denize açılış.** Sertifikadan sonra dümen gemiyi denize çıkarır (4. bölüm).
 
 Sorular `GAME_CONTENT.ship.questions` içinde. 24 soru öğretmenin "Grade 2 Verb to be" çalışma kâğıdına göre:
 - isn't / aren't / am not (`Lucy ___ from France. | isn't | aren't | am not`);
@@ -149,6 +150,62 @@ Sorular `GAME_CONTENT.ship.questions` içinde. 24 soru öğretmenin "Grade 2 Ver
 - I'm / He's / They're, kâğıttaki okuma parçasındaki Defne, Noah, Ana ve Pedro ile.
 - Biçim: `cümle ___ | doğru | yanlış | yanlış`. Uzun cevaplar (am not, They're) düğmede küçük yazıyla sığar.
 - Bir kişiye özel sorular `GAME_CONTENT.ship.people.<kişi>.questions` olarak yazılabilir.
+
+## 4. bölüm: Denizde Kaptan Grumble
+
+"What is school?" ünitesine geçmeden önce 1. ünitenin sınavına hazırlık: aile kelimeleri ve o güne kadarki bütün dil
+bilgisi konuları heyecanlı bir deniz savaşında tekrar edilir.
+
+- **Sparky'nin çağrısı.** Genç Kaptan sertifikasından sonra Sparky "Our ship is ready!" der; ok dümeni gösterir.
+- **Denize açılış.** Dümende "Let's sail!" denir ve gemi limandan açık denize çıkar. Gemide yalnız çocuk (dümende) ve
+  Sparky (pruvada) var. Deniz geniş: adanın doğusunda yaklaşık 6200 x 4100 birimlik bir alan.
+- **Gemiyi sürmek.** Güvertede yürünmez, gemiyi çocuk yüzdürür:
+  - bilgisayarda ok tuşları ya da WASD, telefonda joystick; denize dokunmak/tıklamak da gemiyi oraya götürür;
+  - gemi gösterilen yöne döner ve gider. Kimse dümene dokunmasa da rüzgârla orta hızda ilerlemeye devam eder (fareyle
+    nişan alırken gemi durup hedef olmasın diye). Denizin kenarına gelince kendiliğinden geri döner;
+  - bu sürüş genel bir mod: ileride adalar arasında serbest gezinti için de kullanılacak.
+- **Alıştırma.** Denizde yüzen bir sandık var. Sandığa gidilince 3 soru sorulur; hepsi bilinince top dolar ve sağ alttaki
+  düğme **Fire!** olur. Düğmeye basılı tutup sürükleyerek nişan alınır (Brawl Stars'taki Barley gibi): noktalar topun
+  yolunu, halka düşeceği yeri gösterir; halka hedefin üstünde yeşil olur. Bırakınca ateş edilir. Otomatik nişan yok.
+  Alıştırmada hedef kırmızı beyaz bir şamandıra.
+- **Açık denize.** Şamandıra vurulunca Sparky "Let's sail out to sea!" der. Geminin önünde, suyun üstünde Sparky'nin oku
+  açık denizi gösterir. Yolda sandık yoktur. Sunny Hill geride kaybolur.
+- **Kaptan Grumble.** Adadan yaklaşık 2700 birim uzakta kara, kuru kafalı yelkeniyle korsan gemisi karşıdan gelir.
+  Grumble (üç köşeli şapka, göz bandı, sakal) ailemizin fotoğraf albümünü almıştır. Korsan müziği başlar; üstte
+  "CAPTAIN GRUMBLE" çubuğu ve 5 boş 📖. (Savaşın ortasında oyun kapatılırsa dümenden yine açık denize gidilir; Grumble
+  "Ha ha! You are back!" der, isabetler kaybolmaz.)
+  - Grumble etrafımızda dolaşıp gülle atar (Bongo gibi). Güllenin düşeceği yerde kırmızı halka belirir; gemiyi oradan
+    çekmek gerekir. İlk seferde Sparky "Keep sailing!", üçüncüde "Oh no! Our ship is hurt!" der.
+  - **Hasar.** Her vuruşta gemi kısa bir süre yavaşlar ve sarsılır; güvertede bir yanık, kırık tahta kalır (en çok 6) ve
+    gemi koyu duman çıkarmaya başlar, vuruldukça daha çok. Kaybetmek yok; hasar kayıtlıdır (`state.sea.dmg`).
+  - İlk gülle geminin biraz önüne atılır: tembelce dümdüz giden gemi bazen vurulur, hızlı giden ya da dönen kaçar.
+    2. isabetten sonra ikinci bir gülle geminin dümdüz giderse varacağı yere düşer (dönmek gerekir), 4. isabetten sonra
+    üçüncüsü yakına. Ateş temposu ilk sürümdeki gibi; vurulduktan sonra ve sandık sorularından sonra Grumble kısa bir ara
+    verir; sandık alınırken havadaki gülleler zararsız düşer. (40 saniyede Grumble'ın isabeti, 4 isabetten sonra:
+    hiç dümene dokunmayan 8, fareyle 8, tuşlarla 4, kaçan 2.)
+  - Her atış için önce sandık bulunur, 3 soru cevaplanır. Iska olursa top boşalır, yeni sandık gerekir.
+  - 5 isabet = 5 konu: aile kelimeleri, am / is / are, isn't / aren't / am not, sorular ve kısa cevaplar
+    (Is this your ship? No, it isn't.), kısaltmalar (I'm, He's, She's). Her isabette albümden bir sayfa geri uçar.
+  - İsabetler arttıkça Grumble daha sık ve aynı anda daha çok gülle atar.
+- **Kaçış ve harita.** 5. isabette albümün son sayfası da geri gelir. Grumble "Ouch! Stop! My ship! ... But I am not
+  sorry! Goodbye!" der ve kaçar. Kaçarken attığı son gülle mutlaka gemimize isabet eder. Kaçarken **hazine haritasını**
+  denize düşürür; kâğıt rulo altın bir halkayla yüzer ("Get the map!"). Gemiyle üstünden geçince harita açılır:
+  - eski, kenarları yanık bir parşömen;
+  - batıda Sunny Hill, ortada "We are here!" ile bizim gemi;
+  - doğuda palmiyeler, tepe ve taçlı papağanla **Papağan Kral'ın adası**; kırmızı kesik çizgili rota ve X;
+  - Captain Grumble'ın imzası.
+
+  Harita resim olarak kaydedilebilir.
+- **Son.** Sparky: "Oh no! Our ship is broken! The Parrot King's island is near. We can fix our ship there! And we have
+  our family album!" Bölüm burada biter, gemi limana döner. Dümen artık "Our ship is broken. Next time we sail to the
+  Parrot King's island!" der (sonraki bölüm).
+- **Telefon.** Kamera iki gemiyi, sandığı ya da hedefi ve nişan halkasını görev kartıyla boss çubuğunun altında kalan
+  alana sığdırır; dik ve yatay ekranda, 3D ve 2D'de.
+
+Sorular `GAME_CONTENT.sea.questions` içinde, konu başına 8 soru: `family`, `tobe`, `not`, `ask`, `short`.
+Biçim aynı: `cümle ___ | doğru | yanlış | yanlış`. Kayıt `state.sea = { stage: '' | 'sail' | 'fight' | 'map' | 'won', hits,
+dmg, map, told }`; oyun kapatılıp açılırsa isabetler kaybolmaz, dümenden kalınan yerden devam edilir ('map': Grumble
+kaçtı, haritası hâlâ denizde).
 
 ## Karakterler
 
@@ -242,6 +299,9 @@ node tools/drive.mjs tools/recipes/level2.mjs     # 2. bölüm baştan sona: kap
 node tools/drive.mjs tools/recipes/level2-2d.mjs  # aynısı 2D görünümde (WebGL yokken)
 node tools/drive.mjs tools/recipes/level3.mjs     # 3. bölüm baştan sona: sır, Tess ve listesi, işteki köylüler, 8 parça ve sorular, gemi, suya iniş, güverte, Kaptan Bob'un şapkası, Genç Kaptan sertifikası
 node tools/drive.mjs tools/recipes/level3-2d.mjs  # aynısı 2D görünümde
+GL=gpu node tools/drive.mjs tools/recipes/level4.mjs  # 4. bölüm baştan sona: Sparky'nin çağrısı, dümen, gemiyi sürmek, alıştırma sandığı, gerçek sürüklemeyle nişan, şamandıra, açık denize yolculuk, Grumble, gülleler ve hasar, ıska, 5 isabet ve konuları, kaçış, son gülle, harita, limana dönüş
+node tools/drive.mjs tools/recipes/level4-2d.mjs  # aynısı 2D görünümde
+GL=gpu node tools/drive.mjs tools/recipes/level4-dodge.mjs  # denge: Grumble 40 saniyede kaç kez vuruyor (dümene dokunmadan, dümdüz, fareyle tıklayarak, kaçarak)
 GL=gpu node tools/drive.mjs tools/recipes/og-image.mjs # paylaşım önizleme resmi (tools/shots/og-image.png; JPEG olarak og-image.jpg yapılır)
 node tools/drive.mjs tools/recipes/restart.mjs    # baştan başlama gerçek tıklamalarla: Menu → Main menu → New Game, diyalog açıkken, sertifikadaki Play again; 3 ekran boyutunda
 node tools/drive.mjs tools/recipes/restart-inplace.mjs  # yarım kalmış karışık bir oyunu sıfırlayıp Görev 1'i yeniden oynar; yatay telefonda bütün butonlara erişim

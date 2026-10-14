@@ -157,6 +157,16 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 #actBtn.ready{animation:actPulse 1.1s ease-in-out infinite}
 #actBtn:active,#actBtn.down{transform:translateY(5px) scale(.96);box-shadow:0 2px 0 #c98a12,0 5px 10px rgba(0,0,0,.25);animation:none}
 #actBtn.nope{animation:nope .35s}
+#actBtn.sea{display:none}
+/* the cannon button at sea: drag it to aim, let go to fire */
+#seaFire{position:fixed;z-index:11;right:calc(22px + env(safe-area-inset-right));bottom:calc(24px + env(safe-area-inset-bottom));width:clamp(104px,15vmin,136px);height:clamp(104px,15vmin,136px);
+  border-radius:50%;border:5px solid #fff;padding:0;background:radial-gradient(circle at 35% 28%,#eef3f7,#b8c4cf 50%,#8796a5);box-shadow:0 7px 0 #5f6d7a,0 12px 22px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font);font-weight:bold;color:var(--ink);cursor:grab;touch-action:none;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;outline:none}
+#seaFire #sfIcon{font-size:44px;line-height:1.05;pointer-events:none} #seaFire #sfLbl{font-size:18px;line-height:1.1;pointer-events:none}
+#seaFire.loaded{background:radial-gradient(circle at 35% 28%,#fff1c4,#ff9f43 45%,#e8503a);box-shadow:0 7px 0 #a8341f,0 12px 22px rgba(0,0,0,.3);color:#fff;animation:actPulse 1s ease-in-out infinite}
+#seaFire.aiming{transform:scale(1.12);animation:none;cursor:grabbing}
+#seaFire.nope{animation:nope .35s}
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 @keyframes nope{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
 
@@ -557,10 +567,11 @@ body.fs .fsBtn .fsOut{display:inline}
   <button id="menuBtn" class="btn round white" aria-label="Menu">⚙️</button>
 </div>
 
-<div id="bossBar" class="hidden" aria-hidden="true"><div class="bbName">🦍 <span>BONGO</span></div><div id="bbSlots"></div></div>
+<div id="bossBar" class="hidden" aria-hidden="true"><div class="bbName" id="bbName">🦍 <span>BONGO</span></div><div id="bbSlots"></div></div>
 <div id="fadeFx"></div>
 <div id="talkWrap" class="hidden"><button id="talkBtn" class="btn">Talk 💬</button></div>
 <div id="joyZone" class="hidden" aria-hidden="true"><div id="joyBase"><div id="joyKnob"></div></div></div>
+<button id="seaFire" class="hidden" aria-label="Fire"><span id="sfIcon">📦</span><span id="sfLbl"></span></button>
 <button id="actBtn" class="hidden"><span class="ai" id="actIcon">💬</span><span class="al" id="actLbl"></span></button>
 
 <div id="dialog" class="hidden">
@@ -940,12 +951,63 @@ const GAME_CONTENT = {
   // ve "Genç Kaptan" sertifikası (eski bir deniz haritası) açılır. Sertifika sonra dümenden tekrar açılabilir.
   captain: {
     give: [['bob', 'Ahoy, {name}! What a beautiful ship!'], ['bob', 'You helped Tess. You found eight things!'], ['bob', 'Every captain needs a hat.'], ['bob', "Here is my old captain's hat. It is for you!"]],
-    after: [['bob', 'Ahoy, Captain {name}!'], ['bob', 'We can sail to the islands soon!']],
-    wheel: [['sparky', 'Woof! Captain {name}!'], ['sparky', 'Look at your sea chart!']],
+    after: [['bob', 'Ahoy, Captain {name}!'], ['bob', 'Look at your sea chart!']],
     card: 'Captain Bob is on our ship. Go and see him!',
     title: 'Junior Captain', sub: 'The Sunny Hill Sea Chart',
     is: 'is a Junior Captain!', say: '{name} is a Junior Captain!', next: 'New islands... See you next time!',
     bananas: 'bananas for Bongo', parts: 'ship parts', answers: 'right answers', tie: "Bongo's tie",
+  },
+
+  // 4. bölüm: denizde korsan Kaptan Grumble aile albümünü kaçırdı. Gemiyi çocuk sürer (yanında Sparky). Yüzen sandığın
+  // 3 sorusunu cevaplayınca top dolar; top düğmesini sürükleyip nişan alır, bırakınca ateş eder. 5 isabet; her biri
+  // 1. ünite quizinin bir konusu (sorular aşağıda konulara göre). Korsan sonunda albümü geri verir: sıra Papağan Kral'da.
+  sea: {
+    told: [['sparky', 'Woof! Our ship is ready, Captain {name}!'], ['sparky', "Let's sail! Go to the ship's wheel!"]],
+    go: [['sparky', "Woof! Let's sail, Captain {name}!"]],
+    sail: [['sparky', 'Woof! We are at sea!'], ['sparky', 'Steer the ship. Look! A crate!'], ['sparky', 'Sail to the crate!']],
+    back: [['sparky', "Woof! Let's find Captain Grumble!"], ['sparky', 'Sail out to sea! Follow my arrow!']],
+    out: [['sparky', 'Great shot, Captain {name}!'], ['sparky', 'Now we are ready.'], ['sparky', "Let's sail out to sea! Follow my arrow!"]],
+    loaded: [['sparky', 'The cannon is ready!'], ['sparky', 'Drag the cannon button to aim.'], ['sparky', 'Let go to fire!']],
+    pirate: [['sparky', 'Woof! Look! A pirate ship!'], ['pirate', 'Ha ha! I am Captain Grumble!'], ['pirate', 'I have your family album!'], ['pirate', 'It is my album now!'], ['sparky', "Oh no! Let's get it back, Captain {name}!"]],
+    again: [['pirate', 'Ha ha! You are back!'], ['pirate', 'The album is still mine!'], ['sparky', 'Find a crate. Load the cannon!']],
+    flee: [['pirate', 'Ouch! Stop! My ship!'], ['pirate', 'You are a great captain!'], ['pirate', 'But I am not sorry! Goodbye!'], ['sparky', 'Look! He is running away!']],
+    dropped: 'Look! He dropped something!',
+    mapBack: [['sparky', "Woof! Captain Grumble's map is in the sea!"], ['sparky', "Let's find it! Follow my arrow!"]],
+    end: [['sparky', 'Oh no! Our ship is broken!'], ['sparky', "The Parrot King's island is near."], ['sparky', 'We can fix our ship there!'], ['sparky', 'And we have our family album!'], ['sparky', 'See you next time, Captain {name}!']],
+    after: [['sparky', 'Woof! Our ship is broken.'], ['sparky', "Next time we sail to the Parrot King's island!"]],
+    hurt: 'Oh no! Our ship is hurt!', lastHit: 'Ouch! Our ship!',
+    // the treasure map that falls out of Grumble's ship
+    mapCard: { title: "Captain Grumble's Map", island: "The Parrot King's Island", here: 'We are here!', home: 'Sunny Hill', say: "It is a treasure map! Look! The Parrot King's island!" },
+    card: { go: "Let's sail! Go to the ship's wheel!", crate: 'Sail to the crate!', buoy: 'Drag the cannon button. Hit the target!', load: 'Find a crate! Load the cannon!',
+      fire: 'Drag the cannon button. Fire at the pirate ship!', out: 'Sail out to sea! Follow the arrow!', flee: 'Captain Grumble is running away!',
+      map: 'Get the map!', won: "Next time: the Parrot King's island!" },
+    ask: 'Choose the right word!',
+    ready: 'The cannon is ready!', needCrate: 'Find a crate first!', dragHint: 'Drag the button to aim!', miss: 'Splash! Find a new crate!', keepSailing: 'Keep sailing! Do not stop!', missLand: 'Oops! That is the island! Find a new crate!', buoyHit: 'Great shot!', oops: 'Oops!',
+    hit: ['Bang! Great shot!', 'Bang! You hit it!', 'Bang! Well done!', 'Bang! One more!', 'Bang! You did it!'],
+    album: 'You have your family album!',
+    btnLoad: 'Crate', btnFire: 'Fire!',
+    // her isabette albümden bir sayfa geri gelir (çocuğun 8. görevde kurduğu aileden)
+    pages: { mother: 'This is my mother!', father: 'This is my father!', grandmother: 'This is my grandmother!', grandfather: 'This is my grandfather!', sister: 'This is my sister!',
+      brother: 'This is my brother!', aunt: 'This is my aunt!', uncle: 'This is my uncle!', cousin: 'This is my cousin!', family: 'This is my family!' },
+    // Sorular: cümlede boşluk yerine ___, sonra | doğru cevap | iki yanlış seçenek. Her isabet bir konu:
+    // family (aile kelimeleri), tobe (am / is / are), not (isn't / aren't / am not), ask (soru ve kısa cevap), short (I'm / He's / They're)
+    questions: {
+      family: ["My mother's mother is my ___. | grandmother | aunt | sister", "My father's brother is my ___. | uncle | cousin | grandfather",
+        "My aunt's son is my ___. | cousin | brother | uncle", "My mother's father is my ___. | grandfather | uncle | brother",
+        "My father's sister is my ___. | aunt | sister | grandmother", "My uncle's daughter is my ___. | cousin | sister | aunt",
+        "My father's mother is my ___. | grandmother | mother | aunt", "My mother's brother is my ___. | uncle | father | cousin"],
+      tobe: ['I ___ a captain. | am | is | are', 'My sister ___ on the ship. | is | am | are', 'We ___ at sea. | are | is | am', 'The pirates ___ angry. | are | is | am',
+        'My grandfather ___ seventy. | is | are | am', 'My cousins ___ from Canada. | are | is | am', 'Sparky ___ my dog. | is | are | am', 'You ___ very brave! | are | is | am'],
+      not: ["Captain Grumble ___ my friend. | isn't | aren't | am not", "I ___ scared! | am not | isn't | aren't", "My mom and dad ___ on the ship. | aren't | isn't | am not",
+        "Sparky ___ a cat. | isn't | aren't | am not", "We ___ at home. We are at sea! | aren't | isn't | am not", "My aunt ___ a pirate. | isn't | aren't | am not",
+        "I ___ ten. I am seven. | am not | isn't | aren't", "The crates ___ heavy. | aren't | isn't | am not"],
+      ask: ['___ he your brother? Yes, he is. | Is | Are | Am', '___ they your cousins? Yes, they are. | Are | Is | Am', 'Is she your aunt? Yes, she ___. | is | are | am',
+        "Are they your grandparents? No, they ___. | aren't | isn't | am not", 'Is this your album? Yes, it ___. | is | are | am', 'Are these your photos? Yes, they ___. | are | is | am',
+        "Is this your ship? No, it ___. | isn't | aren't | am not", '___ you a pirate? No, I am not. | Are | Is | Am'],
+      short: ["This is my aunt. ___ nice. | She's | He's | They're", "These are my cousins. ___ funny. | They're | She's | He's", "Hi! ___ a captain! | I'm | He's | They're",
+        "This is my uncle. ___ tall. | He's | She's | They're", "I am happy. = ___ happy. | I'm | He's | They're", "He is my dad. = ___ my dad. | He's | She's | I'm",
+        "They are at sea. = ___ at sea. | They're | He's | I'm", "She is not here. = She ___ here. | isn't | aren't | am not"],
+    },
   },
 
   // Karakter adları ve normal selamlaşma cümleleri
@@ -966,6 +1028,7 @@ const GAME_CONTENT = {
     owl:    { name: 'Mr. Owl', hello: ["Hoo hoo! I'm Mr. Owl.", 'I live in a cottage.'] },
     fizz:   { name: 'Dr. Fizz', hello: ["Hello! I'm Dr. Fizz.", 'This is my lab.'] },
     tess:   { name: 'Tess', hello: ["Hi! I'm Tess.", "I'm an engineer. I make things!"] },
+    pirate: { name: 'Captain Grumble', hello: ['Ha ha! I am Captain Grumble!'] },
     bongo:  { name: 'Bongo', hello: ['Ooh ooh!'] },
     // gizli sürprizlerdeki konuşan hayvanlar
     cat:    { name: 'Cat' },
@@ -1370,7 +1433,7 @@ function hairCap(c, L, hr, hy, side) {
   const st = L.hairStyle;
   if (!st || st === 'none') return;
   const col = L.hair, r = hr + 2, fy = hy - hr * 0.27;
-  if (st === 'bald') {               // hair only over the ears
+  if (st === 'bald' || L.hat === 'tricorn') {               // hair only over the ears (the tricorn sits low: no fringe under it)
     for (const s of side ? [-0.62] : [-1, 1]) ell(c, s * (hr - 0.5), hy - 1.5, 4.2, 7.5, col, 2.5);
     return;
   }
@@ -1462,10 +1525,12 @@ function faceP(c, L, hr, hy, side, t, o) {
     c.beginPath(); c.arc(rx, ey, 5.8, 0, TAU); c.stroke();
     seg(c, lx + 5.8, ey - 1, rx - 5.8, ey - 1, gc, 2);
   }
+  if (L.patch) { seg(c, rx - 4, ey - 4, fx - hr * 0.55, hy - hr * 0.62, '#1d1c22', 1.6); seg(c, rx + 4, ey - 4, fx + hr * 0.95, hy - hr * 0.2, '#1d1c22', 1.6); ell(c, rx, ey, 5, 4.4, '#1d1c22', 1.2); }
   const my = hy + hr * 0.53;
-  if (L.beard) {
-    c.beginPath(); c.arc(fx * 0.6, hy + 1, hr * 0.98, 0.02 * Math.PI, 0.98 * Math.PI);
-    c.quadraticCurveTo(fx, hy + hr * 0.2, hr * 0.98 + fx * 0.6, hy + 1.5); c.closePath(); paint(c, L.beard, 2.5);
+  if (L.beard) {          // from below the eyes down round the chin
+    const R = hr * 0.98, cx = fx * 0.6, cy = hy + 1, a0 = Math.asin(clamp((ey + 4.5 - cy) / R, 0, 0.9));
+    c.beginPath(); c.arc(cx, cy, R, a0, Math.PI - a0);
+    c.quadraticCurveTo(fx, ey + 1, cx + Math.cos(a0) * R, cy + Math.sin(a0) * R); c.closePath(); paint(c, L.beard, 2.5);
   }
   if (L.mustache || L.beard) {
     const mc = L.beard || L.hair;
@@ -1500,6 +1565,11 @@ function hatP(c, L, hr, hy, side, back) {
       else ell(c, 0, hy - hr * 0.38, hr * 0.8, 4, '#222', 2.5);
       circ(c, side ? 5 : 0, hy - hr * 0.6, 3, '#ffd23c', 1.8);
     }
+  } else if (h === 'tricorn') {          // Captain Grumble's three-cornered hat, with a gold edge and a skull badge
+    const y0 = hy - hr * 0.62;
+    poly(c, [-hr * 1.45, y0 + 2, -hr * 0.55, y0 - hr * 0.95, 0, y0 - hr * 0.62, hr * 0.55, y0 - hr * 0.95, hr * 1.45, y0 + 2, 0, y0 - hr * 0.28], '#2b2530', 3);
+    c.strokeStyle = '#d9b25a'; c.lineWidth = 2; c.beginPath(); c.moveTo(-hr * 1.28, y0 - 0.5); c.lineTo(-hr * 0.55, y0 - hr * 0.84); c.lineTo(0, y0 - hr * 0.54); c.lineTo(hr * 0.55, y0 - hr * 0.84); c.lineTo(hr * 1.28, y0 - 0.5); c.stroke();
+    if (!back) circ(c, side ? hr * 0.3 : 0, y0 - hr * 0.42, 3.2, '#f4f1e8', 1.4);
   } else if (h === 'straw') {
     ell(c, 0, hy - hr * 0.55, hr * 1.6, hr * 0.5, '#f2cf6b', 3);
     c.beginPath(); c.moveTo(-hr * 0.82, hy - hr * 0.55);
@@ -3790,6 +3860,11 @@ function paintFace3(F) {
   };
   const eye = (s, mode) => {
     const cx = s * EX, cy = 0;
+    if (F.patch && s > 0) {          // an eye patch, and its strap going up round the head
+      g.beginPath(); g.moveTo(cx - 0.55, 0.44); g.lineTo(cx - 0.12, cy + 0.12); g.moveTo(cx + 0.12, cy + 0.14); g.lineTo(cx + 0.6, 0.44); line(0.05, '#1d1c22');
+      g.beginPath(); g.ellipse(cx, cy, RX * 1.2, RY * 1.1, 0, 0, TAU); g.fillStyle = '#1d1c22'; g.fill();
+      return;
+    }
     if (mode === 'closed' || mode === 'happy') {
       g.beginPath();
       if (mode === 'closed') { g.moveTo(cx - 0.19, cy - 0.02); g.quadraticCurveTo(cx, cy - 0.12, cx + 0.19, cy - 0.02); }
@@ -3893,7 +3968,7 @@ function capBand3(d, k) {          // k: how high the band sits on the head (a c
 function hair3(mb, d, L, P) {
   const S = HAIR3[L.hairStyle];
   if (!S) return;
-  const cut = L.hat === 'captain' || L.hat === 'cap' ? capBand3(d, L.hat === 'cap' ? CAP_K3 : 0).vcut : null;          // under a captain's hat or a cap: no hair on top
+  const cut = L.hat === 'captain' || L.hat === 'cap' || L.hat === 'tricorn' ? capBand3(d, L.hat === 'captain' ? 0 : CAP_K3).vcut : null;          // under a captain's hat or a cap: no hair on top
   const hair = L.hair, base = rgb3(hair);
   const tone = (a) => shade3(hair, a).concat(1);
   // columns: even steps around the head plus each tooth's tip and gap, so points stay sharp
@@ -4142,6 +4217,23 @@ function personModel3(L) {
     for (let j = 0; j < RG.length - 1; j++) for (let i = 0; i < NU; i++) hb.quad(RG[j][i], RG[j][i + 1], RG[j + 1][i + 1], RG[j + 1][i], COLS[j]);
     visor(yb + 0.6, az * 1.04, ax * 0.8, hr * 0.56, '#222222');
     hb.color('#ffd23c').sphere(0, yb + hr * 0.15, az * 1.12 + 0.3, 2.8, 2.6, 1.3, 10, 6);
+  } else if (h === 'tricorn') {          // a pirate's three-cornered hat: a crown over the head, the brim turned up in three walls, a gold edge
+    const { yb, vb, ecb } = capBand3(d, CAP_K3), NU = 24, NV = 5, F = 1.1, R0 = Math.max(d.hx, d.hz) * ecb * 2.15, dark = C('#2b2530'), gold = C('#d9b25a');
+    const rows = [];
+    for (let j = 0; j <= NV; j++) { const v = vb + (Math.PI / 2 - vb) * j / NV, r = []; for (let i = 0; i <= NU; i++) r.push(headPt(d, -Math.PI + TAU * i / NU, v, F)); rows.push(r); }
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) hb.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], dark);
+    const cor = [0, 1, 2].map((k) => [Math.sin(k * TAU / 3) * R0, Math.cos(k * TAU / 3) * R0]), N = 8;
+    for (let k = 0; k < 3; k++) {
+      const A = cor[k], B = cor[(k + 1) % 3], at = (s) => [A[0] + (B[0] - A[0]) * s, A[1] + (B[1] - A[1]) * s, Math.sin(Math.PI * s)];
+      const lo = (q) => [q[0], yb - 0.5, q[1]], hi = (q) => [q[0] * 1.06, yb + 7 + q[2] * 3.5, q[1] * 1.06], up = (p) => [p[0], p[1] + 1.3, p[2]];
+      for (let i = 0; i < N; i++) {
+        const a = at(i / N), b = at((i + 1) / N);
+        hb.quad(lo(a), lo(b), hi(b), hi(a), dark); hb.quad(lo(b), lo(a), hi(a), hi(b), dark);
+        hb.quad(hi(a), hi(b), up(hi(b)), up(hi(a)), gold); hb.quad(hi(b), hi(a), up(hi(a)), up(hi(b)), gold);
+        hb.tri([0, yb - 0.6, 0], lo(b), lo(a), dark); hb.tri([0, yb - 0.6, 0], lo(a), lo(b), dark);
+      }
+    }
+    hb.color('#f4f1e8').sphere(0, yb + hr * 0.3, d.hz * ecb * F + 0.6, 2.6, 2.6, 1.2, 8, 5);          // a little skull badge in front
   } else if (h === 'straw') {
     const y0 = hy + hr * 0.5;
     hb.color('#f2cf6b').lathe(0, y0, 0, [[hr * 1.8, -0.8], [hr * 1.74, 0.8], [hr * 0.98, 2.2], [0.01, 2.4]], 22);
@@ -4180,7 +4272,7 @@ function personModel3(L) {
   const pa = PATCH3[d.A ? 'A' : 'K'] || (PATCH3[d.A ? 'A' : 'K'] = { eyes: patch3(d, EYE_U3, EYE_V3, 18, 8), mouth: patch3(d, MOUTH_U3, MOUTH_V3, 10, 6) });
   P.eyes = pa.eyes; P.mouth = pa.mouth;
   const white = /^#(e|f|d)[0-9a-f]{5}$/i.test(hair || '');
-  P.face = { skin, lashes: !!L.lashes, freckles: !!L.freckles, brows: d.A ? (white ? '#b9b2bf' : shade(hair || '#5a3620', -0.1)) : null, iris: L.eyes || '#2f2833' };
+  P.face = { skin, lashes: !!L.lashes, freckles: !!L.freckles, patch: !!L.patch, brows: d.A ? (white ? '#b9b2bf' : shade(hair || '#5a3620', -0.1)) : null, iris: L.eyes || '#2f2833' };
   P.faceKey = JSON.stringify(P.face);
   PERSON3.set(key, P);
   if (PERSON3.size > 48) { const old = PERSON3.keys().next().value; freePerson3(PERSON3.get(old)); PERSON3.delete(old); }
@@ -4727,7 +4819,8 @@ function g3Camera(dt, snap) {
     lift = (view.ch / 2 - free) / pxPerUnit;
   }
   if (SHIP.camFocus && !Dialog.open) { fx = SHIP.camFocus.x; fz = SHIP.camFocus.y; }
-  const V = LAB.inRoom() ? LAB.view3D() : { x0: 90, x1: W + 40, z0: 70, z1: H + 30 };
+  if (SEA.active && SEA.ship) { const f = SEA.camFocus(); fx = f.x; fz = f.y; }
+  const V = SEA.active ? SEA.view3D() : LAB.inRoom() ? LAB.view3D() : { x0: 90, x1: W + 40, z0: 70, z1: H + 30 };
   const tx = V.x0 < V.x1 ? clamp(fx, V.x0, V.x1) : (V.x0 + V.x1) / 2, tz = clamp(fz + lift, V.z0, V.z1);
   const k = snap ? 1 : 1 - Math.exp(-dt * 6);
   CAM3.x += (tx - CAM3.x) * k; CAM3.z += (tz - CAM3.z) * k;
@@ -4744,6 +4837,7 @@ function g3CamObj(tour) {
 }
 const blob3 = (R, x, z, rx, rz, a, y) => { const m = T3(x, (y || 0) + 2.8, z); m4s(m, rx, 1, rz); R.setTint(1, 1, 1, a / 0.3, 0); R.draw(W3.dyn.blob, m); };
 function g3Render(t, dt, tour) {
+  if (!tour && SEA.active) { SEA.render3(G3.R, t, dt); return; }
   if (!tour && LAB.inRoom()) { LAB.render3(G3.R, t, dt); return; }
   const R = G3.R, cam = g3CamObj(tour);
   R.begin(R.cv.width, R.cv.height, cam, game.ev, t);
@@ -5153,7 +5247,7 @@ function arrive() {
   if (g && game.mode === 'play' && inTalkRange(g)) interact(g);
 }
 function updatePlayer(dt) {
-  if (SHIP.cut) { player.moving = false; player.path = null; player.goal = null; return; }      // watching the ship go into the water
+  if (SHIP.cut || SEA.active) { player.moving = false; player.path = null; player.goal = null; return; }      // watching the ship go into the water; out at sea
   if (player.stun > 0) {        // dizzy after a barrel (Dr. Fizz's yard): a moment of standing still
     player.stun = Math.max(0, player.stun - dt); player.moving = false; player.path = null; player.goal = null;
     return;
@@ -5807,12 +5901,13 @@ const LOOKS = {
   // only in Milo's family photo (Quest 2)
   grandpa: { age: 'adult', skin: '#f3c6a5', hair: '#e6e6ee', hairStyle: 'bald', mustache: true, glasses: true, glassesColor: '#4a3222', shirt: '#ffb238', pants: '#6b5a50' },
   tess: { age: 'adult', skin: '#a8714f', hair: '#3a2418', hairStyle: 'ponytail', ties: '#ff8c42', shirt: '#4aa3ff', overalls: '#ff8c42', goggles: '#ffd23c', toolbelt: true, lashes: true, freckles: true, shoes: '#6b4430' },
+  pirate: { age: 'adult', skin: '#e8b48a', hair: '#2a1a12', hairStyle: 'long', beard: '#2a1a12', hat: 'tricorn', patch: true, shirt: '#ffffff', stripes: '#c8372d', coat: '#a32a2a', buttons: '#ffd23c', pants: '#3a2a20', shoes: '#2b1d16' },
   fizz: { age: 'adult', skin: '#f3c6a5', hair: '#f4f4f8', hairStyle: 'wild', coat: '#ffffff', shirt: '#8fd3ff', pants: '#4a4f6a', glasses: true, glassesColor: '#ff9f1a', bowtie: '#ff4d6d', shoes: '#3a2a20' },
   mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, socks: '#ffffff', shoes: '#ff5a8a' },
 };
 const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
 // pitch per speaker (see Speech.pitchFor)
-const VOICE = { narrator: 1, cat: 1.45, frog: 1.15, rabbit: 1.5, duck: 1.2, scarecrow: 0.95, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3, fizz: 1.15, bongo: 0.6, tess: 1.2 };
+const VOICE = { narrator: 1, cat: 1.45, frog: 1.15, rabbit: 1.5, duck: 1.2, scarecrow: 0.95, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3, fizz: 1.15, bongo: 0.6, tess: 1.2, pirate: 0.72 };
 const NPC_DEFS = [
   Object.assign({ id: 'milo' }, ATP('milo', 104, 37)),
   Object.assign({ id: 'leo', planted: AT('milo', 146, 45) }, ATP('milo', 64, 40)),     // beside Milo (he used to stand where the sign is now)
@@ -6302,12 +6397,12 @@ const Quests = {
   markers() { const L = this.logic(); return (L && L.markers ? L.markers() : []).concat(state.finished ? LAB.markers() : []); },
   target() {
     const L = this.logic();
-    if (!L) return state.finished ? (SHIP.on() ? SHIP.target() : LAB.target()) : null;
+    if (!L) return state.finished ? (SEA.open() ? SEA.target() : SHIP.on() ? SHIP.target() : LAB.target()) : null;
     return L.target ? L.target() : NPC[L.givers[0]];
   },
   card() {
     const L = this.logic(), C = this.content();
-    if (!L) return state.finished ? (SHIP.on() ? SHIP.card() : LAB.card()) : ['sparky', GAME_CONTENT.ui.freeWalk];
+    if (!L) return state.finished ? (SEA.open() ? SEA.card() : SHIP.on() ? SHIP.card() : LAB.card()) : ['sparky', GAME_CONTENT.ui.freeWalk];
     return L.card(C);
   },
   hintId() { const L = this.logic(); return L && L.hintId ? L.hintId() : null; },
@@ -6983,6 +7078,7 @@ const LAB = {
   // where the cameras may look while you are in the hall
   view2D() { const R = this.ROOM; return { x0: R.x0 - 60, y0: R.y0 - 230, x1: R.x1 + 60, y1: R.y1 + 50 }; },     // (room above for the boss bar)
   zoom2D() {           // the flat view steps back in the hall: as much of it as fits, but never smaller than about half
+    if (SEA.active && !G3.on) return SEA.zoom2D();          // (and further out at sea)
     if (G3.on || !this.inRoom()) return 1;
     const V = this.view2D();
     return clamp(Math.min(view.w / (V.x1 - V.x0), view.h / (V.y1 - V.y0)), 0.55, 1);
@@ -7139,6 +7235,7 @@ const LAB = {
     const bar = $('bossBar');
     bar.classList.toggle('hidden', !boss); document.body.classList.toggle('boss', boss);
     if (!boss) return;
+    $('bbName').innerHTML = '🦍 <span>BONGO</span>';
     const sl = $('bbSlots');
     if (sl.children.length !== 8) { sl.textContent = ''; for (let i = 0; i < 8; i++) sl.appendChild(el('span', null, '🍌')); }
     for (let i = 0; i < 8; i++) sl.children[i].classList.toggle('on', i < s.bananas);
@@ -8020,6 +8117,21 @@ const HULL = {
   deck(x) { return this.top(x) - 1.2; },
 };
 
+// the ship's colours: ours, and the pirates' (the flat view and the 3D models both use them)
+const SHIP_PAL = { hull: '#2f6fd0', belly: '#c0392b', stripe: '#ffffff', trim: '#ffd23c', top: '#fff4dc', rail: '#8a5a3a', post: '#ffffff', sail: '#fffaf0', sailBack: '#efe8da',
+  band: '#e8503a', emblem: 'sun', cabin: '#fff3d6', roof: '#e8503a', roofEdge: '#b83a2e', flag: [['#ffd23c', '#ff8c42'], ['#ff8c42', '#ffd23c'], ['#ffd23c', '#ff8c42']], flagDot: '#ffffff' };
+const PIRATE_PAL = { hull: '#3d3646', belly: '#6b2424', stripe: '#d9b25a', trim: '#d9b25a', top: '#2e2934', rail: '#4a3428', post: '#d9b25a', sail: '#34313b', sailBack: '#2a2830',
+  band: '#8a2020', emblem: 'skull', cabin: '#6b4a34', roof: '#8a2020', roofEdge: '#5a1515', flag: [['#1d1c22', '#1d1c22'], ['#1d1c22', '#1d1c22'], ['#1d1c22', '#1d1c22']], flagDot: '#f4f1e8' };
+// the colour of one piece of the sail (cz across, cy up): a band at the top and the bottom, and the sun or a skull and crossbones
+function sailCol3(P, cz, cy, j, NV) {
+  if (j === 0 || j === NV - 1) return P.band;
+  if (P.emblem === 'sun') { const r = Math.hypot(cz, (cy - 122) * 1.05); return r < 15 ? '#ffd23c' : r < 19 ? '#ff9f2b' : P.sail; }
+  const sx = cz, sy = cy - 124, bone = '#f4f1e8';
+  const eye = Math.hypot(Math.abs(sx) - 5.5, sy - 1) < 3.4, nose = Math.hypot(sx, sy + 6) < 1.8;
+  const head = Math.hypot(sx, (sy - 1) * 1.05) < 13 || (Math.abs(sx) < 8.5 && sy > -16 && sy < -8);
+  const bones = (Math.abs(sx - (sy + 27)) < 3 || Math.abs(sx + (sy + 27)) < 3) && Math.abs(sx) < 20 && sy < -15 && sy > -40;
+  return (head && !eye && !nose) || bones ? bone : P.sail;
+}
 const SHIP = {
   WORK: { x: 2930, y: 1192 },                 // the front of Tess's workshop (it faces south, towards the harbour)
   K: 2,                                       // the ship is twice the size of its model (HULL), so children can walk about on it
@@ -8230,7 +8342,7 @@ const SHIP = {
   talk(id) {
     const s = this.st(), C = GAME_CONTENT.ship;
     if (id === 'bob' && this.launched() && !this.launchT) {
-      if (!s.capt) this.captain(false); else Dialog.show(GAME_CONTENT.captain.after);
+      if (!s.capt) this.captain(false); else Dialog.show(GAME_CONTENT.captain.after, () => CaptainCert.open());
       return true;
     }
     if (id === 'tess') {
@@ -8277,7 +8389,7 @@ const SHIP = {
     if (!this.launched()) list.push({ id: 'harbourgate', x: Q.x0 - 18, y: (Q.gate0 + Q.gate1) / 2, topY: Q.gate0 - 60, label: 'look', act: () => Dialog.show(GAME_CONTENT.ship.gate) });
     if (this.launched() && !this.launchT) {
       const p = this.pose(game.t);
-      list.push({ id: 'shipwheel', x: p.x + this.HELM_X * this.K, y: p.z + 14, topY: p.z - 60, label: 'look', act: () => { if (!s.capt) this.captain(true); else Dialog.show(GAME_CONTENT.captain.wheel, () => CaptainCert.open()); } });
+      list.push({ id: 'shipwheel', x: p.x + this.HELM_X * this.K, y: p.z + 14, topY: p.z - 60, label: 'look', act: () => { if (!s.capt) this.captain(true); else SEA.wheel(); } });
     }
     void s;
   },
@@ -8322,7 +8434,7 @@ const SHIP = {
     return null;
   },
   hud() {
-    const s = this.st(), on = this.busy();
+    const s = this.st(), on = this.busy() && !SEA.open();          // (at sea, the parts are long done)
     $('partsBox').classList.toggle('hidden', !on);
     if (on) $('partsCount').textContent = this.built();
   },
@@ -8458,11 +8570,11 @@ Object.assign(SHIP, {
       m.triUp([x0 + nx, y, z0 + nz], [x1 + nx, y, z1 + nz], [x1 - nx, y, z1 - nz]); m.triUp([x0 + nx, y, z0 + nz], [x1 - nx, y, z1 - nz], [x0 - nx, y, z0 - nz]);
     }
     W3.foam = [...ft.values()].map(pack);
-    if (!this.M) this.models();
+    if (!this.M) this.M = this.models(SHIP_PAL);
   },
   // the ship in its stages, the pieces of the gate, the props people carry
-  models() {
-    const M = this.M = {}, X = HULL.XS, V = HULL.VS;
+  models(pal) {          // (returns the models; pal: SHIP_PAL or PIRATE_PAL)
+    const M = {}, X = HULL.XS, V = HULL.VS, P = pal || SHIP_PAL;
     // 1: keel, ribs and the long strips that hold them (a skeleton)
     const sk = new MB(83);
     sk.color('#8a5a30');
@@ -8474,14 +8586,14 @@ Object.assign(SHIP, {
     // 2 and 3: the planked hull, in plain wood and painted (red below the water, a white stripe, blue, a gold line)
     const hull = (painted) => {
       const mb = new MB(painted ? 84 : 85);
-      const woods = ['#c98f55', '#b97f47'], band = (j) => { const v = Math.max(Math.abs(V[j]), Math.abs(V[j + 1])); return v <= 0.7 ? '#c0392b' : v <= 0.72 ? '#ffffff' : v <= 0.95 && v > 0.88 ? '#2f6fd0' : v <= 0.88 ? '#2f6fd0' : v <= 0.97 ? '#ffd23c' : '#fff4dc'; };
+      const woods = ['#c98f55', '#b97f47'], band = (j) => { const v = Math.max(Math.abs(V[j]), Math.abs(V[j + 1])); return v <= 0.7 ? P.belly : v <= 0.72 ? P.stripe : v <= 0.95 ? P.hull : v <= 0.97 ? P.trim : P.top; };
       for (let i = 0; i < X.length - 1; i++) for (let j = 0; j < V.length - 1; j++) {
         const a = HULL.P(X[i], V[j]), b = HULL.P(X[i + 1], V[j]), c = HULL.P(X[i + 1], V[j + 1]), d = HULL.P(X[i], V[j + 1]);
         mb.quad(a, b, c, d, rgb3(painted ? band(j) : woods[(j + (i % 4 < 2 ? 0 : 1)) % 2]).concat(1));
       }
       const sx = X[0], sc = [sx, (HULL.top(sx) + HULL.bot(sx)) / 2, 0];
-      for (let j = 0; j < V.length - 1; j++) { const p = HULL.P(sx, V[j]), q = HULL.P(sx, V[j + 1]); mb.tri(sc, p, q, rgb3(painted ? (Math.abs(V[j]) < 0.7 ? '#c0392b' : '#2f6fd0') : woods[j % 2]).concat(1)); }
-      mb.tri(sc, HULL.P(sx, 1), HULL.P(sx, -1), rgb3(painted ? '#2f6fd0' : woods[0]).concat(1));
+      for (let j = 0; j < V.length - 1; j++) { const p = HULL.P(sx, V[j]), q = HULL.P(sx, V[j + 1]); mb.tri(sc, p, q, rgb3(painted ? (Math.abs(V[j]) < 0.7 ? P.belly : P.hull) : woods[j % 2]).concat(1)); }
+      mb.tri(sc, HULL.P(sx, 1), HULL.P(sx, -1), rgb3(painted ? P.hull : woods[0]).concat(1));
       // the deck: planks from bow to stern, and a wooden rail along the top of the hull
       const planks = ['#d8a868', '#c99a5e', '#e0b273', '#cfa063', '#d8a868', '#c99a5e'];
       for (let i = 0; i < X.length - 2; i++) {
@@ -8491,7 +8603,7 @@ Object.assign(SHIP, {
       for (const s of [-1, 1]) for (let i = 0; i < X.length - 1; i++) {
         const x0 = X[i], x1 = X[i + 1], a = [x0, HULL.top(x0) + 0.9, s * HULL.half(x0)], b = [x1, HULL.top(x1) + 0.9, s * HULL.half(x1)], l = Math.hypot(x1 - x0, b[2] - a[2]);
         mb.push(RY3(T3((x0 + x1) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2), Math.atan2(-(b[2] - a[2]), x1 - x0)));
-        mb.color(painted ? '#8a5a3a' : '#a8703f').box(-l / 2 - 0.4, -1.3, -1.6, l / 2 + 0.4, 1.3, 1.6);
+        mb.color(painted ? P.rail : '#a8703f').box(-l / 2 - 0.4, -1.3, -1.6, l / 2 + 0.4, 1.3, 1.6);
         mb.pop();
       }
       if (painted) {          // round portholes with brass rims
@@ -8519,20 +8631,19 @@ Object.assign(SHIP, {
     for (const s of [-1, 1]) for (let k = 1; k < 5; k++) { const f = k / 5; rp([mx - 12 * f + 0.1, 172 - (172 - HULL.top(mx - 12)) * f, s * (HULL.half(mx - 12) - 0.5) * f], [mx + 20 * f, 172 - (172 - HULL.top(mx + 20)) * f, s * (HULL.half(mx + 20) - 0.5) * f]); }
     rp([mx, top - 4, 0], [124, 40, 0]); rp([mx, top - 4, 0], [-94, HULL.top(-94) + 2, 0]);
     M.mast = pack(ma);
-    // 5: a billowing sail with a sun on it, and a little triangular sail at the bow
+    // 5: a billowing sail with a sun on it (or a skull and crossbones, in finer pieces), and a little triangular sail at the bow
     const sl = new MB(87); sl.smooth = 40; sl.push(RY3(T3(mx, 0, 0), -0.7)); sl.push(T3(-mx, 0, 0));
-    const NU = 8, NV = 8, sailP = (u, v) => { const zw = 40 - 6 * v; return [mx + 4.5 + 11 * Math.sin(Math.PI * u) * (0.45 + 0.55 * Math.sin(Math.PI * v)), 76 + 88 * v, -zw + 2 * zw * u]; };
+    const NU = P.emblem === 'sun' ? 8 : 20, NV = NU, sailP = (u, v) => { const zw = 40 - 6 * v; return [mx + 4.5 + 11 * Math.sin(Math.PI * u) * (0.45 + 0.55 * Math.sin(Math.PI * v)), 76 + 88 * v, -zw + 2 * zw * u]; };
     for (let i = 0; i < NU; i++) for (let j = 0; j < NV; j++) {
       const a = sailP(i / NU, j / NV), b = sailP((i + 1) / NU, j / NV), c = sailP((i + 1) / NU, (j + 1) / NV), d = sailP(i / NU, (j + 1) / NV);
-      const cz = (a[2] + c[2]) / 2, cy = (a[1] + c[1]) / 2, r = Math.hypot(cz, (cy - 122) * 1.05);
-      const col = j === 0 || j === NV - 1 ? '#e8503a' : r < 15 ? '#ffd23c' : r < 19 ? '#ff9f2b' : '#fffaf0';
+      const col = sailCol3(P, (a[2] + c[2]) / 2, (a[1] + c[1]) / 2, j, NV);
       quadTo(sl, a, b, c, d, [1, 0, 0], rgb3(col).concat(1));
-      quadTo(sl, [a[0] - 0.4, a[1], a[2]], [b[0] - 0.4, b[1], b[2]], [c[0] - 0.4, c[1], c[2]], [d[0] - 0.4, d[1], d[2]], [-1, 0, 0], rgb3(col === '#fffaf0' ? '#efe8da' : col).concat(1));
+      quadTo(sl, [a[0] - 0.4, a[1], a[2]], [b[0] - 0.4, b[1], b[2]], [c[0] - 0.4, c[1], c[2]], [d[0] - 0.4, d[1], d[2]], [-1, 0, 0], rgb3(col === P.sail ? P.sailBack : col).concat(1));
     }
-    for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; sl.color('#ffd23c').box(mx + 16.6 - 0.1, 122 + Math.sin(a) * 21 - 1.2, Math.cos(a) * 21 - 1.2, mx + 17, 122 + Math.sin(a) * 21 + 1.2, Math.cos(a) * 21 + 1.2); }
+    if (P.emblem === 'sun') for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; sl.color('#ffd23c').box(mx + 16.6 - 0.1, 122 + Math.sin(a) * 21 - 1.2, Math.cos(a) * 21 - 1.2, mx + 17, 122 + Math.sin(a) * 21 + 1.2, Math.cos(a) * 21 + 1.2); }
     sl.pop(); sl.pop();
     const jib = [[mx + 3, 150, 0], [121, 42, 0], [mx + 10, my + 14, 0]];
-    for (const s of [-1, 1]) sl.tri(...(s > 0 ? jib : jib.slice().reverse()).map((p) => [p[0], p[1], p[2] + s * 0.3]), rgb3('#fffaf0').concat(1));
+    for (const s of [-1, 1]) sl.tri(...(s > 0 ? jib : jib.slice().reverse()).map((p) => [p[0], p[1], p[2] + s * 0.3]), rgb3(P.sail).concat(1));
     M.sail = pack(sl);
     // 6: the wheel, the anchor and railings round the deck
     const ft = new MB(88), wx = this.WHEEL_X, dy = HULL.deck(wx), hx = this.HELM_X;
@@ -8560,15 +8671,15 @@ Object.assign(SHIP, {
       const gap = (this.PLANK_X - this.AFLOAT) / this.K;          // an opening in the rail where the gangplank comes aboard
       const xs = []; for (let x = -88; x <= 86; x += 11) { if (s < 0 && Math.abs(x - gap) < 10) continue; xs.push(x); }
       const pts = posts(xs, s);
-      for (const [x, y, z] of pts) ft.color('#ffffff').cyl(x, y, z, 0.8, 0.8, 10, 5);
-      for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; if (b[0] - a[0] > 14) continue; ft.color('#ffffff'); rod3(ft, [a[0], a[1] + 10, a[2]], [b[0], b[1] + 10, b[2]], 0.8, 5); }
+      for (const [x, y, z] of pts) ft.color(P.post).cyl(x, y, z, 0.8, 0.8, 10, 5);
+      for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; if (b[0] - a[0] > 14) continue; ft.color(P.post); rod3(ft, [a[0], a[1] + 10, a[2]], [b[0], b[1] + 10, b[2]], 0.8, 5); }
     }
     M.fittings = pack(ft);
     // 7: a cabin at the stern with round windows, a compass by the wheel, a lantern and a life ring
     const cb = new MB(89), c0 = -90, c1 = -60, cz = 17, fy = HULL.deck(-75), ch = 24;
-    cb.color('#fff3d6').box(c0, fy, -cz, c1, fy + ch, cz);
+    cb.color(P.cabin).box(c0, fy, -cz, c1, fy + ch, cz);
     for (const x of [c0, c1]) for (const z of [-cz, cz]) cb.color('#a8693a').box(x - 2, fy, z - 2, x + 2, fy + ch, z + 2);
-    cb.color('#e8503a').box(c0 - 3, fy + ch, -cz - 3, c1 + 3, fy + ch + 3, cz + 3); cb.color('#b83a2e').box(c0 - 3.5, fy + ch + 3, -cz - 3.5, c1 + 3.5, fy + ch + 4.4, cz + 3.5);
+    cb.color(P.roof).box(c0 - 3, fy + ch, -cz - 3, c1 + 3, fy + ch + 3, cz + 3); cb.color(P.roofEdge).box(c0 - 3.5, fy + ch + 3, -cz - 3.5, c1 + 3.5, fy + ch + 4.4, cz + 3.5);
     for (const s of [-1, 1]) for (const x of [-82, -68]) { cb.push(RY3(T3(x, fy + 15, s * (cz + 0.2)), s > 0 ? 0 : Math.PI)); cb.color('#ffd23c').torus(0, 0, 0, 3.8, 0.9, 14, 5, 'z'); cb.color('#9fdcf7').cyl(0, 0, -0.5, 3.2, 3.2, 0.5, 12); cb.pop(); }
     cb.push(RY3(T3(c1 + 0.2, fy, 0), Math.PI / 2)); door3(cb, 0, 0, 14, 21, '#4aa3ff'); cb.pop();
     for (let k = 0; k < 4; k++) { cb.push(RY3(T3(c1 + 0.4, fy + 13, 11), Math.PI / 2)); cb.color(k % 2 ? '#ffffff' : '#ff4d4d').torus(0, 0, 0.8, 4.6, 1.5, 4, 6, 'z', k * Math.PI / 2, (k + 1) * Math.PI / 2); cb.pop(); }
@@ -8579,9 +8690,9 @@ Object.assign(SHIP, {
     M.cabin = pack(cb);
     // 8: the flag at the top of the mast, in three pieces that wave (drawn one by one)
     const fp = new MB(90); fp.color('#8a5a30').cyl(0, 0, 0, 0.9, 0.9, 12, 6); M.flagPole = pack(fp);
-    M.flag = [['#ffd23c', '#ff8c42'], ['#ff8c42', '#ffd23c'], ['#ffd23c', '#ff8c42']].map((cols, i) => {
+    M.flag = P.flag.map((cols, i) => {
       const f = new MB(91 + i); f.color(cols[0]).box(0, -6, -0.35, 8.2, 0, 0.35); f.color(cols[1]).box(0, -12, -0.35, 8.2, -6, 0.35);
-      if (i === 1) f.color('#ffffff').sphere(4, -6, 0, 3, 3, 0.7, 10, 5);
+      if (i === 1) f.color(P.flagDot).sphere(4, -6, 0, 3, 3, 0.7, 10, 5);
       return pack(f);
     });
     // scaffolding round the ship while it is being built, and the gate of the quay (one leaf)
@@ -8617,12 +8728,10 @@ Object.assign(SHIP, {
     es.color('#ffffff').box(-14, 22, -3, 14, 46, -1.5); es.color('#4aa3ff').box(-12.5, 24, -1.5, 12.5, 33, -1.2); es.color('#9fdcf7').box(-12.5, 33, -1.5, 12.5, 44.5, -1.2);
     es.color('#ffd23c').sphere(6, 39, -1, 3.4, 3.4, 0.8, 10, 5); es.color('#4cc36a').box(-12.5, 24, -1.2, -2, 28, -0.9); es.color('#8a5a30').box(-15, 21, -4, 15, 22.5, 0);
     M.easel = pack(es);
+    return M;
   },
-  // the ship as it is now, and the gate (drawn every frame)
-  draw3(R, t) {
-    if (!this.M) this.models();
-    const M = this.M, n = this.built(), launched = this.launched(), p = this.pose(t), Q = this.QUAY;
-    const m = T3(p.x, p.y, p.z); m4rz(m, p.pitch); m4rx(m, p.roll); m4s(m, this.K, this.K, this.K);
+  // a whole ship (as much of it as is built) at matrix m
+  drawShip3(R, M, m, t, n, flags) {          // (flags: other pieces for the flag, e.g. a white one)
     if (n === 1) R.draw(M.skeleton, m);
     else if (n === 2) R.draw(M.hullWood, m);
     else if (n >= 3) R.draw(M.hullPaint, m);
@@ -8633,8 +8742,15 @@ Object.assign(SHIP, {
     if (n >= 8) {
       const f = m4t(new Float32Array(m), 18, 196, 0); R.draw(M.flagPole, f);
       let seg = m4t(new Float32Array(f), 0, 12, 0);
-      for (let i = 0; i < 3; i++) { m4ry(seg, Math.sin(t * 6 - i * 1.1) * 0.35 + (i ? 0 : Math.PI)); R.draw(M.flag[i], seg); seg = m4t(new Float32Array(seg), 8, 0, 0); }
+      for (let i = 0; i < 3; i++) { m4ry(seg, Math.sin(t * 6 - i * 1.1) * 0.35 + (i ? 0 : Math.PI)); R.draw((flags || M.flag)[i], seg); seg = m4t(new Float32Array(seg), 8, 0, 0); }
     }
+  },
+  // the ship as it is now, and the gate (drawn every frame)
+  draw3(R, t) {
+    if (!this.M) this.M = this.models(SHIP_PAL);
+    const M = this.M, n = this.built(), launched = this.launched(), p = this.pose(t), Q = this.QUAY;
+    const m = T3(p.x, p.y, p.z); m4rz(m, p.pitch); m4rx(m, p.roll); m4s(m, this.K, this.K, this.K);
+    if (!SEA.active) this.drawShip3(R, M, m, t, n);          // (out at sea, the ship is drawn there)
     if (!launched && n >= 1 && n < 8) { const s = T3(this.ON_SLIP, 0, this.SLIP.y); R.draw(M.scaffold, s); }
     // the quay gate: two leaves that swing open when the ship floats
     const open = launched ? 1 : 0, gx = Q.x0, half = (Q.gate1 - Q.gate0) / 2;
@@ -8646,13 +8762,13 @@ Object.assign(SHIP, {
     }
     if (!launched) R.draw(W3.dyn.lock, T3(gx - 3, 22 + Math.sin(t * 3) * 1.2, (Q.gate0 + Q.gate1) / 2));
     for (const d of this.drops) R.draw(W3.dyn.drop, T3(d.x, d.y, d.z));
-    if (launched && !this.launchT) R.draw(M.plank, T3(this.PLANK_X, 0, 0));
+    if (launched && !this.launchT && !SEA.active) R.draw(M.plank, T3(this.PLANK_X, 0, 0));
   },
   // see-through things: the ocean's foam, ripples from the launch, the ship's shadow on the slipway
   draw3Blend(R, t) {
     if (W3.foam) { R.setTint(1, 1, 1, 0.55 + 0.35 * Math.sin(t * 1.6), 1); for (const m of W3.foam) if (R.visible(m.box)) R.draw(m); }
     for (const r of this.ripples) if (r.t > 0) { const k = r.t / 1.6, m = T3(r.x, WATER_Y3 + 0.8, r.z); m4s(m, (30 + k * 120) * r.s, 1, (20 + k * 70) * r.s); R.setTint(1, 1, 1, 0.8 * (1 - k), 1); R.draw(W3.dyn.ripple, m); }
-    if (this.launched() && !this.launchT) { const p = this.pose(t), k = (t * 0.5) % 1, m = T3(p.x, WATER_Y3 + 0.6, p.z); m4s(m, (110 + k * 20) * this.K, 1, (40 + k * 10) * this.K); R.setTint(1, 1, 1, 0.45 * (1 - k), 1); R.draw(W3.dyn.ripple, m); }
+    if (this.launched() && !this.launchT && !SEA.active) { const p = this.pose(t), k = (t * 0.5) % 1, m = T3(p.x, WATER_Y3 + 0.6, p.z); m4s(m, (110 + k * 20) * this.K, 1, (40 + k * 10) * this.K); R.setTint(1, 1, 1, 0.45 * (1 - k), 1); R.draw(W3.dyn.ripple, m); }
     R.setTint(1, 1, 1, 1, 0);
   },
   // things some people have with them while they work: Mrs. ... Milo's mom's easel, Captain Bob's fishing line
@@ -8835,9 +8951,17 @@ Object.assign(SHIP, {
   },
   // the ship from the side, as much of it as is built
   drawShip2D(c, t) {
-    const n = this.built(); if (!n) return;
+    const n = this.built(); if (!n || SEA.active) return;
     const p = this.pose(t), bx = p.x, by = p.z + 80 - p.y * 0.9, K2 = 1.7;
     c.save(); c.translate(bx, by); c.rotate(-p.pitch * 0.9); c.scale(K2, K2);
+    this.drawHull2D(c, n, t, SHIP_PAL);
+    c.restore();
+    if (!this.launched() && n < 8) {          // scaffolding in front while it is built
+      for (const dx of [-80, -10, 60]) { const x = this.ON_SLIP + dx * K2; seg(c, x, by + 6, x, by - 85, '#c9a46a', 4); seg(c, x + 20, by + 6, x + 20, by - 85, '#c9a46a', 4); rrect(c, x - 3, by - 60, 26, 4, 1, '#b98a55', 1.5); }
+    }
+  },
+  // the ship from the side in its own units (the waterline's middle at 0, 0, the bow to the right), as much as is built
+  drawHull2D(c, n, t, P) {
     const hullPts = [[-95, -42], [-70, -40], [0, -38], [70, -42], [96, -52], [80, -20], [40, -4], [-60, -4], [-90, -16]];
     const path = () => { c.beginPath(); c.moveTo(hullPts[0][0], hullPts[0][1]); for (const q of hullPts.slice(1)) c.lineTo(q[0], q[1]); c.closePath(); };
     if (n === 1) {                         // the skeleton
@@ -8845,14 +8969,14 @@ Object.assign(SHIP, {
       for (let x = -84; x <= 80; x += 18) { const top = x > 50 ? -44 - (x - 50) * 0.18 : -40; c.beginPath(); c.moveTo(x - 3, top); c.quadraticCurveTo(x, -2, x + 3, top); c.lineWidth = 3; c.strokeStyle = '#c99a62'; c.stroke(); }
       seg(c, -95, -40, 94, -48, '#a8703f', 3);
     } else {
-      path(); paint(c, n >= 3 ? '#2f6fd0' : '#c98f55', 3);
+      path(); paint(c, n >= 3 ? P.hull : '#c98f55', 3);
       if (n >= 3) {
         c.save(); path(); c.clip();
-        c.fillStyle = '#c0392b'; c.fillRect(-100, -16, 200, 30); c.fillStyle = '#ffffff'; c.fillRect(-100, -19, 200, 4); c.fillStyle = '#ffd23c'; c.fillRect(-100, -38, 200, 3);
+        c.fillStyle = P.belly; c.fillRect(-100, -16, 200, 30); c.fillStyle = P.stripe; c.fillRect(-100, -19, 200, 4); c.fillStyle = P.trim; c.fillRect(-100, -38, 200, 3);
         c.restore(); path(); paint(c, null, 3);
         for (const x of [-42, -18, 6, 30, 52]) { circ(c, x, -28, 3.6, '#2b4a6a', 2); }
       } else { c.save(); path(); c.clip(); c.strokeStyle = '#a8703f'; c.lineWidth = 1.5; for (let y = -36; y < 0; y += 6) { c.beginPath(); c.moveTo(-100, y); c.lineTo(100, y - 2); c.stroke(); } c.restore(); path(); paint(c, null, 3); }
-      rrect(c, -96, -44, 192, 4, 2, '#8a5a3a', 2);
+      rrect(c, -96, -44, 192, 4, 2, P.rail, 2);
     }
     if (n >= 4) {
       rrect(c, 16, -200, 5, 160, 2, '#a8703f', 2);
@@ -8861,18 +8985,19 @@ Object.assign(SHIP, {
       seg(c, 18, -172, -90, -44, '#c8a878', 1.4); seg(c, 18, -192, 120, -40, '#c8a878', 1.4); seg(c, 94, -48, 122, -40, '#8a5a30', 3);
     }
     if (n >= 5) {
-      c.beginPath(); c.moveTo(-22, -164); c.quadraticCurveTo(18, -150, 58, -164); c.lineTo(62, -76); c.quadraticCurveTo(18, -60, -26, -76); c.closePath(); paint(c, '#fffaf0', 2.5);
-      circ(c, 18, -120, 16, '#ffd23c', 2); circ(c, 18, -120, 9, '#ff9f2b', 0);
-      rrect(c, -26, -82, 88, 5, 2, '#e8503a', 0); rrect(c, -22, -164, 80, 5, 2, '#e8503a', 0);
-      poly(c, [22, -150, 118, -42, 26, -54], '#fffaf0', 2);
+      c.beginPath(); c.moveTo(-22, -164); c.quadraticCurveTo(18, -150, 58, -164); c.lineTo(62, -76); c.quadraticCurveTo(18, -60, -26, -76); c.closePath(); paint(c, P.sail, 2.5);
+      if (P.emblem === 'sun') { circ(c, 18, -120, 16, '#ffd23c', 2); circ(c, 18, -120, 9, '#ff9f2b', 0); }
+      else {          // a skull and crossbones
+        for (const s of [-1, 1]) { seg(c, 18 - 16 * s, -100, 18 + 16 * s, -80, '#f4f1e8', 5); circ(c, 18 - 16 * s, -100, 3, '#f4f1e8', 0); circ(c, 18 + 16 * s, -80, 3, '#f4f1e8', 0); }
+        circ(c, 18, -124, 14, '#f4f1e8', 2); rrect(c, 9, -114, 18, 9, 3, '#f4f1e8', 2);
+        circ(c, 12, -125, 3.6, '#1d1c22', 0); circ(c, 24, -125, 3.6, '#1d1c22', 0); circ(c, 18, -117, 1.8, '#1d1c22', 0);
+      }
+      rrect(c, -26, -82, 88, 5, 2, P.band, 0); rrect(c, -22, -164, 80, 5, 2, P.band, 0);
+      poly(c, [22, -150, 118, -42, 26, -54], P.sail, 2);
     }
-    if (n >= 6) { for (let x = -88; x <= 86; x += 11) seg(c, x, -44, x, -54, '#ffffff', 1.6); seg(c, -88, -54, 86, -54, '#ffffff', 2); c.beginPath(); c.arc(this.WHEEL_X, -62, 9, 0, TAU); c.lineWidth = 2.4; c.strokeStyle = '#a8703f'; c.stroke(); seg(c, this.WHEEL_X, -53, this.WHEEL_X, -44, '#8a5a30', 2.4); poly(c, [74, -30, 70, -16, 78, -16], '#4a4a52', 1.5); }
-    if (n >= 7) { rrect(c, -90, -68, 30, 24, 3, '#fff3d6', 2.5); rrect(c, -93, -72, 36, 5, 2, '#e8503a', 2); circ(c, -82, -56, 3.4, '#9fdcf7', 1.8); circ(c, -68, -56, 3.4, '#9fdcf7', 1.8); }
-    if (n >= 8) { const wv = Math.sin(t * 6) * 3; poly(c, [18, -212, 18 - 26, -206 + wv, 18 - 24, -196 + wv, 18, -200], '#ffd23c', 2); circ(c, 18 - 12, -204 + wv * 0.6, 3, '#ffffff', 0); }
-    c.restore();
-    if (!this.launched() && n < 8) {          // scaffolding in front while it is built
-      for (const dx of [-80, -10, 60]) { const x = this.ON_SLIP + dx * K2; seg(c, x, by + 6, x, by - 85, '#c9a46a', 4); seg(c, x + 20, by + 6, x + 20, by - 85, '#c9a46a', 4); rrect(c, x - 3, by - 60, 26, 4, 1, '#b98a55', 1.5); }
-    }
+    if (n >= 6) { for (let x = -88; x <= 86; x += 11) seg(c, x, -44, x, -54, P.post, 1.6); seg(c, -88, -54, 86, -54, P.post, 2); c.beginPath(); c.arc(this.WHEEL_X, -62, 9, 0, TAU); c.lineWidth = 2.4; c.strokeStyle = '#a8703f'; c.stroke(); seg(c, this.WHEEL_X, -53, this.WHEEL_X, -44, '#8a5a30', 2.4); poly(c, [74, -30, 70, -16, 78, -16], '#4a4a52', 1.5); }
+    if (n >= 7) { rrect(c, -90, -68, 30, 24, 3, P.cabin, 2.5); rrect(c, -93, -72, 36, 5, 2, P.roof, 2); circ(c, -82, -56, 3.4, '#9fdcf7', 1.8); circ(c, -68, -56, 3.4, '#9fdcf7', 1.8); }
+    if (n >= 8) { const wv = Math.sin(t * 6) * 3; poly(c, [18, -212, 18 - 26, -206 + wv, 18 - 24, -196 + wv, 18, -200], P.flag[0][0], 2); circ(c, 18 - 12, -204 + wv * 0.6, 3, P.flagDot, 0); }
   },
   drawGate2D(c, t) {
     const Q = this.QUAY, x = Q.x0, open = this.launched();
@@ -9021,6 +9146,834 @@ MINI.quiz = function (who, done) {
 document.getElementById('partsBox').addEventListener('click', () => { if (game.mode === 'play') { Sfx.play('tap'); Parts.open(); } });
 document.getElementById('ptOk').addEventListener('click', () => { Sfx.play('tap'); Parts.close(); });
 
+/* ============================== KORSAN (4. bölüm) ==============================
+   Out at sea, east of the island, the child sails our ship (Sparky on deck) and fights Captain Grumble the pirate,
+   who took the family album. Steer with the arrow keys or the joystick (or point with the mouse); sail over a floating
+   crate, answer its three questions and the cannon is loaded; drag the cannon button to aim (dots and a ring show where
+   the ball will fall), let go to fire. There is no help with aiming: a miss means another crate. The pirate fires back,
+   and a red ring on the water shows where each ball will fall, so you can steer away. Five hits, one for each part of
+   the unit 1 quiz (family words, am / is / are, isn't / aren't, questions and short answers, I'm / He's / They're), and
+   he gives the album back, page by page. First a short practice: one crate and a floating target.
+   Steering the ship is the sea's own mode (SEA.active), so later the child can sail on to other islands. */
+const SEA_TOPICS = ['family', 'tobe', 'not', 'ask', 'short'];
+const wrapA = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+const SEA = {
+  AREA: { x0: 3600, y0: -800, x1: 9800, y1: 3300 },       // the open sea east of the island (its coast is at x 3400)
+  GOAL: { x: 7000, y: 1100 },                             // far out at sea, where Captain Grumble shows up (Sunny Hill is out of sight)
+  START: { x: 3800, y: 1500 },                            // just out of the harbour, the bow to the east
+  BUOY: { x: 4440, y: 1380 },                             // the practice target
+  RANGE: 1000, HALF: 190, BEAM: 62,                       // how far the cannon shoots; half the ship's length and beam
+  CRUISE: 150,                                            // the wind in the sails: with no steering the ship keeps going this fast
+  // live, not saved
+  active: false, ship: null, pirate: null, buoy: null, balls: [], shots: [], crates: [], drops: [], rings: [], bits: [], wake: [], puffs: [],
+  loaded: false, aim: null, steer: null, page: null, crateT: 0, endT: 0, outT: 0, goal: null, mapItem: null, smokeT: 0, shake: 0, zoom: 2, playT: 0, wakeT: 0, aimTold: false, quiz: false,
+  qOrder: {}, qi: {}, M: null, PM: null, tiles: null,
+  st() {
+    const s = state.sea && typeof state.sea === 'object' ? state.sea : (state.sea = {});
+    if (!s.stage) s.stage = '';
+    s.hits = clamp(s.hits | 0, 0, 5);
+    return s;
+  },
+  open() { return !!(state.ship && state.ship.capt); },        // level 4 begins after the Junior Captain certificate
+  won() { return this.st().stage === 'won'; },
+  fight() { return this.active && this.st().stage !== 'sail' && !!this.pirate && !this.pirate.enter; },
+  music() {
+    if (!this.active) return null;
+    const P = this.pirate;
+    return P && !P.enter && !P.flag && this.st().hits < 5 ? 'pirate' : 'village';
+  },
+  // ---- the quest card, Sparky's arrow, the HUD
+  card() {
+    const s = this.st(), K = GAME_CONTENT.sea.card, P = this.pirate;
+    if (!this.active || s.stage === 'won') return s.stage === 'won' ? ['sparky', K.won] : ['sparky', K.go];
+    if (this.mapItem || (!P && s.hits >= 5)) return ['sparky', K.map];
+    if (P && (P.flee || s.hits >= 5)) return ['pirate', K.flee];
+    if (this.goal || this.outT > 0 || (P && P.enter)) return ['sparky', K.out];
+    if (!P) return ['sparky', this.loaded ? K.buoy : K.crate];
+    return ['pirate', this.loaded ? K.fire : K.load];
+  },
+  target() { return this.active || this.won() ? null : SHIP.helmSpot(); },        // (at sea, the arrow is drawn on the ship)
+  seaTarget() {
+    const P = this.pirate;
+    if (this.mapItem) return this.mapItem;
+    if (this.goal) return this.goal;
+    if (P && (P.enter || P.flee)) return P.enter ? P : null;
+    if (this.loaded) return P || this.buoy;
+    return this.crates[0] || null;
+  },
+  hud() {
+    const on = this.active && !!this.pirate && !this.pirate.enter, bar = $('bossBar');
+    if (!on) return;
+    bar.classList.remove('hidden'); document.body.classList.add('boss');
+    $('bbName').innerHTML = '🏴‍☠️ <span>' + GAME_CONTENT.characters.pirate.name.toUpperCase() + '</span>';
+    const sl = $('bbSlots'), n = this.st().hits;
+    if (sl.children.length !== 5 || sl.dataset.k !== 'sea') { sl.textContent = ''; sl.dataset.k = 'sea'; for (let i = 0; i < 5; i++) sl.appendChild(el('span', null, '📖')); }
+    for (let i = 0; i < 5; i++) sl.children[i].classList.toggle('on', i < n);
+    bar.classList.toggle('calm', n >= 5);
+    requestAnimationFrame(() => LAB.placeBar());
+  },
+  fireUI() {
+    const b = $('seaFire'), C = GAME_CONTENT.sea;
+    b.classList.toggle('hidden', !this.active || game.mode !== 'play' && game.mode !== 'dialog' || this.st().hits >= 5 || !!this.goal || this.outT > 0 || !!(this.pirate && this.pirate.enter));
+    b.classList.toggle('loaded', this.loaded);
+    $('sfIcon').textContent = this.loaded ? '💣' : '📦';
+    $('sfLbl').textContent = this.loaded ? C.btnFire : C.btnLoad;
+  },
+  // ---- the ship's wheel in the harbour: off to sea
+  wheel() {
+    const C = GAME_CONTENT.sea;
+    if (this.won()) { Dialog.show(C.after); return; }
+    Dialog.show(C.go, () => this.start());
+  },
+  start() {
+    const s = this.st(), C = GAME_CONTENT.sea;
+    if (s.hits >= 5 && s.stage !== 'map') s.stage = 'won';
+    if (s.stage === 'won') return;
+    if (s.stage !== 'fight' && s.stage !== 'map') s.stage = 'sail';
+    Save.save();
+    this.reset();
+    this.active = true;
+    this.ship = { x: this.START.x, y: this.START.y, a: 0, v: 60, turn: 0, bank: 0, slow: 0, inv: 0, recoil: 0, aimA: 0 };
+    // the practice near home; or (back again) straight out to sea to find him, or his map
+    let say = C.sail;
+    if (s.stage === 'fight') { this.goal = { x: this.GOAL.x, y: this.GOAL.y }; say = C.back; }
+    else if (s.stage === 'map') { this.mapItem = { x: this.GOAL.x + 300, y: this.GOAL.y - 150, t: 0, sd: 1 }; say = C.mapBack; }
+    else this.buoy = { x: this.BUOY.x, y: this.BUOY.y, t: 0 };
+    flashScreen(); Talk.hide();
+    player.path = null; player.goal = null; player.moving = false;
+    this.fr = null; this.ins = null; this.k2 = 0; this.zoom = 0;
+    const z = this.zoomWant(); if (G3.on) this.zoom = z; else this.k2 = z;
+    this.fr = null; snapCamera();
+    Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+    Dialog.show(say, () => { this.crateT = 0.4; Hud.cardKey = ''; Hud.refresh(); this.fireUI(); });
+  },
+  end() {                  // back in the harbour, at the wheel
+    this.active = false; this.reset();
+    flashScreen(); snapCamera();
+    $('bossBar').classList.add('hidden'); document.body.classList.remove('boss');
+    Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+  },
+  reset() {
+    this.ship = null; this.pirate = null; this.buoy = null; this.loaded = false; this.aim = null; this.steer = null; this.page = null; this.quiz = false;
+    for (const k of ['balls', 'shots', 'crates', 'drops', 'rings', 'bits', 'wake', 'puffs']) this[k].length = 0;
+    this.crateT = 0; this.endT = 0; this.outT = 0; this.shake = 0; this.aimTold = false; this.tipped = false; this.hurtTold = false;
+    this.goal = null; this.mapItem = null; this.mapDropped = false; this.smokeT = 0;
+    if ($('seaFire')) $('seaFire').classList.remove('aiming');
+  },
+  // ---- every frame
+  update(dt) {
+    const s = this.st(), play = game.mode === 'play';
+    if (this.active && this.ship && !G3.on) { const k = this.frame().zoom; this.k2 = this.k2 ? this.k2 + (k - this.k2) * Math.min(1, dt * (k > this.k2 ? 1.2 : 3)) : k; }
+    if (this.open() && !s.told && !this.active) {        // Sparky: the ship is ready, let's sail
+      this.playT = play && !Dialog.open ? this.playT + dt : 0;
+      if (this.playT > 2.5) { s.told = 1; Save.save(); Dialog.show(GAME_CONTENT.sea.told, () => Hud.refresh()); }
+    }
+    if (!this.active) return;
+    this.fx(dt);
+    this.shake = Math.max(0, this.shake - dt * 1.8);
+    if (this.page && (this.page.t += dt / 1.1) >= 1) this.pageHome();
+    if (!play) return;
+    this.sail(dt);
+    if (this.buoy) this.buoy.t += dt;
+    if (this.pirate) this.pirateAI(dt);
+    if (this.outT > 0 && (this.outT -= dt) <= 0) {          // after the target: out to sea
+      this.goal = { x: this.GOAL.x, y: this.GOAL.y };
+      Dialog.show(GAME_CONTENT.sea.out, () => { Hud.cardKey = ''; Hud.refresh(); });
+      Hud.cardKey = ''; Hud.refresh();
+    }
+    if (this.goal && !this.pirate && Math.hypot(this.goal.x - this.ship.x, this.goal.y - this.ship.y) < 900) { this.goal = null; this.spawnPirate(true); }
+    this.moveBalls(dt); this.moveShots(dt); this.crateTick(dt); this.mapTick(dt); this.smoke(dt);
+    if (this.endT > 0 && (this.endT -= dt) <= 0) this.finish();
+  },
+  sail(dt) {
+    const S = this.ship, A = this.AREA;
+    let vx = keys.right - keys.left, vy = keys.down - keys.up, spf = 1;
+    if (!vx && !vy && Joy.m > 0) { vx = Joy.vx; vy = Joy.vy; spf = Joy.speed; }
+    if (vx || vy) this.steer = null;
+    else if (this.steer) {            // sailing to where the mouse (or a finger) pointed
+      const dx = this.steer.x - S.x, dy = this.steer.y - S.y, d = Math.hypot(dx, dy);
+      if (d < 70 || game.t - this.steer.t > 14) this.steer = null; else { vx = dx / d; vy = dy / d; spf = clamp(d / 260, 0.45, 1); }
+    }
+    const m = 200;                    // near the edge of the sea the ship turns back on its own
+    if (S.x < A.x0 + m) vx += 1.6; else if (S.x > A.x1 - m) vx -= 1.6;
+    if (S.y < A.y0 + m) vy += 1.6; else if (S.y > A.y1 - m) vy -= 1.6;
+    let want = 0, rate = 0;
+    if (vx || vy) {
+      const d = wrapA(Math.atan2(vy, vx) - S.a), turn = 2.3 * dt;
+      rate = clamp(d, -turn, turn); S.a = wrapA(S.a + rate);
+      want = Math.max(this.CRUISE, 250 * Math.min(1, spf)) * Math.max(0.5, Math.cos(d));          // (a sharp turn slows it, a little)
+    } else want = this.CRUISE;
+    S.turn = rate / Math.max(dt, 1e-3);
+    S.bank += (clamp(S.turn * 0.05, -0.09, 0.09) - S.bank) * Math.min(1, dt * 4);
+    if (S.slow > 0) { S.slow -= dt; want *= 0.35; }
+    S.v += clamp(want - S.v, -140 * dt, 240 * dt);
+    S.x = clamp(S.x + Math.cos(S.a) * S.v * dt, A.x0 + 40, A.x1 - 40);
+    S.y = clamp(S.y + Math.sin(S.a) * S.v * dt, A.y0 + 40, A.y1 - 40);
+    const P = this.pirate;             // the two ships never sail through each other
+    if (P) { const dx = S.x - P.x, dy = S.y - P.y, d = Math.hypot(dx, dy) || 1, min = 330; if (d < min) { const k = (min - d) / 2 / d; S.x += dx * k; S.y += dy * k; P.x -= dx * k; P.y -= dy * k; } }
+    if (S.inv > 0) S.inv -= dt;
+    S.recoil = Math.max(0, S.recoil - dt * 3);
+    // the cannon turns to where you aim, or looks ahead
+    const goal = this.aim ? Math.atan2(this.aimPoint().y - this.cannonPos().y, this.aimPoint().x - this.cannonPos().x) : S.a;
+    S.aimA = wrapA(S.aimA + clamp(wrapA(goal - S.aimA), -6 * dt, 6 * dt));
+    if ((this.wakeT -= dt) <= 0 && S.v > 30) { this.wakeT = 0.09; this.wake.push({ x: S.x - Math.cos(S.a) * 170, y: S.y - Math.sin(S.a) * 170, t: 0, s: Math.min(1, S.v / 250) }); }
+  },
+  // ---- the crates
+  crateTick(dt) {
+    const P = this.pirate;
+    if (this.loaded || this.quiz || this.shots.length || this.outT > 0 || this.mapItem || (!P && !this.buoy) || (P && (P.enter || P.flee || this.st().hits >= 5))) return;
+    if (!this.crates.length) { if ((this.crateT -= dt) <= 0) this.spawnCrate(); return; }
+    const S = this.ship, c = this.crates[0];
+    c.t += dt; c.x += c.vx * dt; c.y += c.vy * dt;
+    const dx = c.x - S.x, dy = c.y - S.y, al = dx * Math.cos(S.a) + dy * Math.sin(S.a), sd = -dx * Math.sin(S.a) + dy * Math.cos(S.a);
+    if (Math.abs(al) < this.HALF + 20 && Math.abs(sd) < this.BEAM + 36) this.takeCrate();
+  },
+  spawnCrate() {
+    const S = this.ship, A = this.AREA, P = this.pirate;
+    let best = null;
+    for (let k = 0; k < 60 && !best; k++) {
+      const ang = S.a + (Math.random() - 0.5) * (k < 30 ? 2.2 : 6.2), d = 420 + Math.random() * 260, x = S.x + Math.cos(ang) * d, y = S.y + Math.sin(ang) * d;
+      if (x < A.x0 + 240 || x > A.x1 - 240 || y < A.y0 + 240 || y > A.y1 - 240) continue;
+      if (P && Math.hypot(x - P.x, y - P.y) < 420) continue;
+      if (this.buoy && Math.hypot(x - this.buoy.x, y - this.buoy.y) < 220) continue;
+      best = { x, y };
+    }
+    if (!best) best = { x: clamp(S.x + 420, A.x0 + 300, A.x1 - 300), y: clamp(S.y - 240, A.y0 + 300, A.y1 - 300) };
+    this.crates = [{ x: best.x, y: best.y, t: 0, vx: (Math.random() - 0.5) * 18, vy: (Math.random() - 0.5) * 12, sd: Math.random() * 6 }];
+    Sfx.tone(784, 0.1, 'triangle', 0.06); Sfx.tone(1047, 0.12, 'triangle', 0.05, 0.1);
+  },
+  takeCrate() {
+    const s = this.st(), c = this.crates[0];
+    this.crates = []; this.quiz = true; Sfx.play('pick');
+    for (const b of this.balls) this.splash(b.tx, b.ty, 0.6);
+    this.balls.length = 0;
+    this.splash(c.x, c.y, 0.6);
+    const topic = s.stage === 'sail' ? 'family' : SEA_TOPICS[Math.min(4, s.hits)];
+    const rest = () => { if (this.pirate) this.pirate.fireT = Math.max(this.pirate.fireT, 2); };
+    MINI.sea(topic, () => { this.quiz = false; rest(); this.load(); }, () => { this.quiz = false; rest(); this.crateT = 0.8; this.fireUI(); });
+  },
+  load() {
+    const C = GAME_CONTENT.sea;
+    this.loaded = true;
+    Sfx.tone(523, 0.12, 'square', 0.05); Sfx.tone(659, 0.12, 'square', 0.05, 0.1); Sfx.tone(784, 0.2, 'square', 0.06, 0.2);
+    Toast.show('💣 ' + C.ready);
+    if (!this.aimTold) { this.aimTold = true; Dialog.show(C.loaded, () => { Hud.refresh(); this.fireUI(); }); }
+    else Speech.speak(C.ready, { who: 'narrator' });
+    Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+  },
+  // ---- aiming: the cannon button is dragged (the ball goes the way you drag, further the more you drag)
+  fireDown(e) {
+    e.preventDefault(); e.stopPropagation(); Sfx.unlock();
+    if (!this.active || game.mode !== 'play') return;
+    const C = GAME_CONTENT.sea, b = $('seaFire');
+    if (!this.loaded) { Sfx.play('no'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); Toast.show('📦 ' + C.needCrate, true); return; }
+    const r = b.getBoundingClientRect();
+    this.aim = { id: e.pointerId, cx: r.left + r.width / 2, cy: r.top + r.height / 2, dx: 0, dy: 0 };
+    try { b.setPointerCapture(e.pointerId); } catch (err) { /* old browsers */ }
+    b.classList.add('aiming');
+  },
+  fireMove(e) { const a = this.aim; if (!a || e.pointerId !== a.id) return; e.preventDefault(); a.dx = e.clientX - a.cx; a.dy = e.clientY - a.cy; },
+  fireUp(e) {
+    const a = this.aim; if (!a || e.pointerId !== a.id) return;
+    $('seaFire').classList.remove('aiming');
+    const p = this.aimPoint(); this.aim = null;
+    if (!p || game.mode !== 'play' || !this.loaded) return;
+    if (Math.hypot(a.dx, a.dy) < 18) { const C = GAME_CONTENT.sea; Toast.show('👆 ' + C.dragHint, true); Speech.speak(C.dragHint, { who: 'narrator' }); return; }
+    this.fire(p);
+  },
+  aimPoint() {
+    const a = this.aim; if (!a || !this.ship) return null;
+    const len = Math.hypot(a.dx, a.dy), k = G3.on ? Math.sin(CAM3.pitch) : 1, wx = a.dx, wz = a.dy / k, wl = Math.hypot(wx, wz);
+    const c = this.cannonPos();
+    if (wl < 1) return { x: c.x + Math.cos(this.ship.a) * 170, y: c.y + Math.sin(this.ship.a) * 170 };
+    const d = 170 + clamp((len - 18) / 130, 0, 1) * (this.RANGE - 170);
+    return { x: c.x + wx / wl * d, y: c.y + wz / wl * d };
+  },
+  cannonPos() { const S = this.ship; return { x: S.x + Math.cos(S.a) * 116, y: S.y + Math.sin(S.a) * 116, h: 44 }; },
+  fire(p) {
+    const c = this.cannonPos(), d = Math.hypot(p.x - c.x, p.y - c.y), S = this.ship;
+    S.aimA = Math.atan2(p.y - c.y, p.x - c.x);
+    this.shots.push({ sx: c.x, sy: c.y, h0: c.h, tx: p.x, ty: p.y, t: 0, T: 0.7 + d / 1500 });
+    this.loaded = false; S.recoil = 1; this.shake = Math.max(this.shake, 0.25);
+    this.puffs.push({ x: c.x + Math.cos(S.aimA) * 30, y: c.y + Math.sin(S.aimA) * 30, h: c.h + 6, t: 0, s: 1.3 });
+    Sfx.tone(95, 0.35, 'sine', 0.22, 0, 40); Sfx.crack(0.6);
+    Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+  },
+  moveShots(dt) {
+    for (const b of this.shots) { b.t += dt; if (b.t >= b.T) { b.dead = true; this.land(b); } }
+    if (this.shots.length) this.shots = this.shots.filter((b) => !b.dead);
+  },
+  ballPos(b) { const k = clamp(b.t / b.T, 0, 1); return { x: b.sx + (b.tx - b.sx) * k, y: b.sy + (b.ty - b.sy) * k, h: b.h0 * (1 - k) + (WATER_Y3 + 4) * k + 4 * k * (1 - k) * Math.max(160, Math.hypot(b.tx - b.sx, b.ty - b.sy) * 0.42) }; },
+  land(b) {
+    const P = this.pirate, C = GAME_CONTENT.sea;
+    if (P && !P.enter && !P.flee && this.st().hits < 5 && this.inHull(P, b.tx, b.ty, 40)) { this.hitPirate(b); return; }
+    if (this.buoy && Math.hypot(b.tx - this.buoy.x, b.ty - this.buoy.y) < 80) { this.hitBuoy(); return; }
+    const land = shoreC(b.tx, b.ty) >= 8, say = land ? C.missLand : C.miss;
+    if (land) {          // on the island's sand or grass
+      const g = groundH3(b.tx, b.ty);
+      for (let i = 0; i < 4; i++) this.puffs.push({ x: b.tx + (Math.random() - 0.5) * 40, y: b.ty + (Math.random() - 0.5) * 24, h: g + 8 + i * 6, t: -i * 0.06, s: 1.2 });
+      Sfx.tone(80, 0.25, 'sine', 0.12, 0, 40);
+    } else this.splash(b.tx, b.ty, 1.1);
+    Toast.show((land ? '💨 ' : '🌊 ') + say, true); Speech.speak(say, { who: 'narrator' });
+    this.crateT = 1.2;
+  },
+  // is (x, y) on a ship (a little more round it: pad)?
+  inHull(o, x, y, pad) {
+    const dx = x - o.x, dy = y - o.y, al = dx * Math.cos(o.a) + dy * Math.sin(o.a), sd = -dx * Math.sin(o.a) + dy * Math.cos(o.a);
+    if (Math.abs(al) > this.HALF + pad) return false;
+    return Math.abs(sd) < this.BEAM * Math.sqrt(Math.max(0, 1 - (al / (this.HALF + 12)) ** 2)) + pad;
+  },
+  hitBuoy() {
+    const B = this.buoy, C = GAME_CONTENT.sea;
+    this.buoy = null; this.burst(B.x, B.y, 1);
+    Fx.confetti(); Sfx.play('star'); Toast.show('🎯 ' + C.buoyHit); Speech.speak(C.buoyHit, { who: 'narrator' });
+    this.outT = 1.6; this.crates = [];
+    Hud.cardKey = ''; Hud.refresh();
+  },
+  // ---- Captain Grumble
+  spawnPirate(enter) {
+    const S = this.ship, A = this.AREA, d = enter ? 1300 : 720;          // ahead of us
+    const x = clamp(S.x + Math.cos(S.a) * d, A.x0 + 300, A.x1 - 260), y = clamp(S.y + Math.sin(S.a) * d, A.y0 + 300, A.y1 - 300);
+    this.pirate = { x, y, a: Math.atan2(S.y - y, S.x - x), v: enter ? 160 : 0, dir: Math.random() < 0.5 ? 1 : -1, flipT: 9, fireT: enter ? 3.2 : 2.6, hitT: 0, rock: 0, flag: 0, enter: enter ? 1 : 0, t: 0 };
+    if (enter) { Sfx.tone(196, 0.5, 'sawtooth', 0.05, 0, 147); Hud.cardKey = ''; Hud.refresh(); }
+    else this.hud();
+  },
+  pirateAI(dt) {
+    const P = this.pirate, S = this.ship, A = this.AREA, s = this.st(), h = s.hits;
+    P.t += dt; P.hitT = Math.max(0, P.hitT - dt); P.rock *= Math.exp(-dt * 1.6);
+    const dx = P.x - S.x, dy = P.y - S.y, d = Math.hypot(dx, dy) || 1;
+    if (P.flee) {
+      const A2 = this.AREA, C = GAME_CONTENT.sea;
+      P.fleeT += dt;
+      P.a = wrapA(P.a + clamp(wrapA(Math.atan2(dy, dx) - P.a), -1.4 * dt, 1.4 * dt));
+      P.v += clamp(300 - P.v, -110 * dt, 120 * dt);
+      P.x += Math.cos(P.a) * P.v * dt; P.y += Math.sin(P.a) * P.v * dt;          // (off the edge of the sea, too)
+      if (!this.mapDropped && P.fleeT > 1.3) {
+        this.mapDropped = true;
+        const mx = clamp(P.x - Math.cos(P.a) * 160, A2.x0 + 260, A2.x1 - 260), my = clamp(P.y - Math.sin(P.a) * 160, A2.y0 + 260, A2.y1 - 260);
+        this.mapItem = { x: mx, y: my, t: 0, sd: 2 }; this.splash(mx, my, 0.8);
+        Toast.show('🗺️ ' + C.dropped); Speech.speak(C.dropped, { who: 'sparky' });
+        Hud.cardKey = ''; Hud.refresh();
+      }
+      if (P.fleeT > 9 || d > 2600) {
+        this.pirate = null; $('bossBar').classList.add('hidden'); document.body.classList.remove('boss');
+        Hud.cardKey = ''; Hud.refresh();
+      }
+      return;
+    }
+    let want = 0;
+    if (!P.flag) {
+      const R = P.enter ? 560 : 660 - h * 18, ux = dx / d, uy = dy / d, k = clamp((R - d) / R * 2.2, -1, 1);
+      let wx = -uy * P.dir + ux * k, wy = ux * P.dir + uy * k;
+      if (P.x < A.x0 + 280) wx += 1.6; else if (P.x > A.x1 - 280) wx -= 1.6;
+      if (P.y < A.y0 + 280) wy += 1.6; else if (P.y > A.y1 - 280) wy -= 1.6;
+      P.a = wrapA(P.a + clamp(wrapA(Math.atan2(wy, wx) - P.a), -1.1 * dt, 1.1 * dt));
+      want = (P.enter ? 170 : 105 + h * 16) * (P.hitT > 0 ? 0.3 : 1);
+      if ((P.flipT -= dt) <= 0) { P.dir = -P.dir; P.flipT = 8 + Math.random() * 6; }
+    }
+    P.v += clamp(want - P.v, -110 * dt, 150 * dt);
+    P.x = clamp(P.x + Math.cos(P.a) * P.v * dt, A.x0 + 60, A.x1 - 60); P.y = clamp(P.y + Math.sin(P.a) * P.v * dt, A.y0 + 60, A.y1 - 60);
+    if (P.enter) {                 // sailing in: when he is near, he says who he is, and the fight begins
+      if (d < 860 || P.t > 6) {
+        P.enter = 0; P.v = 80;
+        Dialog.show(this.st().stage === 'fight' ? GAME_CONTENT.sea.again : GAME_CONTENT.sea.pirate, () => { const st = this.st(); st.stage = 'fight'; Save.save(); this.crateT = 0.6; Hud.cardKey = ''; Hud.refresh(); this.fireUI(); });
+      }
+      return;
+    }
+    if (P.flag || P.hitT > 0 || s.hits >= 5) return;
+    if ((P.fireT -= dt) > 0) return;
+    // a volley: one ball a little ahead of our ship (sail on fast, or turn, and it misses); from the 2nd hit a second one
+    // where it will be if it sails straight on (turn!); from the 4th a third one close by
+    const n = h < 2 ? 1 : h < 4 ? 2 : 3, T = 1.9 - h * 0.06;
+    const nx = -Math.sin(P.a), ny = Math.cos(P.a), side = (S.x - P.x) * nx + (S.y - P.y) * ny > 0 ? 1 : -1;
+    for (let i = 0; i < n; i++) {
+      const lead = i === 1 ? 0.9 : i === 0 ? 0.25 : 0, tx = S.x + Math.cos(S.a) * S.v * T * lead, ty = S.y + Math.sin(S.a) * S.v * T * lead;
+      const sp = i === 0 ? 20 + Math.random() * 30 : i === 1 ? 80 + Math.random() * 70 : 160 + Math.random() * 90, ang = Math.random() * TAU, along = (i - (n - 1) / 2) * 90;
+      const sx = P.x + nx * side * 70 + Math.cos(P.a) * along, sy = P.y + ny * side * 70 + Math.sin(P.a) * along;
+      this.balls.push({ sx, sy, h0: 40, tx: tx + Math.cos(ang) * sp, ty: ty + Math.sin(ang) * sp * 0.8, t: -i * 0.24, T });
+      this.puffs.push({ x: sx + nx * side * 16, y: sy + ny * side * 16, h: 40, t: -i * 0.24, s: 1 });
+    }
+    P.fireT = Math.max(1.8, 3.4 - h * 0.4);
+    Sfx.tone(110, 0.3, 'sine', 0.13, 0, 50);
+  },
+  moveBalls(dt) {
+    const S = this.ship;
+    for (const b of this.balls) {
+      if (b.sure && b.t < b.T - 0.25) { b.tx = S.x; b.ty = S.y; }          // (the last one follows the ship)
+      b.t += dt;
+      if (b.t < b.T) continue;
+      b.dead = true; this.splash(b.tx, b.ty, 0.9);
+      if ((b.sure || !(S.inv > 0)) && this.inHull(S, b.tx, b.ty, 8)) this.hitUs(b);
+    }
+    if (this.balls.length) this.balls = this.balls.filter((b) => !b.dead);
+  },
+  hitUs(b) {
+    const S = this.ship;
+    S.slow = 1.3; S.inv = 1.8; this.shake = 0.7; S.bank = (Math.random() < 0.5 ? -1 : 1) * 0.12;
+    this.burst(b.tx, b.ty, 0.6);
+    Sfx.tone(880, 0.12, 'sine', 0.12, 0, 440); Sfx.tone(660, 0.18, 'triangle', 0.08, 0.1, 990);
+    if (this.pirate) this.pirate.fireT = Math.max(this.pirate.fireT, 2.8);
+    const s = this.st(); s.dmg = Math.min(9, (s.dmg | 0) + 1); Save.save();
+    if (b.sure) { const say = GAME_CONTENT.sea.lastHit; Toast.show('💥 ' + say, true); Speech.speak(say, { who: 'sparky' }); }
+    else if (!this.tipped) { this.tipped = true; const tip = GAME_CONTENT.sea.keepSailing; Toast.show('🐶 ' + tip, true); Speech.speak(tip, { who: 'sparky' }); }
+    else if (s.dmg >= 3 && !this.hurtTold) { this.hurtTold = true; const tip = GAME_CONTENT.sea.hurt; Toast.show('🐶 ' + tip, true); Speech.speak(tip, { who: 'sparky' }); }
+    else Toast.show('💦 ' + GAME_CONTENT.sea.oops, true);
+  },
+  hitPirate(b) {
+    const s = this.st(), P = this.pirate, C = GAME_CONTENT.sea;
+    s.hits = Math.min(5, s.hits + 1);
+    if (s.hits >= 5) s.stage = 'map';          // (he runs away; his map is next)
+    Save.save();
+    P.hitT = 2.3; P.rock = 1; P.fireT = Math.max(P.fireT, 2.8); this.balls.length = 0;
+    this.shake = Math.max(this.shake, 0.6);
+    this.burst(b.tx, b.ty, 1.4);
+    Sfx.crack(1.2); Sfx.tone(70, 0.4, 'sine', 0.25, 0, 35);
+    this.page = { t: 0, x: P.x, y: P.y, n: s.hits };
+    Toast.show('💥 ' + C.hit[(s.hits - 1) % C.hit.length]);
+    if (s.hits >= 5) this.endT = 2.2; else this.crateT = 1.6;
+    Hud.cardKey = ''; Hud.refresh();
+  },
+  // a page of the album flew back to our ship: who is on it
+  pageHome() {
+    const n = this.page.n; this.page = null;
+    const line = this.pageLine(n);
+    Sfx.play('ok'); Toast.show('📖 ' + line); Speech.speak(line, { who: 'player' });
+  },
+  pageLine(n) {
+    const fam = state.family || {}, P = GAME_CONTENT.sea.pages, roles = [];
+    for (const r of ['mother', 'father', 'grandmother', 'grandfather', 'sister', 'brother', 'aunt', 'uncle', 'cousin']) if (fam[r] > 0) roles.push(r);
+    const r = roles[n - 1] || (roles.length ? null : ['mother', 'father', 'grandmother', 'grandfather', 'sister'][n - 1]);
+    return P[r] || P.family;
+  },
+  finish() {               // five hits: Grumble has had enough. He says so, fires one last ball (it finds us) and runs away
+    Dialog.show(GAME_CONTENT.sea.flee, () => {
+      const P = this.pirate, S = this.ship;
+      if (!P || !S) return;
+      P.flee = 1; P.fleeT = 0; P.hitT = 0;
+      this.balls.push({ sx: P.x, sy: P.y, h0: 40, tx: S.x, ty: S.y, t: 0, T: 1.7, sure: 1 });
+      this.puffs.push({ x: P.x, y: P.y, h: 40, t: 0, s: 1.2 }); Sfx.tone(110, 0.3, 'sine', 0.13, 0, 50);
+      Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+    });
+  },
+  // his map, floating: sail over it and it opens (then Sparky: our ship is broken, the Parrot King's island is near)
+  mapTick(dt) {
+    const M = this.mapItem, S = this.ship;
+    if (!M || this.quiz) return;
+    M.t += dt;
+    const dx = M.x - S.x, dy = M.y - S.y, al = dx * Math.cos(S.a) + dy * Math.sin(S.a), sd = -dx * Math.sin(S.a) + dy * Math.cos(S.a);
+    if (Math.abs(al) < this.HALF + 30 && Math.abs(sd) < this.BEAM + 46) this.takeMap();
+  },
+  takeMap() {
+    const s = this.st(), M = this.mapItem;
+    this.mapItem = null; s.stage = 'won'; s.map = 1; Save.save();
+    $('toast').classList.add('hidden');
+    this.splash(M.x, M.y, 0.6); Sfx.play('pick');
+    Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+    CaptainCert.open(() => Dialog.show(GAME_CONTENT.sea.end, () => this.end()), 'map');
+  },
+  // a damaged ship smokes (more, the more it has been hit)
+  smoke(dt) {
+    const S = this.ship, n = Math.min(7, this.st().dmg | 0);
+    if (!S || !n || (this.smokeT -= dt) > 0) return;
+    this.smokeT = 1.15 - n * 0.11;
+    const K = SHIP.K, lx = (Math.random() - 0.5) * 130, lz = (Math.random() - 0.5) * 30;
+    this.puffs.push({ x: S.x + (Math.cos(S.a) * lx - Math.sin(S.a) * lz) * K, y: S.y + (Math.sin(S.a) * lx + Math.cos(S.a) * lz) * K, h: HULL.deck(lx) * K + 6, t: 0, s: 1.1 + n * 0.12, dark: 1 });
+  },
+  // ---- splashes, smoke, splinters, the wake
+  splash(x, y, s) {
+    for (let i = 0; i < 12 * s; i++) { const a = Math.random() * TAU, sp = (30 + Math.random() * 80) * s; this.drops.push({ x: x + Math.cos(a) * 10, z: y + Math.sin(a) * 8, y: WATER_Y3, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp * 0.7, vy: (110 + Math.random() * 150) * Math.sqrt(s), t: 0 }); }
+    this.rings.push({ x, y, t: 0, s }, { x, y, t: -0.2, s: s * 0.7 });
+    if (this.drops.length > 260) this.drops.splice(0, this.drops.length - 260);
+    Sfx.tone(240, 0.3, 'sine', 0.08 * s, 0, 90);
+  },
+  burst(x, y, s) {         // a hit on a ship (or the target): splinters, smoke, spray
+    for (let i = 0; i < 14 * s; i++) {
+      const a = Math.random() * TAU, sp = (60 + Math.random() * 150) * s;
+      this.bits.push({ x, y, h: 30, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.8, vh: 120 + Math.random() * 200, rx: Math.random() * 6, rz: Math.random() * 6, wx: (Math.random() - 0.5) * 18, wz: (Math.random() - 0.5) * 18, life: 1.4 + Math.random() * 0.5, k: Math.random() < 0.5 ? 0 : 1 });
+    }
+    for (let i = 0; i < 4; i++) this.puffs.push({ x: x + (Math.random() - 0.5) * 50, y: y + (Math.random() - 0.5) * 30, h: 30 + i * 6, t: -i * 0.08, s: 1.4 * s });
+    this.splash(x, y, 0.7 * s);
+  },
+  fx(dt) {
+    for (const d of this.drops) { d.t += dt; d.vy -= 420 * dt; d.x += d.vx * dt; d.z += d.vz * dt; d.y += d.vy * dt; }
+    if (this.drops.length) this.drops = this.drops.filter((d) => d.y > WATER_Y3 - 6);
+    for (const r of this.rings) r.t += dt;
+    if (this.rings.length) this.rings = this.rings.filter((r) => r.t < 1.5);
+    for (const w of this.wake) w.t += dt;
+    if (this.wake.length) this.wake = this.wake.filter((w) => w.t < 1.6);
+    for (const p of this.puffs) p.t += dt;
+    if (this.puffs.length) this.puffs = this.puffs.filter((p) => p.t < 1.1);
+    for (const b of this.bits) {
+      b.life -= dt; b.vh -= 520 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.h += b.vh * dt; b.rx += b.wx * dt; b.rz += b.wz * dt;
+      if (b.h < WATER_Y3 + 2) { b.h = WATER_Y3 + 2; b.vh = 0; b.vx *= 0.9; b.vy *= 0.9; b.wx *= 0.9; b.wz *= 0.9; }
+    }
+    if (this.bits.length) this.bits = this.bits.filter((b) => b.life > 0);
+  },
+  // ---- the camera: whatever matters now (our ship, the pirate, the crate or the target, where you aim) in the part of
+  // the screen the quest card, the boss bar and the dialog box leave free; as close as that allows, never closer than a minimum
+  camFocus() { const f = this.frame(); return { x: f.x, y: f.y }; },
+  zoomWant() { return this.frame().zoom; },
+  zoom2D() { return this.k2 || this.frame().zoom; },
+  view3D() { const A = this.AREA; return { x0: A.x0 - 700, x1: A.x1 + 400, z0: A.y0 - 500, z1: A.y1 + 500 }; },
+  insets() {            // pixels the HUD covers: at the top (the card and the boss bar), at the bottom (the dialog box)
+    if (this.ins && game.t - this.ins.t < 0.25 && this.ins.w === view.cw && this.ins.h === view.ch && this.ins.d === Dialog.open) return this.ins;
+    let top = 8;
+    for (const id of ['questCard', 'bossBar']) { const e = $(id); if (e && !e.classList.contains('hidden')) top = Math.max(top, e.getBoundingClientRect().bottom + 6); }
+    return (this.ins = { t: game.t, w: view.cw, h: view.ch, d: Dialog.open, top: Math.min(top, view.ch * 0.45), bottom: Dialog.open ? Math.min(Dialog.h + 8, view.ch * 0.5) : 10, side: 8 });
+  },
+  framePts() {           // h: how high above the water (the 3D view leans those up the screen)
+    const S = this.ship, out = [], flat = !G3.on;
+    const ship = (o) => {
+      if (flat) { out.push({ x: o.x - 230, z: o.y + 60, h: 0 }, { x: o.x + 230, z: o.y + 60, h: 0 }, { x: o.x, z: o.y - 300, h: 0 }); return; }
+      const c = Math.cos(o.a), s = Math.sin(o.a);
+      for (const [u, v] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const lx = u * (this.HALF + 20), ly = v * (this.BEAM + 20); out.push({ x: o.x + c * lx - s * ly, z: o.y + s * lx + c * ly, h: 0 }); }
+      out.push({ x: o.x, z: o.y, h: 170 });
+    };
+    const spot = (x, y, r) => { out.push({ x: x - r, z: y - r, h: 0 }, { x: x + r, z: y + r, h: flat ? 0 : 40 }); if (flat) out.push({ x, z: y - r - 40, h: 0 }); };
+    ship(S);
+    const P = this.pirate, far = (o, d) => Math.hypot(o.x - S.x, o.y - S.y) > d;
+    if (P && !far(P, 1500)) ship(P);
+    if (!this.loaded && this.crates[0] && !far(this.crates[0], 950)) spot(this.crates[0].x, this.crates[0].y, 50);
+    if (this.loaded && this.buoy && !P && !far(this.buoy, 1100)) spot(this.buoy.x, this.buoy.y, 60);
+    if (this.mapItem && !far(this.mapItem, 1100)) spot(this.mapItem.x, this.mapItem.y, 50);
+    const ap = this.aim && this.aimPoint(); if (ap) spot(ap.x, ap.y, 60);
+    return out;
+  },
+  frame() {
+    if (this.fr && this.fr.t === game.t && this.fr.g === G3.on) return this.fr;
+    const I = this.insets(), pts = this.framePts(), port = view.cw < view.ch;
+    let f;
+    if (G3.on) {           // the 3D camera looks down at CAM3.pitch from CAM3.D * zoom: the zoom that fits, and the spot to look at
+      const p = CAM3.pitch, sp = Math.sin(p), cp = Math.cos(p), th = Math.tan(CAM3.fov / 2), asp = view.cw / view.ch;
+      const top = 1 - 2 * I.top / view.ch, bot = -1 + 2 * I.bottom / view.ch, left = -1 + 2 * I.side / view.cw, right = 1 - 2 * I.side / view.cw;
+      let z0 = 1e9, z1 = -1e9; for (const q of pts) { z0 = Math.min(z0, q.z); z1 = Math.max(z1, q.z); }
+      const solve = (z) => {
+        const D = CAM3.D * z;
+        let a0 = z0 - D * 0.6, a1 = z1 + D * 0.6, az = 0, mx = 0, mn = 0, xl = -1e9, xh = 1e9;
+        for (let i = 0; i < 24; i++) {         // the spot where the room left above equals the room left below (screen heights run -1..1)
+          az = (a0 + a1) / 2; mx = -1e9; mn = 1e9;
+          for (const q of pts) { const dz = q.z - az, s = ((q.h - 10) * cp - dz * sp) / ((D - (q.h - 10) * sp - dz * cp) * th); mx = Math.max(mx, s); mn = Math.min(mn, s); }
+          if (top - mx > mn - bot) a0 = az; else a1 = az;
+        }
+        for (const q of pts) { const w = (D - (q.h - 10) * sp - (q.z - az) * cp) * th * asp; xl = Math.max(xl, q.x - right * w); xh = Math.min(xh, q.x - left * w); }
+        return { x: (xl + xh) / 2, y: az, ok: mx <= top && mn >= bot && xl <= xh };
+      };
+      const zMax = port ? 3.6 : 3.2;
+      let z = port ? 1.6 : 1.7;
+      while (z < zMax && !solve(z).ok) z = Math.min(zMax, z * 1.05);
+      const s = solve(this.zoom > 0 ? this.zoom : z);
+      f = { x: s.x, y: s.y, zoom: z };
+    } else {               // the flat view: a plain scale
+      let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+      for (const q of pts) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.z); y1 = Math.max(y1, q.z); }
+      const aw = view.cw - 2 * I.side, ah = view.ch - I.top - I.bottom, kMax = clamp(Math.min(view.w, view.h) / 1500, 0.32, 0.6);
+      const k = clamp(Math.min(kMax, aw / (view.scale * (x1 - x0)), ah / (view.scale * (y1 - y0))), 0.2, kMax), sc = view.scale * (this.k2 || k);
+      f = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - (I.top - I.bottom) / 2 / sc, zoom: k };
+    }
+    f.t = game.t; f.g = G3.on;
+    return (this.fr = f);
+  },
+  ease(z, want, dt) { return z + (want - z) * Math.min(1, dt * (want < z ? 1.2 : 3)); },        // (a bigger 3D zoom is further out: out quickly, back in slowly)
+  // the mouse (or a finger) on the sea: sail there
+  tap(x, y) { if (this.ship && game.mode === 'play') { this.steer = { x, y, t: game.t }; tapMark.x = x; tapMark.y = y; tapMark.t = game.t; } },
+
+  /* ---------------- 3D ---------------- */
+  models() {
+    const M = this.M = {};
+    const cn = new MB(110);           // our cannon on the foredeck: a barrel on a carriage with two wheels (it turns as you aim)
+    cn.color('#8a5a30').box(-8, 0, -6, 10, 6, 6);
+    for (const s of [-1, 1]) { cn.push(RX3(T3(2, 3.5, s * 6.8), Math.PI / 2)); cn.color('#6b4430').cyl(0, -0.8, 0, 4.2, 4.2, 1.6, 12); cn.pop(); }
+    cn.push(RZ3(T3(0, 8, 0), -Math.PI / 2 + 0.32)); cn.color('#2b2b33').cyl(0, -4, 0, 3.6, 3, 24, 14); cn.color('#4a4a55').torus(0, 20, 0, 3.4, 1, 14, 5, 'y'); cn.pop();
+    cn.color('#2b2b33').sphere(-4, 8, 0, 4.2, 4.2, 4.2, 10, 6);
+    M.cannon = pack(cn);
+    const gn = new MB(111);           // the pirates' cannons, along both sides
+    for (const x of [-48, -16, 16, 46]) for (const s of [-1, 1]) {
+      gn.push(RX3(T3(x, HULL.top(x) - 9, s * (HULL.half(x) - 1)), s * Math.PI / 2)); gn.color('#1d1c22').cyl(0, 0, 0, 2.6, 2.2, 12, 10); gn.color('#d9b25a').torus(0, 11, 0, 2.4, 0.7, 10, 4, 'y'); gn.pop();
+    }
+    M.guns = pack(gn);
+    const wf = new MB(112); wf.color('#ffffff').box(0, -12, -0.35, 8.2, 0, 0.35); M.whiteFlag = pack(wf);          // (a piece of the masthead flag)
+    M.ball = pack(new MB(113).color('#26262e').sphere(0, 0, 0, 7, 7, 7, 12, 8).color('#6a6a78').sphere(-2.5, 3, 2.5, 2, 2, 2, 6, 4));
+    const cr = new MB(114);           // a floating crate with a gold star on its lid
+    cr.color('#c98f55').box(-17, -8, -17, 17, 20, 17); cr.color('#a8703f');
+    for (const y of [-2, 8]) { cr.box(-17.6, y, -17.6, 17.6, y + 2.4, -16.8); cr.box(-17.6, y, 16.8, 17.6, y + 2.4, 17.6); cr.box(-17.6, y, -17.6, -16.8, y + 2.4, 17.6); cr.box(16.8, y, -17.6, 17.6, y + 2.4, 17.6); }
+    cr.color('#8a5a30').box(-18, 18, -18, 18, 21, 18);
+    const star = []; for (let k = 0; k < 10; k++) { const a = Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 5.2 : 12; star.push([Math.cos(a) * r, Math.sin(a) * r]); }
+    cr.push(RX3(T3(0, 21, 0), -Math.PI / 2)); cr.color('#ffd23c').extrude(star, 0, 2.4); cr.pop();
+    M.crate = pack(cr);
+    const bu = new MB(115);           // the practice target: a striped float with a bull's-eye and a little flag
+    for (let k = 0; k < 4; k++) bu.color(k % 2 ? '#ffffff' : '#e8503a').cyl(0, -10 + k * 6, 0, 16 - k, 15 - k, 6, 18);
+    for (let k = 0; k < 4; k++) bu.color(k % 2 ? '#ffffff' : '#e8503a').cyl(0, 14 + k * 0.3, 0, 13 - k * 3.2, 13 - k * 3.2, 0.3, 20);
+    bu.color('#8a5a30').cyl(0, 14, 0, 0.9, 0.9, 30, 6); bu.color('#ffd23c').box(0, 34, -0.3, 12, 42, 0.3);
+    M.buoy = pack(bu);
+    const pg = new MB(116);           // a page of the family album, flying home
+    pg.color('#fffaf0').box(-9, -11, -0.5, 9, 11, 0.5); pg.color('#9fdcff').box(-7, -1, -0.6, 7, 9, 0.6); pg.color('#7ccf6a').box(-7, -9, -0.6, 7, -1, 0.6);
+    for (const x of [-3, 3]) pg.color(x < 0 ? '#ff7aa2' : '#4aa3ff').sphere(x, -1, -0.8, 2, 3, 0.4, 8, 5);
+    M.page = pack(pg);
+    M.disc = pack(new MB(117).color('#ffffff').disc(0, 0, 0, 1, 28));
+    M.dot = pack(new MB(118).color('#ffffff').sphere(0, 0, 0, 3.2, 3.2, 3.2, 8, 5));
+    M.plank = pack(new MB(119).color('#a8703f').box(-1.4, -0.7, -6, 1.4, 0.7, 6));
+    // burnt, broken planks on our deck: one more for every hit (up to six)
+    M.scorch = [[-40, 12], [36, -14], [-20, -15], [72, 8], [0, 16], [46, 12]].map(([x, z], i) => {
+      const b = new MB(121 + i), y = HULL.deck(x);
+      b.color('#2a201a').box(x - 7, y + 0.2, z - 4.2, x + 7, y + 0.8, z + 4.2);
+      b.color('#7a5634').box(x - 9, y + 0.4, z - 0.8 + (i % 2) * 1.4, x + 9, y + 1.3, z + 0.6 + (i % 2) * 1.4);
+      return pack(b);
+    });
+    // Captain Grumble's treasure map: a rolled-up parchment with a red ribbon
+    const mp = new MB(127);
+    mp.push(RZ3(T3(0, 4, 0), Math.PI / 2)); mp.color('#efdcae').cyl(0, -17, 0, 5.5, 5.5, 34, 14);
+    mp.color('#d9b678').cyl(0, -17.4, 0, 3.6, 3.6, 0.6, 12).cyl(0, 16.8, 0, 3.6, 3.6, 0.6, 12);
+    mp.color('#c8372d').torus(0, 0, 0, 5.9, 1.1, 14, 5, 'y'); mp.pop();
+    M.mapRoll = pack(mp);
+    M.chip = pack(new MB(120).color('#d9a066').box(-1, -1, -2.6, 1, 1, 2.6));
+  },
+  // the open sea round the battle: big tiles of water with waves. It starts under the edge of the island's own ocean
+  // and fades in there, so there is no line between the two
+  build3D() {
+    // the island's own water reaches 264 past its edges (x < W + 264, -264 < z < H + 240); out here the open sea takes over,
+    // fading in over the island's water on the east side, and solid where the island's water stops (to the south and north)
+    // (z0 puts a cell edge on the island water's south edge, H + 240)
+    const A = this.AREA, tiles = new Map(), x0 = 1800, x1 = A.x1 + 2000, z0 = -2400, z1 = A.y1 + 1800, CS = 60, edge = W + 264;
+    const inIsle = (x, z) => x < edge && z > -264 + CS && z < H + 240 - CS;     // a cell short of its edges: the cells don't line up with them
+    const tile = (x, z) => { const k = Math.floor(x / 600) + ',' + Math.floor(z / 600); let t = tiles.get(k); if (!t) { tiles.set(k, t = new MB(121)); t.anim = -1.4; t.smooth = 0; } return t; };
+    const col = (x, z) => {
+      const f = clamp((x - edge) / 700, 0, 1), n = 0.5 + f * (0.25 * Math.sin(x * 0.0021 + z * 0.0013) + 0.25 * Math.sin(x * 0.0009 - z * 0.0031 + 1.3));
+      return [0.13 + n * 0.06, 0.45 + n * 0.1, 0.72 + n * 0.04, inIsle(x, z) ? clamp((x - W) / (edge - W), 0, 1) : 1];
+    };
+    for (let z = z0; z < z1; z += CS) for (let x = x0; x < x1; x += CS) {
+      if (x + CS <= W && inIsle(x, z) && inIsle(x, z + CS)) continue;        // all under the island's own water
+      const P = (px, pz) => [px, WATER_Y3, pz], t = tile(x, z);
+      t.triC(P(x, z), P(x, z + CS), P(x + CS, z + CS), col(x, z), col(x, z + CS), col(x + CS, z + CS));
+      t.triC(P(x, z), P(x + CS, z + CS), P(x + CS, z), col(x, z), col(x + CS, z + CS), col(x + CS, z));
+    }
+    this.tiles = [...tiles.values()].map(pack);
+  },
+  shipM(o, t, bob) {       // where a ship is, which way it points, how it rocks (as big as the harbour's ship)
+    const K = SHIP.K, m = T3(o.x, Math.sin(t * 1.25 + o.x * 0.004) * 1.4 * (bob == null ? 1 : bob) - 0.5, o.y);
+    m4ry(m, -o.a); m4rz(m, Math.sin(t * 0.9 + o.y * 0.003) * 0.016); m4rx(m, (o.bank || 0) + (o.rock ? Math.sin(t * 9) * 0.09 * o.rock : 0) + Math.sin(t * 1.1 + o.x * 0.002) * 0.014);
+    m4s(m, K, K, K);
+    return m;
+  },
+  render3(R, t, dt) {
+    if (!this.M) this.models();
+    if (!this.tiles) this.build3D();
+    if (!SHIP.M) SHIP.M = SHIP.models(SHIP_PAL);
+    if (!this.PM) this.PM = SHIP.models(PIRATE_PAL);
+    this.zoom = this.ease(this.zoom, this.zoomWant(), dt);
+    const sh = this.shake * 10, ox = sh ? Math.sin(t * 61) * sh : 0, oy = sh ? Math.cos(t * 47) * sh * 0.6 : 0, D = CAM3.D * this.zoom;
+    const at = [CAM3.x + ox, 10 + oy, CAM3.z];
+    R.begin(R.cv.width, R.cv.height, { eye: [at[0], at[1] + Math.sin(CAM3.pitch) * D, at[2] + Math.cos(CAM3.pitch) * D], at, fov: CAM3.fov, near: 40, far: D * 4, fogNear: D * 1.4, fogFar: D * 3.2 }, 0, t);
+    // the island, when it is in sight
+    for (const c of W3.chunks) if (R.visible(c.box)) R.draw(c);
+    for (const o of W3.tall) if (R.visible(o.box)) R.draw(o.mesh, o.m);
+    SHIP.draw3(R, t);
+    const M = this.M, S = this.ship, P = this.pirate;
+    // our ship: the child at the wheel, Sparky on the foredeck, the cannon turning to where you aim
+    if (S) {
+      const m = this.shipM(S, t), blink = S.inv > 0 && Math.floor(t * 12) % 2;
+      SHIP.drawShip3(R, SHIP.M, m, t, 8);
+      for (let i = 0; i < Math.min(6, this.st().dmg | 0); i++) R.draw(M.scorch[i], m);
+      const cm = new Float32Array(m); m4t(cm, 58, HULL.deck(58), 0); m4ry(cm, -wrapA(S.aimA - S.a)); m4t(cm, -S.recoil * 4, 0, 0); R.draw(M.cannon, cm);
+      const hp = m4apply(m, SHIP.HELM_X, HULL.deck(SHIP.HELM_X), 0), dp = m4apply(m, 34, HULL.deck(34), 14);
+      if (!blink) drawPerson3(R, PLAYER_LOOK, { x: hp[0], z: hp[2], y: hp[1], yaw: Math.PI / 2 - S.a, moving: false, mv: 0, phase: 0, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3 });
+      drawAnimal3(R, 'dog', { x: dp[0], z: dp[2], y: dp[1], yaw: Math.PI / 2 - S.a + 0.5, moving: false, phase: 0, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    }
+    // Captain Grumble's ship, its cannons, and the captain at his wheel
+    if (P) {
+      const m = this.shipM(P, t);
+      SHIP.drawShip3(R, this.PM, m, t, 8, P.flag ? [M.whiteFlag, M.whiteFlag, M.whiteFlag] : null); R.draw(M.guns, m);
+      const hp = m4apply(m, SHIP.HELM_X, HULL.deck(SHIP.HELM_X), 0);
+      drawPerson3(R, LOOKS.pirate, { x: hp[0], z: hp[2], y: hp[1], yaw: Math.atan2((S ? S.x : hp[0]) - hp[0], (S ? S.y : hp[2] + 1) - hp[2]), moving: false, mv: 0, phase: 0, t, seed: 3.1, talk: Dialog.mouth === 'pirate', wave: !P.flag && P.hitT <= 0, dizzy: P.hitT > 0, scale: CS3 });
+    }
+    // the target, the crate, the cannonballs, the splinters, the page, splashes
+    if (this.buoy) { const B = this.buoy, m = T3(B.x, WATER_Y3 + 3 + Math.sin(t * 2.2) * 2, B.y); m4rz(m, Math.sin(t * 1.7) * 0.08); m4s(m, 1.6, 1.6, 1.6); R.draw(M.buoy, m); }
+    for (const c of this.crates) { const k = Math.min(1, c.t / 0.4), m = T3(c.x, WATER_Y3 + 2 + Math.sin(t * 2.4 + c.sd) * 2.5, c.y); m4ry(m, t * 0.4 + c.sd); m4rz(m, Math.sin(t * 1.9 + c.sd) * 0.1); m4s(m, 1.5 * k, 1.5 * k, 1.5 * k); R.setTint(1, 1, 1, 1, 0.12 + 0.12 * Math.sin(t * 5)); R.draw(M.crate, m); R.setTint(1, 1, 1, 1, 0); }
+    if (this.mapItem) { const g = this.mapItem, k = Math.min(1, g.t / 0.4), m = T3(g.x, WATER_Y3 + 3 + Math.sin(t * 2.4) * 2.5, g.y); m4ry(m, t * 0.5); m4rz(m, Math.sin(t * 1.9) * 0.1); m4s(m, 2.4 * k, 2.4 * k, 2.4 * k); R.setTint(1, 1, 1, 1, 0.15 + 0.12 * Math.sin(t * 5)); R.draw(M.mapRoll, m); R.setTint(1, 1, 1, 1, 0); }
+    for (const b of this.balls.concat(this.shots)) { if (b.t < 0) continue; const p = this.ballPos(b), m = T3(p.x, p.h, p.y); m4s(m, 1.5, 1.5, 1.5); R.draw(M.ball, m); }
+    for (const b of this.bits) { const k = Math.min(1, b.life / 0.3), m = T3(b.x, b.h, b.y); m4ry(m, b.rx); m4rx(m, b.rz); m4s(m, 2.2 * k, 2.2 * k, 2.2 * k); R.draw(b.k ? M.chip : M.plank, m); }
+    for (const d of this.drops) { const m = T3(d.x, d.y, d.z); m4s(m, 1.6, 1.6, 1.6); R.draw(W3.dyn.drop, m); }
+    if (this.page && S) { const g = this.page, k = g.t, x = g.x + (S.x - g.x) * k, z = g.y + (S.y - g.y) * k, m = T3(x, 60 + 320 * 4 * k * (1 - k), z); m4ry(m, t * 7); m4s(m, 2.4, 2.4, 2.4); R.setTint(1, 1, 1, 1, 0.3); R.draw(M.page, m); R.setTint(1, 1, 1, 1, 0); }
+    // the aim: dots along the flight and a ring where the ball will fall (green on the pirate ship or the target)
+    const ap = this.aimPoint();
+    if (ap && S) {
+      const c = this.cannonPos(), fake = { sx: c.x, sy: c.y, h0: c.h, tx: ap.x, ty: ap.y, t: 0, T: 1 };
+      R.setTint(1, 1, 1, 1, 1);
+      for (let i = 1; i < 14; i++) { fake.t = i / 14; const p = this.ballPos(fake); R.draw(M.dot, T3(p.x, p.h, p.y)); }
+    }
+    // Sparky's arrow: on the water in front of our ship, gliding the way to go (the crate, the target, out to sea, the map)
+    const tg = game.mode === 'play' ? this.seaTarget() : null, td = tg && S ? Math.hypot(tg.x - S.x, tg.y - S.y) : 0;
+    if (td > 450) {
+      const ux = (tg.x - S.x) / td, uy = (tg.y - S.y) / td, r = 300 + ((t * 0.8) % 1) * 50;
+      const m = T3(S.x + ux * r, WATER_Y3 + 6 + Math.sin(t * 5) * 2, S.y + uy * r); m4ry(m, Math.atan2(-uy, ux)); m4rx(m, -Math.PI / 2); m4s(m, 3.4, 3.4, 3.4);
+      R.setTint(1, 1, 1, 1, 0.55); R.draw(W3.dyn.arrow, m); R.setTint(1, 1, 1, 1, 0);
+    }
+    // see-through: the sea, foam, the wakes, splashes, smoke, warnings where the pirates' balls will fall
+    R.mode('blend');
+    R.setLook(0.55, 0); R.draw(W3.oceanFar); for (const m of W3.ocean) if (R.visible(m.box)) R.draw(m);
+    for (const m of this.tiles) if (R.visible(m.box)) R.draw(m);
+    R.setLook(0, 0);
+    SHIP.draw3Blend(R, t);
+    this.whitecaps(R, t);
+    const ring = (x, z, rx, rz, r, g, b, a, mesh) => { R.setTint(r, g, b, a, 1); const m = T3(x, WATER_Y3 + 1.4, z); m4s(m, rx, 1, rz); R.draw(mesh || W3.dyn.ripple, m); };
+    for (const w of this.wake) { const k = w.t / 1.6; ring(w.x, w.y, (26 + k * 70) * (0.5 + w.s), (14 + k * 34) * (0.5 + w.s), 1, 1, 1, 0.55 * (1 - k) * w.s); }
+    if (S) for (const o of [S, P]) if (o) { const k = (t * 0.6) % 1; R.setTint(1, 1, 1, 0.3 * (1 - k), 1); const m = T3(o.x, WATER_Y3 + 1, o.y); m4ry(m, -o.a); m4s(m, 230 + k * 40, 1, 80 + k * 20); R.draw(W3.dyn.ripple, m); }
+    for (const r of this.rings) if (r.t > 0) { const k = r.t / 1.5; ring(r.x, r.y, (20 + k * 110) * r.s, (14 + k * 70) * r.s, 1, 1, 1, 0.8 * (1 - k)); }
+    for (const b of this.balls) {
+      if (b.t < 0) continue;
+      const k = clamp(b.t / b.T, 0, 1), rr = 46;
+      ring(b.tx, b.ty, rr, rr * 0.8, 1, 0.15, 0.1, 0.18 + 0.25 * k, M.disc);
+      ring(b.tx, b.ty, 6 + (rr - 6) * k, (6 + (rr - 6) * k) * 0.8, 1, 0.2, 0.12, 0.3 + 0.25 * k, M.disc);
+      for (const q of [rr, rr + 3]) ring(b.tx, b.ty, q, q * 0.8, 1, 0.25, 0.15, 0.65 + 0.35 * k);
+    }
+    for (const c of this.crates) { const p = (t * 1.1) % 1; ring(c.x, c.y, 34 + p * 40, (34 + p * 40) * 0.75, 1, 0.92, 0.3, 0.8 * (1 - p)); }
+    if (this.mapItem) { const g = this.mapItem, p = (t * 1.1) % 1; ring(g.x, g.y, 44 + p * 46, (44 + p * 46) * 0.75, 1, 0.92, 0.3, 0.85 * (1 - p)); }
+    if (ap) {
+      const on = (this.pirate && !this.pirate.enter && this.inHull(this.pirate, ap.x, ap.y, 40)) || (this.buoy && Math.hypot(ap.x - this.buoy.x, ap.y - this.buoy.y) < 80);
+      const [r, g, b] = on ? [0.3, 1, 0.4] : [1, 0.92, 0.3];
+      ring(ap.x, ap.y, 40, 32, r, g, b, 0.3, M.disc); ring(ap.x, ap.y, 40, 32, r, g, b, 0.95); ring(ap.x, ap.y, 43, 35, r, g, b, 0.95);
+    }
+    for (const p of this.puffs) {
+      if (p.t < 0) continue;
+      const k = p.t / 1.1;
+      if (p.dark) R.setTint(0.36, 0.34, 0.34, 0.55 * (1 - k), 0.4); else R.setTint(0.85, 0.85, 0.88, 0.6 * (1 - k), 0.6);
+      for (let i = 0; i < 5; i++) { const a = i * 2.4 + p.x, m = T3(p.x + Math.cos(a) * (6 + k * 34) * p.s, p.h + k * 30 + (i % 3) * 4, p.y + Math.sin(a) * (5 + k * 22) * p.s); const z = (0.9 + k * 1.6) * p.s; m4s(m, z, z * 0.85, z); R.draw(W3.dyn.puff, m); }
+    }
+    R.setTint(1, 1, 1, 1, 0); R.mode('opaque');
+    const c = ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+  },
+  // white crests here and there on the open sea: they come and go, and show the ship is moving
+  whitecaps(R, t) {
+    const G = 230, cx = Math.floor(CAM3.x / G), cz = Math.floor(CAM3.z / G), M = this.M;
+    for (let gz = cz - 6; gz <= cz + 5; gz++) for (let gx = cx - 7; gx <= cx + 7; gx++) {
+      const x0 = gx * G, z0 = gz * G;
+      if (x0 < W + 280 || z0 < -1100 || z0 > 3300) continue;
+      const h = hash1(gx * 7.13 + gz * 3.71), a = Math.sin(t * 0.8 + h * 40);
+      if (a < 0.35) continue;
+      const m = T3(x0 + h * G, WATER_Y3 + 1.2, z0 + hash1(h * 91) * G); m4ry(m, h * 6); m4s(m, 16 + h * 14, 1, 4 + h * 3);
+      R.setTint(1, 1, 1, (a - 0.35) * 0.9, 1); R.draw(M.disc, m);
+    }
+  },
+
+  /* ---------------- 2D (the flat view) ---------------- */
+  render2D(c, cx, cy, pr, t) {
+    const z = this.zoom2D(); pr *= z;
+    const vw = view.w / z, vh = view.h / z;
+    c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#45b6e0'; c.fillRect(0, 0, c.canvas.width, c.canvas.height);          // (the island picture's deep sea)
+    const sh = this.shake * 8, ox = sh ? Math.sin(t * 61) * sh : 0, oy = sh ? Math.cos(t * 47) * sh * 0.6 : 0;
+    c.setTransform(pr, 0, 0, pr, -(cx + ox) * pr, -(cy + oy) * pr); c.lineJoin = 'round'; c.lineCap = 'round';
+    // the island at the left (its picture), and waves on the sea
+    const x1 = Math.min(W, cx + vw);
+    if (x1 > cx) { const sx = Math.max(0, cx), sy = Math.max(0, cy), sw = (x1 - sx) * BG.pr, shh = Math.min(H, cy + vh) - sy; if (shh > 0) c.drawImage(BG.cv, sx * BG.pr, sy * BG.pr, sw, shh * BG.pr, sx, sy, x1 - sx, shh); }
+    c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = 5;
+    for (let y = Math.floor(cy / 110) * 110; y < cy + vh + 110; y += 110) for (let x = Math.floor(cx / 190) * 190; x < cx + vw + 190; x += 190) {
+      const px = x + ((y / 110) % 2) * 95 + Math.sin(t * 0.8 + y * 0.03) * 14, py = y + Math.sin(t + x * 0.02) * 4;
+      if (px < W + 40 && py < H + 40 && py > -40) continue;
+      c.beginPath(); c.arc(px, py, 20, 1.15 * Math.PI, 1.85 * Math.PI); c.stroke();
+    }
+    for (const o of STATIC) if (o.x + o.b[2] > cx && o.x + o.b[0] < cx + vw && o.y + o.b[3] > cy && o.y + o.b[1] < cy + vh) o.draw(c, t);
+    // the wakes, splashes and warnings on the water
+    for (const w of this.wake) { const k = w.t / 1.6; c.strokeStyle = 'rgba(255,255,255,' + (0.6 * (1 - k) * w.s).toFixed(3) + ')'; c.lineWidth = 4; c.beginPath(); c.ellipse(w.x, w.y, (26 + k * 70) * (0.5 + w.s), (14 + k * 34) * (0.5 + w.s), 0, 0, TAU); c.stroke(); }
+    for (const r of this.rings) if (r.t > 0) { const k = r.t / 1.5; c.strokeStyle = 'rgba(255,255,255,' + (0.8 * (1 - k)).toFixed(3) + ')'; c.lineWidth = 5; c.beginPath(); c.ellipse(r.x, r.y, (20 + k * 110) * r.s, (14 + k * 70) * r.s, 0, 0, TAU); c.stroke(); }
+    for (const b of this.balls) if (b.t >= 0) {
+      const k = clamp(b.t / b.T, 0, 1), rr = 46;
+      c.fillStyle = 'rgba(255,40,30,' + (0.18 + 0.2 * k).toFixed(3) + ')'; c.beginPath(); c.ellipse(b.tx, b.ty, rr, rr * 0.8, 0, 0, TAU); c.fill();
+      c.strokeStyle = 'rgba(255,60,50,' + (0.6 + 0.4 * k).toFixed(3) + ')'; c.lineWidth = 6; c.beginPath(); c.ellipse(b.tx, b.ty, rr, rr * 0.8, 0, 0, TAU); c.stroke();
+    }
+    for (const cr of this.crates) { const p = (t * 1.1) % 1; c.strokeStyle = 'rgba(255,230,80,' + (0.8 * (1 - p)).toFixed(3) + ')'; c.lineWidth = 5; c.beginPath(); c.ellipse(cr.x, cr.y, 34 + p * 40, (34 + p * 40) * 0.75, 0, 0, TAU); c.stroke(); }
+    const ap = this.aimPoint();
+    if (ap) {
+      const on = (this.pirate && !this.pirate.enter && this.inHull(this.pirate, ap.x, ap.y, 40)) || (this.buoy && Math.hypot(ap.x - this.buoy.x, ap.y - this.buoy.y) < 80);
+      c.strokeStyle = on ? '#4cff6a' : '#ffe14d'; c.lineWidth = 6; c.beginPath(); c.ellipse(ap.x, ap.y, 42, 34, 0, 0, TAU); c.stroke();
+    }
+    // things on the water, nearest last
+    const L = [];
+    if (this.buoy) { const B = this.buoy; L.push({ y: B.y, draw: () => { const yy = B.y + Math.sin(t * 2.2) * 3; rrect(c, B.x - 22, yy - 34, 44, 34, 8, '#e8503a', 3); rrect(c, B.x - 22, yy - 24, 44, 9, 2, '#ffffff', 0); circ(c, B.x, yy - 40, 14, '#ffffff', 3); circ(c, B.x, yy - 40, 8, '#e8503a', 0); } }); }
+    if (this.mapItem) { const g = this.mapItem; L.push({ y: g.y, draw: () => {
+      const yy = g.y + Math.sin(t * 2.4) * 3, p = (t * 1.1) % 1;
+      c.strokeStyle = 'rgba(255,230,80,' + (0.8 * (1 - p)).toFixed(3) + ')'; c.lineWidth = 5; c.beginPath(); c.ellipse(g.x, g.y, 34 + p * 40, (34 + p * 40) * 0.75, 0, 0, TAU); c.stroke();
+      rrect(c, g.x - 30, yy - 22, 60, 16, 8, '#efdcae', 3); circ(c, g.x - 30, yy - 14, 8, '#d9b678', 3); circ(c, g.x + 30, yy - 14, 8, '#d9b678', 3); seg(c, g.x, yy - 23, g.x, yy - 5, '#c8372d', 4);
+    } }); }
+    for (const cr of this.crates) L.push({ y: cr.y, draw: () => { const yy = cr.y + Math.sin(t * 2.4 + cr.sd) * 3; rrect(c, cr.x - 24, yy - 36, 48, 40, 4, '#c98f55', 3); seg(c, cr.x - 24, yy - 22, cr.x + 24, yy - 22, '#a8703f', 3); starPath(c, cr.x, yy - 44, 13, 0); paint(c, '#ffd23c', 2.5); } });
+    for (const [o, pal, look] of [[this.ship, SHIP_PAL, PLAYER_LOOK], [this.pirate, PIRATE_PAL, LOOKS.pirate]]) {
+      if (!o) continue;
+      L.push({ y: o.y, draw: () => {
+        const face = Math.cos(o.a) < 0 ? -1 : 1, by = o.y + 30 + Math.sin(t * 1.25 + o.x * 0.004) * 2, K2 = 1.3;
+        if (o === this.ship && o.inv > 0 && Math.floor(t * 12) % 2) return;
+        c.save(); c.translate(o.x, by); c.rotate((o.rock ? Math.sin(t * 9) * 0.06 * o.rock : 0) + face * (o.bank || 0) * 0.5); c.scale(face * K2, K2);
+        SHIP.drawHull2D(c, 8, t, o === this.pirate && o.flag ? Object.assign({}, pal, { flag: pal.flag.map(() => ['#ffffff', '#ffffff']), flagDot: '#ffffff' }) : pal);
+        if (o === this.pirate && o.flag) { seg(c, -80, -44, -80, -110, '#8a5a30', 3); poly(c, [-80, -110, -80 + 24, -104 + Math.sin(t * 5) * 3, -80 + 22, -94 + Math.sin(t * 5) * 3, -80, -98], '#ffffff', 2); }
+        if (o === this.ship) [-55, -30, 18, 41, -6, 64].slice(0, Math.min(6, this.st().dmg | 0)).forEach((x, i) => {          // burnt patches
+          ell(c, x, -24 + (i % 2) * 3, 7, 5, '#2a201a', 0); seg(c, x - 8, -27 + (i % 2) * 5, x + 8, -22 + (i % 2) * 3, '#a8703f', 2.6);
+        });
+        c.restore();
+        drawPerson(c, look, { x: o.x + face * SHIP.HELM_X * K2, y: by - 44 * K2, dir: face < 0 ? 'left' : 'right', t, seed: 1.2, noShadow: true, talk: Dialog.mouth === (o === this.ship ? 'player' : 'pirate') });
+        if (o === this.ship) drawDog(c, { x: o.x + face * 34 * K2, y: by - 44 * K2, face, t, noShadow: true, talk: Dialog.mouth === 'sparky' });
+      } });
+    }
+    L.sort((a, b) => a.y - b.y);
+    for (const o of L) o.draw();
+    // in the air: balls (with their shadows), the aim's dots, splinters, the page, smoke
+    for (const b of this.balls.concat(this.shots)) if (b.t >= 0) { const p = this.ballPos(b); c.fillStyle = 'rgba(0,0,0,.2)'; c.beginPath(); c.ellipse(p.x, p.y, 12, 6, 0, 0, TAU); c.fill(); circ(c, p.x, p.y - p.h, 10, '#26262e', 2); }
+    if (ap && this.ship) { const cp = this.cannonPos(), fake = { sx: cp.x, sy: cp.y, h0: cp.h, tx: ap.x, ty: ap.y, t: 0, T: 1 }; for (let i = 1; i < 14; i++) { fake.t = i / 14; const p = this.ballPos(fake); circ(c, p.x, p.y - p.h, 5, '#ffffff', 0); } }
+    for (const b of this.bits) { c.fillStyle = b.k ? '#d9a066' : '#a8703f'; c.save(); c.translate(b.x, b.y - b.h); c.rotate(b.rz); c.fillRect(-3, -9, 6, 18); c.restore(); }
+    for (const d of this.drops) circ(c, d.x, d.z - d.y, 4, '#dff8ff', 0);
+    for (const p of this.puffs) if (p.t >= 0) { const k = p.t / 1.1; c.fillStyle = (p.dark ? 'rgba(80,74,72,' : 'rgba(220,220,226,') + (0.7 * (1 - k)).toFixed(3) + ')'; c.beginPath(); c.arc(p.x, p.y - p.h - k * 30, (14 + k * 30) * p.s, 0, TAU); c.fill(); }
+    if (this.page && this.ship) { const g = this.page, k = g.t, x = g.x + (this.ship.x - g.x) * k, y = g.y + (this.ship.y - g.y) * k - 320 * 4 * k * (1 - k) - 60; c.save(); c.translate(x, y); c.rotate(t * 5); rrect(c, -18, -22, 36, 44, 3, '#fffaf0', 3); c.fillStyle = '#9fdcff'; c.fillRect(-14, -18, 28, 20); c.fillStyle = '#7ccf6a'; c.fillRect(-14, 2, 28, 16); c.restore(); }
+    const tg = game.mode === 'play' ? this.seaTarget() : null;
+    if (tg && this.ship && Math.hypot(tg.x - this.ship.x, tg.y - this.ship.y) > 260) drawGuideArrow(c, this.ship.x, this.ship.y - 230, Math.atan2(tg.y - this.ship.y, tg.x - this.ship.x), t);
+  },
+};
+// the crate's three questions (choose the right word); then the cannon is loaded
+MINI.sea = function (topic, done, quit) {
+  const tok = MG.open('sparky', quit), C = GAME_CONTENT.sea;
+  const box = el('div', 'tbBox'), sent = el('div', 'tbSent'), row = el('div', 'tbRow');
+  const btns = [0, 1, 2].map((k) => { const b = el('button', 'btn tbBtn tb-' + ['am', 'is', 'are'][k]); row.appendChild(b); return b; });
+  box.append(sent, row); $('mgBody').appendChild(box);
+  let i = 0, wrongs = 0, busy = false, q = null, blank = null;
+  const ask = () => {
+    if (!MG.alive(tok)) return;
+    if (i >= 3) { MG.close(); done(); return; }
+    q = SEA.nextQuestion(topic); wrongs = 0; busy = false; MG.next(null);
+    const opts = shuffle(q.options.slice());
+    btns.forEach((b, k) => { b.classList.remove('hint', 'ok', 'dim'); b.dataset.v = opts[k] || ''; b.textContent = opts[k] || ''; b.classList.toggle('hidden', !opts[k]); b.classList.toggle('long', (opts[k] || '').length > 4); });
+    const parts = q.text.split(/_{2,}/);
+    sent.textContent = ''; blank = el('span', 'tbBlank', '?');
+    sent.append(parts[0] || '', blank, parts.slice(1).join('') || '');
+    MG.dots(i, 3); MG.prompt(C.ask, false);
+    MG.text = q.text.replace(/_{2,}/, '…'); MG.say(MG.text);
+  };
+  for (const b of btns) b.addEventListener('click', (e) => {
+    e.currentTarget.blur();
+    if (busy || !MG.alive(tok)) return;
+    const right = btns.find((x) => x.dataset.v === q.answer);
+    if (b === right) {
+      busy = true; Sfx.play('ok'); b.classList.remove('hint'); b.classList.add('ok');
+      blank.textContent = q.answer; blank.classList.add('filled');
+      const full = q.text.replace(/_{2,}/, q.answer); MG.text = full;
+      MG.say(full, () => setTimeout(() => { i++; ask(); }, 350));
+    } else { wrongs++; b.classList.add('dim'); MG.wrong(b, right, wrongs, 2); }
+  });
+  ask();
+};
+// questions: "sentence ___ | right | wrong | wrong", a shuffled round of each topic, then another round
+SEA.questions = function (topic) {
+  const out = [];
+  for (const raw of (GAME_CONTENT.sea.questions[topic] || [])) {
+    const parts = String(raw).split('|').map((s) => s.trim()), text = parts[0], opts = parts.slice(1).filter(Boolean);
+    if (text && /_{2,}/.test(text) && opts.length >= 2) out.push({ text, answer: opts[0], options: opts.slice(0, 3) });
+  }
+  return out;
+};
+SEA.nextQuestion = function (topic) {
+  const Q = this.questions(topic);
+  if (!Q.length) return { text: 'I ___ a captain.', answer: 'am', options: ['am', 'is', 'are'] };
+  if (!this.qOrder[topic] || this.qi[topic] >= this.qOrder[topic].length || this.qOrder[topic].length !== Q.length) { this.qOrder[topic] = shuffle(Q.map((q, i) => i)); this.qi[topic] = 0; }
+  return Q[this.qOrder[topic][this.qi[topic]++]];
+};
+document.getElementById('seaFire').addEventListener('pointerdown', (e) => SEA.fireDown(e));
+document.getElementById('seaFire').addEventListener('pointermove', (e) => SEA.fireMove(e));
+for (const ev of ['pointerup', 'pointercancel']) document.getElementById('seaFire').addEventListener(ev, (e) => SEA.fireUp(e));
+
 /* ============================== ARAYÜZ ============================== */
 const game = { mode: 'title', t: 0, paused: false, sleepT: 0, ev: 0 };
 // While one of these full-screen windows is open the village is not updated or redrawn.
@@ -9034,6 +9987,7 @@ function charName(id) { const c = GAME_CONTENT.characters[id]; return c ? fillNa
 /* ---- interaction ---- */
 function interactables() {
   const list = [];
+  if (SEA.active) return list;          // (out at sea there is nobody to talk to)
   for (const n of NPCS) {
     if (n.hidden || n.follow || n.sleeping) continue;
     list.push({ id: n.id, x: n.x, y: n.y, npc: n, topY: n.y + n.top, label: 'talk' });
@@ -9170,7 +10124,7 @@ const Dialog = {
 };
 
 /* ---- portraits ---- */
-const PORTRAIT_BG = { cat: '#ffe0c2', frog: '#d6f5d6', rabbit: '#ffe4ef', duck: '#dff4ff', scarecrow: '#fff0b8', sparky: '#ffe7a8', milo: '#bfe6ff', leo: '#ffe0e0', mom: '#ffd6e6', dad: '#d6f5d6', rosa: '#eadcff', nomi: '#ffe0cc', bob: '#cfe0ff', max: '#fff0b8', lily: '#d6f5e0', pip: '#fff4b8', pop: '#d6f5d6', owl: '#e8dcc8', player: '#d8f3ff', fizz: '#d9f2ff', bongo: '#ffe9b0', tess: '#ffe0b8' };
+const PORTRAIT_BG = { cat: '#ffe0c2', frog: '#d6f5d6', rabbit: '#ffe4ef', duck: '#dff4ff', scarecrow: '#fff0b8', sparky: '#ffe7a8', milo: '#bfe6ff', leo: '#ffe0e0', mom: '#ffd6e6', dad: '#d6f5d6', rosa: '#eadcff', nomi: '#ffe0cc', bob: '#cfe0ff', max: '#fff0b8', lily: '#d6f5e0', pip: '#fff4b8', pop: '#d6f5d6', owl: '#e8dcc8', player: '#d8f3ff', fizz: '#d9f2ff', bongo: '#ffe9b0', tess: '#ffe0b8', pirate: '#ffd9c2' };
 function drawPortrait2D(cv, who, live) {
   const g = cv.getContext('2d'), S = cv.width, t = live ? live.t : 0.2, talk = !!(live && live.talk);
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
@@ -9196,7 +10150,7 @@ const Hud = {
   cardKey: '',
   refresh() {
     $('starCount').textContent = state.stars;
-    LAB.hud(); SHIP.hud();
+    LAB.hud(); SHIP.hud(); SEA.hud(); SEA.fireUI();
     $('starTotal').textContent = SETTINGS.totalStars;
     const [who, text] = Quests.card();
     const key = who + '|' + text;
@@ -9357,6 +10311,7 @@ const Touch = {
   },
   update() {            // every frame: shown only while walking around, the button says what it will do
     const show = this.on && game.mode === 'play' && !Dialog.open;
+    this.btn.classList.toggle('sea', SEA.active);          // (at sea the cannon button takes its place)
     if (show !== this.shown) {
       this.shown = show;
       this.zone.classList.toggle('hidden', !show); this.btn.classList.toggle('hidden', !show);
@@ -9556,6 +10511,7 @@ function resetProgress(settings) {
   EGGS.reset();
   LAB.reset();
   SHIP.reset();
+  SEA.active = false; SEA.reset(); SEA.playT = 0;
   applyWorldState(true);
   Talk.hide(); Hud.cardKey = '';
   snapCamera();
@@ -9785,23 +10741,25 @@ const Cert = {
    the signatures of Dr. Fizz, Tess and Captain Bob and a red wax seal. It can be saved as a picture. */
 const CaptainCert = {
   after: null,
-  open(after) {
-    const C = GAME_CONTENT.captain;
-    this.after = after || null; setMode('capcert'); Talk.hide();
+  kind: 'cert',
+  open(after, kind) {          // kind: 'cert' (the Junior Captain certificate) or 'map' (Captain Grumble's treasure map)
+    const C = GAME_CONTENT.captain, map = kind === 'map';
+    this.after = after || null; this.kind = map ? 'map' : 'cert'; setMode('capcert'); Talk.hide();
     const cv = $('capImg'); this.draw(cv);
     $('capSave').textContent = '📷 ' + GAME_CONTENT.final.save; $('capOk').textContent = GAME_CONTENT.ui.ok + ' 👍';
     $('capCert').classList.remove('hidden'); $('capCard').scrollTop = 0;
     Fx.confetti(); Sfx.play('star');
     [[392, 0], [523, 0.16], [659, 0.32], [784, 0.48], [1047, 0.7]].forEach(([f, d], i) => Sfx.tone(f, i === 4 ? 0.7 : 0.18, 'triangle', 0.11, d + 0.25));
-    Speech.speak(fmt(C.say), { who: 'narrator' });
+    Speech.speak(fmt(map ? GAME_CONTENT.sea.mapCard.say : C.say), { who: map ? 'sparky' : 'narrator' });
   },
   close() {
     $('capCert').classList.add('hidden'); Speech.stop(); setMode('play'); Hud.cardKey = ''; Hud.refresh();
     const f = this.after; this.after = null; if (f) f();
   },
-  save() { sharePicture(this.draw(cnv(1600, 1100)), 'Sunny-Hill-Kaptan-' + String(state.name || 'sertifika').replace(/[^0-9A-Za-zÇĞİÖŞÜçğıöşü-]+/g, '_') + '.png'); },
+  save() { sharePicture(this.draw(cnv(1600, 1100)), 'Sunny-Hill-' + (this.kind === 'map' ? 'Harita' : 'Kaptan') + '-' + String(state.name || 'sertifika').replace(/[^0-9A-Za-zÇĞİÖŞÜçğıöşü-]+/g, '_') + '.png'); },
   // the whole picture, drawn on canvas cv (1600 x 1100)
   draw(cv) {
+    if (this.kind === 'map') return drawPirateMap(cv);
     cv.width = 1600; cv.height = 1100;
     const g = cv.getContext('2d'), C = GAME_CONTENT.captain, R = rng(1907), W2 = 1600, H2 = 1100, INKC = '#5a3a1e';
     g.lineJoin = 'round'; g.lineCap = 'round'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -9921,6 +10879,108 @@ const CaptainCert = {
     return cv;
   },
 };
+// Captain Grumble's treasure map (1600 x 1100): an old burnt-edged chart. Sunny Hill far to the west, our ship where the
+// fight was, and a red dotted route to the Parrot King's island (palm trees, a hill, the king with his crown, and an X)
+function drawPirateMap(cv) {
+  cv.width = 1600; cv.height = 1100;
+  const g = cv.getContext('2d'), K = GAME_CONTENT.sea.mapCard, R = rng(777), W2 = 1600, H2 = 1100, INKC = '#4a2e18';
+  g.lineJoin = 'round'; g.lineCap = 'round'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const tb = g.createRadialGradient(W2 / 2, H2 / 2, 200, W2 / 2, H2 / 2, 1000); tb.addColorStop(0, '#6b4a30'); tb.addColorStop(1, '#38241a');
+  g.fillStyle = tb; g.fillRect(0, 0, W2, H2);
+  const edge = [];
+  const side = (x0, y0, x1, y1, n) => { for (let i = 0; i < n; i++) { const k = i / n; edge.push([x0 + (x1 - x0) * k + (R() - 0.5) * 18, y0 + (y1 - y0) * k + (R() - 0.5) * 18]); } };
+  side(40, 36, W2 - 40, 36, 50); side(W2 - 36, 40, W2 - 36, H2 - 40, 34); side(W2 - 40, H2 - 36, 40, H2 - 36, 50); side(36, H2 - 40, 36, 40, 34);
+  const paperPath = () => { g.beginPath(); g.moveTo(edge[0][0], edge[0][1]); for (const p of edge) g.lineTo(p[0], p[1]); g.closePath(); };
+  g.save(); g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 30; g.shadowOffsetY = 12; paperPath(); g.fillStyle = '#e8cf98'; g.fill(); g.restore();
+  g.save(); paperPath(); g.clip();
+  const pp = g.createRadialGradient(W2 / 2, H2 / 2, 150, W2 / 2, H2 / 2, 900); pp.addColorStop(0, '#f6e6bc'); pp.addColorStop(0.65, '#e9cf95'); pp.addColorStop(1, '#b98a4e');
+  g.fillStyle = pp; g.fillRect(0, 0, W2, H2);
+  for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(150 + R() * 1300, 150 + R() * 800, 40 + R() * 70, 0, TAU); g.fillStyle = 'rgba(120,70,30,.06)'; g.fill(); }
+  g.strokeStyle = 'rgba(74,46,24,.26)'; g.lineWidth = 2.2;          // waves all over the sea
+  for (let y = 230; y < H2 - 60; y += 46) for (let x = 70 + ((y / 46) % 2) * 40; x < W2 - 60; x += 80) { g.beginPath(); g.arc(x, y, 9, 1.2 * Math.PI, 1.8 * Math.PI); g.stroke(); }
+  paperPath(); g.lineWidth = 70; g.strokeStyle = 'rgba(90,50,20,.22)'; g.stroke();          // burnt edges
+  g.restore();
+  paperPath(); g.lineWidth = 3; g.strokeStyle = 'rgba(70,40,15,.6)'; g.stroke();
+  // the title, between two skulls
+  g.font = 'bold 70px ' + LOGO_FONT; g.fillStyle = INKC; g.fillText(K.title, W2 / 2, 122);
+  for (const s of [-1, 1]) drawSkull2D(g, W2 / 2 + s * 520, 118, 1.25, INKC);
+  // Sunny Hill, small, far to the west
+  const s = 300 / W, ox = 250 - W * s / 2, oy = 610 - H * s / 2, P = (x, y) => [ox + x * s, oy + y * s];
+  const coast = islePerim(shoreWob, 30).map(([x, y]) => P(x, y)), coastPath = () => { g.beginPath(); g.moveTo(coast[0][0], coast[0][1]); for (const p of coast) g.lineTo(p[0], p[1]); g.closePath(); };
+  coastPath(); g.lineWidth = 9; g.strokeStyle = '#f4e3b2'; g.stroke();
+  g.save(); coastPath(); g.clip();
+  { const [bx, by] = P(0, 0), x0 = bx - 20, y0 = by - 20, w0 = W * s + 40, h0 = H * s + 40;
+    g.fillStyle = '#b9c27e'; g.fillRect(x0, y0, w0, h0);
+    if (BG.cv) g.drawImage(BG.cv, 0, 0, BG.cv.width, BG.cv.height, bx, by, W * s, H * s);
+    g.globalCompositeOperation = 'saturation'; g.fillStyle = 'hsl(40,16%,50%)'; g.fillRect(x0, y0, w0, h0);
+    g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgba(244,222,170,.9)'; g.fillRect(x0, y0, w0, h0); g.globalCompositeOperation = 'source-over'; }
+  g.restore();
+  coastPath(); g.lineWidth = 2.4; g.strokeStyle = INKC; g.stroke();
+  { const x = 250, y = 610 + H * s / 2 + 40; g.beginPath(); rrPath(g, x - 90, y - 20, 180, 40, 10); g.fillStyle = '#f8ebc8'; g.fill(); g.lineWidth = 2.2; g.strokeStyle = INKC; g.stroke();
+    g.font = 'bold italic 28px ' + LOGO_FONT; g.fillStyle = INKC; g.fillText(K.home, x, y + 1); }
+  // the Parrot King's island, east (q: its size on this map; at 1 it would be about as big as Sunny Hill)
+  const q = 0.56, ix = 1200, iy = 600, iw = 320 * q, ih = 200 * q, f = [R() * TAU, R() * TAU], pts = [];
+  for (let k = 0; k < 80; k++) { const a = k / 80 * TAU, r = 1 + 0.1 * Math.sin(3 * a + f[0]) + 0.07 * Math.sin(5 * a + f[1]); pts.push([ix + Math.cos(a) * iw / 2 * r, iy + Math.sin(a) * ih / 2 * r]); }
+  const ipath = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (const p of pts) g.lineTo(p[0], p[1]); g.closePath(); };
+  // the route from where we are (where the fight was) to the X, red and dotted
+  const sx = 640, sy = 700, xx = ix - 72 * q, xy = iy + 38 * q, xr = 20 * q + 4;
+  ipath(); g.lineWidth = 14 * q + 4; g.strokeStyle = '#f4e3b2'; g.stroke();
+  ipath(); g.fillStyle = '#a9c27a'; g.fill(); g.lineWidth = 3; g.strokeStyle = INKC; g.stroke();
+  { const hx = ix + 25 * q, hy = iy - 5 * q, hw = 60 * q, hh = 72 * q;          // a hill, shaded with ink
+    g.beginPath(); g.moveTo(hx - hw, hy + 20 * q); g.quadraticCurveTo(hx - 14 * q, hy - hh, hx, hy - hh + 4 * q); g.quadraticCurveTo(hx + 20 * q, hy - hh, hx + hw, hy + 20 * q); g.fillStyle = '#c9c48e'; g.fill(); g.lineWidth = 2.2; g.strokeStyle = INKC; g.stroke();
+    g.lineWidth = 1.2; for (let j = 1; j < 6; j++) { g.beginPath(); g.moveTo(hx + j * 8 * q, hy - hh + (8 + j * 12) * q); g.lineTo(hx + (j * 8 - 7) * q, hy + 17 * q); g.stroke(); } }
+  for (const [px, py, ps] of [[-112, -14, 0.8], [-78, -60, 0.68], [100, 14, 0.74], [80, -54, 0.64], [-22, 62, 0.68]]) drawPalm2D(g, ix + px * q, iy + py * q, ps * q, INKC);
+  drawParrot2D(g, ix + 30 * q, iy - 92 * q, 1.45 * q, INKC);
+  g.setLineDash([12, 10]); g.lineWidth = 5; g.strokeStyle = 'rgba(200,55,45,.9)'; g.beginPath(); g.moveTo(sx + 30, sy - 10); g.quadraticCurveTo(880, 720, xx - 3, xy + xr * 0.9); g.stroke(); g.setLineDash([]);
+  g.lineWidth = 8; g.strokeStyle = '#c8372d'; g.beginPath(); g.moveTo(xx - xr, xy - xr); g.lineTo(xx + xr, xy + xr); g.moveTo(xx + xr, xy - xr); g.lineTo(xx - xr, xy + xr); g.stroke();
+  { const x = ix, y = iy + ih / 2 + 46; g.beginPath(); rrPath(g, x - 195, y - 22, 390, 44, 12); g.fillStyle = '#f8ebc8'; g.fill(); g.lineWidth = 2.6; g.strokeStyle = INKC; g.stroke();
+    g.font = 'bold italic 30px ' + LOGO_FONT; g.fillStyle = '#9e2a22'; g.fillText(K.island, x, y + 2); }
+  // our ship, where the fight was
+  drawShipIcon(g, sx, sy, 1.5);
+  g.font = 'bold 30px ' + FONT; g.fillStyle = '#c8372d'; g.fillText(K.here, sx, sy - 110);
+  g.lineWidth = 3; g.strokeStyle = '#c8372d'; g.beginPath(); g.moveTo(sx, sy - 90); g.lineTo(sx, sy - 76); g.stroke();
+  drawCompassRose(g, 1450, 935, 62, INKC);
+  drawWhale(g, 470, 940, 1.1, INKC);
+  // signed by the captain
+  g.save(); g.translate(1130, 1000); g.rotate(-0.05); g.font = 'italic bold 40px ' + LOGO_FONT; g.fillStyle = INKC; g.fillText('Captain Grumble', 0, 0); g.restore();
+  drawSkull2D(g, 920, 996, 0.75, INKC);
+  return cv;
+}
+function drawSkull2D(g, x, y, s, col) {          // a skull over crossed bones
+  g.save(); g.translate(x, y); g.scale(s, s);
+  const bone = (x0, y0, x1, y1) => { g.lineWidth = 11; g.strokeStyle = col; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); g.lineWidth = 6; g.strokeStyle = '#f6ecd2'; g.stroke(); };
+  bone(-26, -18, 26, 28); bone(26, -18, -26, 28);
+  g.fillStyle = '#f6ecd2'; g.strokeStyle = col; g.lineWidth = 3;
+  g.beginPath(); g.arc(0, -4, 18, 0, TAU); g.fill(); g.stroke();
+  g.beginPath(); rrPath(g, -10, 8, 20, 13, 4); g.fill(); g.stroke();
+  g.fillStyle = col;
+  for (const ex of [-7, 7]) { g.beginPath(); g.arc(ex, -5, 5, 0, TAU); g.fill(); }
+  g.beginPath(); g.moveTo(0, 2); g.lineTo(-3, 7); g.lineTo(3, 7); g.closePath(); g.fill();
+  g.restore();
+}
+function drawPalm2D(g, x, y, s, ink) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(-6, -24, 4, -46); g.lineWidth = 7; g.strokeStyle = ink; g.stroke(); g.lineWidth = 4; g.strokeStyle = '#a8703f'; g.stroke();
+  for (const a of [-2.7, -2.1, -1.5, -0.9, -0.3]) {
+    g.beginPath(); g.moveTo(4, -46); g.quadraticCurveTo(4 + Math.cos(a) * 18, -46 + Math.sin(a) * 18 - 8, 4 + Math.cos(a) * 30, -46 + Math.sin(a) * 30 + 6);
+    g.lineWidth = 7; g.strokeStyle = ink; g.stroke(); g.lineWidth = 4.4; g.strokeStyle = '#5f9a4a'; g.stroke();
+  }
+  g.restore();
+}
+function drawParrot2D(g, x, y, s, ink) {          // a red parrot with blue and yellow wings and a golden crown
+  g.save(); g.translate(x, y); g.scale(s, s); g.lineWidth = 2; g.strokeStyle = ink;
+  g.beginPath(); g.moveTo(-6, 20); g.lineTo(-16, 54); g.lineTo(0, 50); g.closePath(); g.fillStyle = '#2f7fd8'; g.fill(); g.stroke();
+  g.beginPath(); g.ellipse(0, 6, 15, 22, -0.2, 0, TAU); g.fillStyle = '#e8402e'; g.fill(); g.stroke();
+  g.beginPath(); g.ellipse(-6, 10, 9, 17, -0.35, 0, TAU); g.fillStyle = '#ffd23c'; g.fill(); g.stroke();
+  g.beginPath(); g.ellipse(-8, 16, 5, 10, -0.35, 0, TAU); g.fillStyle = '#2f7fd8'; g.fill();
+  g.beginPath(); g.arc(4, -18, 12, 0, TAU); g.fillStyle = '#e8402e'; g.fill(); g.stroke();
+  g.beginPath(); g.arc(8, -20, 5, 0, TAU); g.fillStyle = '#ffffff'; g.fill(); g.lineWidth = 1.5; g.stroke();
+  g.beginPath(); g.arc(9, -20, 2.2, 0, TAU); g.fillStyle = ink; g.fill();
+  g.beginPath(); g.moveTo(14, -18); g.quadraticCurveTo(27, -16, 20, -5); g.quadraticCurveTo(17, -10, 13, -11); g.closePath(); g.fillStyle = '#efe4c4'; g.fill(); g.lineWidth = 2; g.stroke();
+  g.beginPath(); g.moveTo(-6, -27); g.lineTo(-7, -40); g.lineTo(-1, -33); g.lineTo(4, -44); g.lineTo(9, -33); g.lineTo(15, -40); g.lineTo(14, -27); g.closePath(); g.fillStyle = '#ffd23c'; g.fill(); g.stroke();
+  for (const cx of [-7, 4, 15]) { g.beginPath(); g.arc(cx, cx === 4 ? -44 : -40, 2.2, 0, TAU); g.fillStyle = '#c8372d'; g.fill(); }
+  g.restore();
+}
 // small drawings used by the chart
 function drawAnchor2D(g, x, y, s, col) {
   g.save(); g.translate(x, y); g.scale(s, s); g.strokeStyle = col; g.lineWidth = 3.4;
@@ -10064,6 +11124,7 @@ function tapHits(it, sx, sy, wx, wy) {
 }
 function tapAt(sx, sy, drag) {
   const wp = screenToWorld(sx, sy), wx = wp.x, wy = wp.y;
+  if (SEA.active) { SEA.tap(wx, wy); return; }          // at sea: sail there
   if (!drag) {
     for (const it of interactables()) {   // tapped a character?
       if (tapHits(it, sx, sy, wx, wy)) {
@@ -10092,13 +11153,13 @@ const VOICE_KIND = {
   narrator: 'female', sparky: 'child', player: 'child',
   milo: 'child', leo: 'child', pip: 'child', pop: 'child', nomi: 'child',
   mom: 'female', rosa: 'female', lily: 'female', tess: 'female',
-  dad: 'male', bob: 'male', max: 'male', owl: 'male', fizz: 'male', bongo: 'male',
+  dad: 'male', bob: 'male', max: 'male', owl: 'male', fizz: 'male', bongo: 'male', pirate: 'male',
   cat: 'child', frog: 'child', rabbit: 'child', duck: 'female', scarecrow: 'male',
 };
 // who gets the best voice of each kind first
 const VOICE_ORDER = {
   female: ['narrator', 'mom', 'rosa', 'lily', 'tess'],
-  male: ['dad', 'bob', 'max', 'owl', 'fizz', 'bongo'],
+  male: ['dad', 'bob', 'max', 'owl', 'fizz', 'bongo', 'pirate'],
   child: ['milo', 'pip', 'nomi', 'leo', 'pop', 'sparky', 'player'],
 };
 const VOICE_NAMES = {
@@ -10337,15 +11398,15 @@ const Music = {
     const talking = (window.speechSynthesis && speechSynthesis.speaking) || !!Dialog.mouth;
     this.gain.gain.setTargetAtTime(this.wanted() ? (talking ? 0.2 : 0.62) : 0, a.currentTime, 0.35);
     if (this.next < a.currentTime) this.next = a.currentTime + 0.05;
-    const want = LAB.music();
-    if (want !== this.track) {        // into Bongo's fight and out again: one tune fades, the other starts from the top
+    const want = SEA.music() || LAB.music();
+    if (want !== this.track) {        // into Bongo's (or the pirate's) fight and out again: one tune fades, the other starts from the top
       this.track = want; this.step = 0; this.next = a.currentTime + 0.1;
       this.bus.gain.setTargetAtTime(want === 'village' ? 1 : 0, a.currentTime, 0.08);
-      this.ch.boss.gain.setTargetAtTime(want === 'boss' ? 1.3 : 0, a.currentTime, 0.04);
+      this.ch.boss.gain.setTargetAtTime(want === 'boss' || want === 'pirate' ? 1.3 : 0, a.currentTime, 0.04);
     }
     if (!this.wanted() || want === 'quiet') return;
-    const boss = want === 'boss', len = boss ? 60 / this.bossBpm() / 4 : this.EIGHTH;
-    while (this.next < a.currentTime + 0.6) { if (boss) this.playBoss(this.step, this.next); else this.play(this.step, this.next); this.step++; this.next += len; }
+    const boss = want === 'boss', pir = want === 'pirate', len = boss ? 60 / this.bossBpm() / 4 : pir ? this.pirateStep() : this.EIGHTH;
+    while (this.next < a.currentTime + 0.6) { if (boss) this.playBoss(this.step, this.next); else if (pir) this.playPirate(this.step, this.next); else this.play(this.step, this.next); this.step++; this.next += len; }
   },
   // ---- instruments
   mf(m) { return 440 * Math.pow(2, (m - 69) / 12); },
@@ -10462,6 +11523,50 @@ const Music = {
       for (const [s, m, len] of this.BOSS_MEL[mb]) if (s === e) {
         this.voice(t, m, 0.05, len * S * 0.92, 'bLead', 'lead');
         if (lvl >= 1 && !lite) this.voice(t, m - 12, 0.028, len * S * 0.92, 'bHarm', 'pulse');
+      }
+    } catch (err) { /* music is optional */ }
+  },
+  // ---- Captain Grumble's fight: a sea-shanty jig of our own in E minor, in 6/8 (eighth notes, two beats a bar), on
+  // the same chip voices: a lead with an echo, an arpeggio, a rolling bass, kick, snare and hats. Two bars of drum roll
+  // first; after 2 hits the tune is doubled an octave down and the drums get busier, after 4 it is faster.
+  pirateLevel() { const n = SEA.st().hits; return n >= 4 ? 2 : n >= 2 ? 1 : 0; },
+  pirateStep() { return 60 / (132 + this.pirateLevel() * 8) / 3; },
+  PIR_CH: { Em: [40, [64, 67, 71]], D: [38, [62, 66, 69]], C: [36, [60, 64, 67]], B: [35, [59, 63, 66]], G: [43, [62, 67, 71]] },
+  PIR_BARS: [['Em'], ['D'], ['C'], ['B'], ['Em'], ['D'], ['C', 'B'], ['Em'], ['G'], ['D'], ['Em'], ['B'], ['G'], ['D'], ['C', 'B'], ['Em']],
+  PIR_MEL: [          // per bar: [eighth it starts on, note, length in eighths]
+    [[0, 71, 1], [1, 71, 1], [2, 71, 1], [3, 76, 2], [5, 74, 1]], [[0, 74, 1], [1, 72, 1], [2, 71, 1], [3, 69, 3]],
+    [[0, 72, 1], [1, 72, 1], [2, 72, 1], [3, 79, 2], [5, 78, 1]], [[0, 78, 1], [1, 76, 1], [2, 75, 1], [3, 71, 3]],
+    [[0, 71, 1], [1, 71, 1], [2, 71, 1], [3, 76, 2], [5, 78, 1]], [[0, 79, 2], [2, 78, 1], [3, 76, 1], [4, 74, 1], [5, 72, 1]],
+    [[0, 71, 2], [2, 72, 1], [3, 69, 2], [5, 71, 1]], [[0, 76, 3], [3, 64, 1], [4, 67, 1], [5, 71, 1]],
+    [[0, 79, 1], [1, 79, 1], [2, 78, 1], [3, 79, 2], [5, 81, 1]], [[0, 78, 2], [2, 74, 1], [3, 78, 2], [5, 74, 1]],
+    [[0, 76, 1], [1, 78, 1], [2, 79, 1], [3, 83, 2], [5, 81, 1]], [[0, 78, 3], [3, 75, 3]],
+    [[0, 79, 1], [1, 79, 1], [2, 78, 1], [3, 79, 2], [5, 81, 1]], [[0, 83, 2], [2, 81, 1], [3, 78, 2], [5, 74, 1]],
+    [[0, 76, 1], [1, 74, 1], [2, 72, 1], [3, 71, 1], [4, 72, 1], [5, 75, 1]], [[0, 76, 3], [3, 71, 1], [4, 74, 1], [5, 75, 1]],
+  ],
+  playPirate(step, t) {
+    try {
+      const S = this.pirateStep(), bar = Math.floor(step / 6), e = step % 6, lvl = this.pirateLevel();
+      const lite = typeof Device !== 'undefined' && Device.touch;
+      if (bar < 2) {                     // two bars of drum roll, louder and louder
+        const k = (step + 1) / 12;
+        this.bsnare(t, 0.04 + 0.1 * k); if (e % 3 === 0) this.bkick(t, 0.22);
+        if (step === 0) this.riser(t, 12 * S);
+        return;
+      }
+      const mb = (bar - 2) % 16, names = this.PIR_BARS[mb], ch = this.PIR_CH[names[names.length > 1 && e >= 3 ? 1 : 0]];
+      if (e === 0) { this.ch.bEcho.delayTime.setValueAtTime(S * 3, t); if (mb % 8 === 0) this.crash(t, mb === 0 ? 0.12 : 0.08); }
+      // bass: the root on the beats, the octave on the last eighth of each beat (a rolling 6/8)
+      if (e === 0 || e === 3) this.bsq(t, ch[0] + (e === 3 && names.length === 1 ? 7 : 0), 0.1, S * 1.6);
+      else if (e === 2 || e === 5) this.bsq(t, ch[0] + 12, 0.06, S * 0.8);
+      // drums: kick on the beats, a snare on the second beat, hats on every eighth
+      if (e === 0 || (lvl >= 1 && e === 3) || (lvl >= 2 && e === 5)) this.bkick(t, 0.24);
+      if (e === 3) this.bsnare(t, 0.13); else if (mb % 4 === 3 && e >= 4) this.bsnare(t, 0.06);
+      if (!lite || e % 3 === 0) this.bhat(t, e % 3 === 0 ? 0.03 : 0.016, lvl >= 1 && e % 3 === 2 ? 0.08 : 0.02);
+      // the arpeggio up and down the chord, and the tune
+      if (!lite || e % 2 === 0) this.voice(t, ch[1][[0, 1, 2, 1, 2, 1][e]] + 12, 0.022, S * 0.7, 'bArp', 'pulse');
+      for (const [s, m, len] of this.PIR_MEL[mb]) if (s === e) {
+        this.voice(t, m, 0.05, len * S * 0.92, 'bLead', 'lead');
+        if (lvl >= 1 && !lite) this.voice(t, m - 12, 0.026, len * S * 0.92, 'bHarm', 'pulse');
       }
     } catch (err) { /* music is optional */ }
   },
@@ -10613,7 +11718,7 @@ function defaultState() {
     v: 1, parentSeen: false, created: false, started: false, name: GAME_CONTENT.defaultName,
     look: { body: 0, hair: 1, outfit: 0 },
     stars: 0, quest: 0, stage: 'available', q: {}, done: [], unlocked: [], wear: {},
-    family: {}, age: 7, country: 'turkey', finished: false, finishedAt: '', eggs: {}, lab: { stage: 'meet', bananas: 0, told: 0 }, ship: { stage: '', got: [] },
+    family: {}, age: 7, country: 'turkey', finished: false, finishedAt: '', eggs: {}, lab: { stage: 'meet', bananas: 0, told: 0 }, ship: { stage: '', got: [] }, sea: { stage: '', hits: 0 },
     settings: { sound: true, slow: true, view: '3d', music: true },
   };
 }
@@ -10673,10 +11778,11 @@ function updateCamera(dt, snap) {
     ty = (top + bottom) / 2 - midPx / sc;
   } else ty = (SHIP.camFocus ? SHIP.camFocus.y : player.y) - 40 - vh / 2;
   if (SHIP.camFocus && !Dialog.open) fx = SHIP.camFocus.x;
+  if (SEA.active && SEA.ship) { const f = SEA.camFocus(); fx = f.x; ty = f.y - vh / 2; }
   const tx = fx - vw / 2;
   let x = snap ? tx : lerp(cam.x, tx, 1 - Math.exp(-dt * 6));
   let y = snap ? ty : lerp(cam.y, ty, 1 - Math.exp(-dt * 6));
-  const V = LAB.inRoom() ? LAB.view2D() : { x0: -200, y0: -170, x1: W + 200, y1: H + 200 }, bw = V.x1 - V.x0, bh = V.y1 - V.y0;
+  const SA = SEA.AREA, V = SEA.active ? { x0: SA.x0 - 700, y0: SA.y0 - 200, x1: SA.x1 + 200, y1: SA.y1 + 200 } : LAB.inRoom() ? LAB.view2D() : { x0: -200, y0: -170, x1: W + 200, y1: H + 200 }, bw = V.x1 - V.x0, bh = V.y1 - V.y0;
   x = vw >= bw ? V.x0 + (bw - vw) / 2 : clamp(x, V.x0, V.x1 - vw);
   y = vh >= bh ? V.y0 + (bh - vh) / 2 : clamp(y, V.y0, V.y1 - vh);
   cam.x = x; cam.y = y;
@@ -10684,6 +11790,7 @@ function updateCamera(dt, snap) {
 const drawList = [];
 function markerFor(n) { return Quests.marker(n.id); }
 function renderWorld(c, cx, cy, pr, vw, vh, t) {
+  if (c === ctx && SEA.active) { SEA.render2D(c, cx, cy, pr, t); return; }     // out at sea
   if (c === ctx && cy + vh / 2 > H) { LAB.render2D(c, cx, cy, pr, t); return; }     // in Dr. Fizz's hall
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.fillStyle = c === ctx ? '#45b6e0' : '#5fae43'; c.fillRect(0, 0, c.canvas.width, c.canvas.height);
@@ -10773,6 +11880,7 @@ function update(dt, tour) {
   EGGS.update(dt);
   LAB.update(dt);
   SHIP.update(dt);
+  SEA.update(dt);
   game.ev += (eveningTarget() - game.ev) * Math.min(1, dt * 1.2);
   if (game.sleepT > 0 && game.mode === 'play' && (game.sleepT -= dt) <= 0) {   // morning: the twins wake up
     game.sleepT = 0; NPC.pip.sleeping = NPC.pop.sleeping = false;
@@ -10948,7 +12056,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys, LAB, SHIP, Parts, shoreC,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, Wardrobe, Parent, Creator, Toast, get look() { return PLAYER_LOOK; },
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, Wardrobe, Parent, Creator, Toast, get look() { return PLAYER_LOOK; },
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');

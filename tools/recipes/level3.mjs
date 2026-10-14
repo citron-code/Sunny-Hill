@@ -93,6 +93,7 @@ export default async function ({ evaluate, sleep, shot, savePng, viewport }) {
   await S(`document.getElementById('capOk').click()`); await sleep(200);
   log('closed: mode', await S('SH.game.mode'), '| card:', await card(), '| saved', await S(`(() => { try { return JSON.stringify(JSON.parse(localStorage.getItem('sunnyHill.save.v1')).ship); } catch (e) { return 'x'; } })()`));
   await step(4); log('Captain Bob back at work', await S('!!SH.NPC.bob.rt'), '| marker', await S(`SH.Quests.marker('bob')`));
+  log('Sparky (level 4 begins):', await lines(), '| card:', await card());
   // the wardrobe: six things now, one hat at a time
   await S('SH.Wardrobe.open()'); await sleep(300); await shot('l3-wardrobe');
   log('wardrobe items', await S(`document.querySelectorAll('#wdItems .pick').length`));
@@ -101,7 +102,9 @@ export default async function ({ evaluate, sleep, shot, savePng, viewport }) {
   await S(`[...document.querySelectorAll('#wdItems .pick')][5].click()`); await sleep(100);
   log('captain hat on: hat', await S('SH.state.wear.hat'), '| look', await S('SH.look.hat'));
   await S('SH.Wardrobe.close()');
-  // the wheel again: the certificate opens again
-  await talk('shipwheel'); log('wheel again:', await lines()); log('certificate again', await S(`SH.game.mode === 'capcert'`));
+  // Captain Bob shows the certificate again; the wheel now takes you out to sea (level 4, see level4.mjs)
+  await talk('bob'); log('Captain Bob:', await lines()); log('certificate again', await S(`SH.game.mode === 'capcert'`));
   await S(`document.getElementById('capOk').click()`); await sleep(100);
+  await talk('shipwheel'); log('wheel again:', await lines(), '| at sea', await S('SH.SEA.active'));
+  await step(0.5); await shot('l3-sea');
 }
