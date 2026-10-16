@@ -99,7 +99,7 @@ export default async function ({ evaluate, sleep, shot, savePng, send, consoleLo
   await S('SH.keys.right = 1'); await step(4); await S('SH.keys.right = 0');
   log('sailing out: x', await S('Math.round(SH.SEA.ship.x)'), '| pirate yet', await S('!!SH.SEA.pirate'), '| crates on the way', await S('SH.SEA.crates.length'));
   await shot('l4-voyage');
-  await S('(() => { const s = SH.SEA.ship, G = SH.SEA.goal; s.x = G.x - 1000; s.y = G.y; s.a = 0; })()'); await step(1);
+  await S('(() => { const s = SH.SEA.ship, G = SH.SEA.goal; if (!G) return; s.x = G.x - 1000; s.y = G.y; s.a = 0; })()'); await step(1);          // (no goal: the ship, at sea at full speed since the harbour, already got there and Grumble is coming)
   log('far out: pirate', await S('!!SH.SEA.pirate'), '| our ship', await S('Math.round(SH.SEA.ship.x) - 3400'), 'from the island coast');
   await step(1.5); await shot('l4-pirate-comes');
   await step(4); log('Grumble:', await lines(), '| stage', await S('SH.state.sea.stage'), '| music', await S('SH.SEA.music()'), '| boss bar', await S(`!document.getElementById('bossBar').classList.contains('hidden') && document.getElementById('bbName').textContent`));
