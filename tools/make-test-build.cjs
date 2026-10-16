@@ -4,7 +4,7 @@
 //     the new levels: every new game starts with the first eight quests done (level 2 is open)
 //     (default: ../Sunny Hill TEST.html, outside the repo)
 //   node tools/make-test-build.cjs --full [output file]
-//     the whole game from the very start (parent screen, character, quest 1 ... Captain Grumble at sea),
+//     the whole game from the very start (parent screen, character, quest 1 ... Captain Grumble at sea, the Parrot King),
 //     with shortcuts to every quest and level, a list of what has been reached, and "jump to where Sparky points"
 //     (default: ../Sunny Hill TEST - Baştan Sona.html)
 const fs = require('fs'), path = require('path');
@@ -55,7 +55,12 @@ const buttons = FULL ? `
     <button data-p="sea3">Korsan savaşı: 3 isabet yapılmış</button>
     <button data-p="sea4">Korsan savaşı: son atış (4 isabet)</button>
     <button data-p="seamap">Korsan kaçtı: haritası denizde</button>
-    <button data-p="seawon">Harita bulundu (bölüm bitti)</button>
+    <button data-p="seawon">Harita bulundu: adaya yolculuk</button>
+    <div class="tmHead">5. bölüm: Papağan Kral'ın adası</div>
+    <button data-p="isle0">Dümen başında: adaya yolculuk</button>
+    <button data-p="isle1">Adada, iskelede (köy ve kafesler)</button>
+    <button data-p="isle3">Tepede: Papağan Kral, 3 tüy alınmış</button>
+    <button data-p="isleW">Papağan yenildi, gemi tamir edildi</button>
     <div class="tmHead">Yardım</div>
     <button data-p="goal">🎯 Sparky'nin gösterdiği yere ışınlan</button>
     <div class="tmHead">Nereye kadar gelindi</div>
@@ -69,7 +74,11 @@ const buttons = FULL ? `
     <button data-p="sea3">Korsan savaşı: 3 isabet yapılmış</button>
     <button data-p="sea4">Korsan savaşı: son atış (4 isabet)</button>
     <button data-p="seamap">Korsan kaçtı: haritası denizde</button>
-    <button data-p="seawon">Harita bulundu (bölüm bitti)</button>`;
+    <button data-p="seawon">Harita bulundu: adaya yolculuk</button>
+    <button data-p="isle0">5. bölüm: dümen başında, adaya yolculuk</button>
+    <button data-p="isle1">Papağan adası: iskelede</button>
+    <button data-p="isle3">Papağan adası: tepede, 3 tüy alınmış</button>
+    <button data-p="isleW">Papağan yenildi, gemi tamir edildi</button>`;
 rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99;font:bold 14px sans-serif">
   <button id="testBtn" style="background:#e8503a;color:#fff;border:0;border-radius:10px;padding:4px 12px;font:inherit;opacity:.92;cursor:pointer">${LABEL} ▴ (yayında değil)</button>
   <div id="testMenu" style="display:none;position:absolute;bottom:34px;left:50%;transform:translateX(-50%);background:#fff;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);padding:8px;width:${FULL ? 'min(420px,94vw)' : '270px'};max-height:min(78vh,calc(100vh - 60px));overflow:auto">${buttons}
@@ -109,8 +118,16 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
     seamap: () => after3({ stage: 'map', hits: 5, told: 1, dmg: 4 }),
     seawon: () => after3({ stage: 'won', hits: 5, told: 1, dmg: 4, map: 1 }),
   });
+  // level 5: after Grumble's map (our ship broken), with the Parrot King's island at some point
+  const after4 = (isle, fixed) => Object.assign(after3({ stage: 'won', hits: 5, told: 1, dmg: fixed ? 0 : 4, map: 1 }), { isle });
+  Object.assign(P, {
+    isle0: () => after4({ stage: '' }),
+    isle1: () => after4({ stage: 'land' }),
+    isle3: () => after4({ stage: 'fight', f: 3, n: 0 }),
+    isleW: () => after4({ stage: 'won', f: 5, n: 0, fixed: 1 }, true),
+  });
   for (let i = 0; i < 8; i++) P['q' + i] = () => atQuest(i);
-  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm' };
+  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm', isle0: 'helm', isle1: 'isle', isle3: 'hill', isleW: 'isle' };
   const menu = document.getElementById('testMenu');
   const refresh = () => { try { Hud.cardKey = ''; Hud.refresh(); } catch (e) { /* older game */ } };          // the quest card, after a jump
   // what has been reached so far (read from the game itself)
@@ -129,6 +146,7 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
       ok(!!sh.capt) + 'Kaptan şapkası ve Genç Kaptan sertifikası',
       ok(((s.sea || {}).hits | 0) >= 5) + '4. bölüm: Kaptan Grumble ' + ((s.sea || {}).hits | 0) + ' / 5 isabet',
       ok(!!(s.sea || {}).map) + "Grumble'ın haritası (Papağan Kral'ın adası)",
+      ok((s.isle || {}).stage === 'won') + "5. bölüm: Papağan Kral " + ((s.isle || {}).f | 0) + ' / 5 tüy',
       'ℹ️ Gizli sürprizler: ' + eggs + ' / 8',
     ].map((t) => '<div>' + t + '</div>').join('');
   };
@@ -150,7 +168,7 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
   });
   // after the reload: the first time you are in the game (Continue), jump to the right place
   let tp = null; try { tp = localStorage.getItem(TP); } catch (e) { /* no storage */ }
-  if (tp) { const iv = setInterval(() => { if (window.SH && SH.game && SH.game.mode === 'play') { clearInterval(iv); try { localStorage.removeItem(TP); } catch (e) { /* */ } let p = JSON.parse(tp); if (p === 'helm') { const q = SH.SHIP.helmSpot(); p = [q.x, q.y]; } SH.tp(p[0], p[1]); refresh(); } }, 300); }
+  if (tp) { const iv = setInterval(() => { if (window.SH && SH.game && SH.game.mode === 'play') { clearInterval(iv); try { localStorage.removeItem(TP); } catch (e) { /* */ } let p = JSON.parse(tp); if (p === 'isle' || p === 'hill') { SH.ISLE5.land(); if (p === 'hill') { const H = SH.ISLE5.HILL; SH.tp(H.x - H.rx * H.top - 50, SH.ISLE5.RAMP.y); } refresh(); return; } if (p === 'helm') { const q = SH.SHIP.helmSpot(); p = [q.x, q.y]; } SH.tp(p[0], p[1]); refresh(); } }, 300); }
   void FULL;
 })();
 </script>

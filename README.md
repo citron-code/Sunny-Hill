@@ -157,8 +157,9 @@ Sorular `GAME_CONTENT.ship.questions` içinde. 24 soru öğretmenin "Grade 2 Ver
 bilgisi konuları heyecanlı bir deniz savaşında tekrar edilir.
 
 - **Sparky'nin çağrısı.** Genç Kaptan sertifikasından sonra Sparky "Our ship is ready!" der; ok dümeni gösterir.
-- **Denize açılış.** Dümende "Let's sail!" denir ve gemi limandan açık denize çıkar. Gemide yalnız çocuk (dümende) ve
-  Sparky (pruvada) var. Deniz geniş: adanın doğusunda yaklaşık 6200 x 4100 birimlik bir alan.
+- **Denize açılış.** Dümende "Let's sail!" denir. Sahne kesilmez: gemi iskelede durduğu yerden başlar, kamera
+  yavaşça geri çekilir; köy, insanlar ve hayvanlar görünmeye devam eder. Sparky konuşmasını bitirince gemi limandan
+  kendiliğinden açık denize süzülür, sonra dümen çocuğa geçer. Gemide yalnız çocuk (dümende) ve Sparky (pruvada) var. Deniz geniş: adanın doğusunda yaklaşık 6200 x 4100 birimlik bir alan.
 - **Gemiyi sürmek.** Güvertede yürünmez, gemiyi çocuk yüzdürür:
   - bilgisayarda ok tuşları ya da WASD, telefonda joystick; denize dokunmak/tıklamak da gemiyi oraya götürür;
   - gemi gösterilen yöne döner ve gider. Kimse dümene dokunmasa da rüzgârla orta hızda ilerlemeye devam eder (fareyle
@@ -197,15 +198,111 @@ bilgisi konuları heyecanlı bir deniz savaşında tekrar edilir.
 
   Harita resim olarak kaydedilebilir.
 - **Son.** Sparky: "Oh no! Our ship is broken! The Parrot King's island is near. We can fix our ship there! And we have
-  our family album!" Bölüm burada biter, gemi limana döner. Dümen artık "Our ship is broken. Next time we sail to the
-  Parrot King's island!" der (sonraki bölüm).
+  our family album! Let's sail there!" Hasarlı, dumanı tüten gemiyle doğrudan Papağan Kral'ın adasına gidilir
+  (5. bölüm: korsan ve papağan tek uzun yolculuk).
 - **Telefon.** Kamera iki gemiyi, sandığı ya da hedefi ve nişan halkasını görev kartıyla boss çubuğunun altında kalan
   alana sığdırır; dik ve yatay ekranda, 3D ve 2D'de.
 
-Sorular `GAME_CONTENT.sea.questions` içinde, konu başına 8 soru: `family`, `tobe`, `not`, `ask`, `short`.
+Sorular `GAME_CONTENT.sea.questions` içinde, konu başına 8 soru: `family`, `tobe`, `not`, `ask`, `short`. Aile soruları sınavdaki
+gibi: "He is my ___. / She is my ___." ve seçeneklerde zamire uyan tek bir aile kelimesi ("My mother's mother" türü
+akrabalık bilmeceleri sınavda olmadığı için kaldırıldı).
 Biçim aynı: `cümle ___ | doğru | yanlış | yanlış`. Kayıt `state.sea = { stage: '' | 'sail' | 'fight' | 'map' | 'won', hits,
 dmg, map, told }`; oyun kapatılıp açılırsa isabetler kaybolmaz, dümenden kalınan yerden devam edilir ('map': Grumble
 kaçtı, haritası hâlâ denizde).
+
+## 5. bölüm: Papağan Kral'ın adası
+
+Korsandan sonraki yolculuğun devamı. İçerik yine 1. ünitenin tekrarı: aile kelimeleri ve o güne kadarki bütün dil bilgisi.
+
+- **Yolculuk.** Grumble'ın haritası bulununca hasarlı gemiyle doğuya, adaya gidilir. Oyun kapatılıp açıldıysa Sunny Hill'deki
+  dümen de adaya götürür. Ada denizden uzaktan görünür; gemi kumsala çıkamaz. İskeleye yaklaşınca dümen kendiliğinden
+  döner: gemi yavaşlayarak iskelenin yanına süzülür ve durur, iskele tahtası gemiye iner. Sahne kesilmez, kamera
+  adadaki görünüme kendiliğinden geçer. Çocuk dümenden güverte boyunca yürür, tahtadan iskeleye iner; Sparky de arkasından
+  gelir.
+- **Ada.** Sunny Hill'in yarısı kadar. Kumsal ve palmiyeler, eğrelti otları, ebegümeci ve çiçeklerle tropik bir orman, muz
+  ağaçları. Saman çatılı, süslü kulübeleriyle küçük bir köy: kamp ateşi (alevler, kıvılcımlar, sıcak ışık), oturmak için
+  kütükler, kapı önlerinde hasırlar, flamalar, meşaleler, tepesinde papağan oturan bir totem, kumsalda bir kano, balık
+  kurutma askısı. Gökyüzünde renkli papağanlar, çiçeklerin üstünde kelebekler dolaşır. Kumsalda denizyıldızları ve deniz
+  kabukları, yan yan yürüyen yengeçler; kıyıda köpüklü, yosunlu kayalar; suda güneş ışıltıları. Yapıların altında yumuşak
+  gölgeler, ufukta deniz gökyüzüne yumuşakça karışır. Doğuda kayalık yamaçlı bir tepe. Tepeye yalnızca batıdaki duvarlı
+  taş basamaklardan çıkılır; basamakların üstünde boyalı bir kapı ve iki yanında altın papağan heykelleri. Düz tepede taş
+  bir halka, ortasında renkli bir güneş deseni, Papağan Kral'ın sarayı: altın kenarlı taş kaide, altın tünek, kırmızı-sarı
+  şemsiye ve bayraklar. 2D görünümde de aynıları çizilir; çocuk bir ağacın ya da kulübenin arkasına geçince yarı saydam
+  görünür.
+- **Kafesteki köylüler.** Papağan Kral köydeki aileyi bambu kafeslere koymuş: Büyükanne Nani, Papa Koa, Mama Malia ve
+  kardeşler Kai ile Lani. Köye girince "Help! Help!" diye seslenirler. Her biriyle konuşulabilir; aile cümleleri kurarlar
+  ("Koa is my son.", "Kai and Lani are my children.").
+- **Papağan Kral.** Kocaman bir ara papağanı: kırmızı, altın göğüslü; kanatlarında kırmızı, sarı ve uzun mavi tüy
+  sıraları, kırmızıdan maviye dönen uzun kuyruk tüyleri. Kısa kıvrık gaga, sarı irisli gözler, ensesinde tüyler, ikisi
+  önde ikisi arkada pençeler. Taşlı altın tacında 5 renkli tüy var: her kaybettiği tüy tacından süzülerek yere düşer
+  (üstteki çubuktaki tüyler de onlar). Boynunda altın zincir ve madalya. İngilizceyi Grumble'dan öğrenmiş
+  ve yanlış konuşuyor: "I is the king of this island!"
+- **Savaş.** Tepeye çıkınca sarmaşıklar dönüş yolunu kapatır, kral havalanır. Tepenin üstünde yüksekten, kanat
+  çırparak uçar (kanatlar hızlı iner, yavaş kalkar; arada süzülür). Uçarken kuyruğu arkaya uzanır, ayaklarını toplar,
+  dönüşlerde yana yatar. 2D görünümde de kanat çırpar, çocuğa doğru bakar; savaşta kamera bütün tepeyi gösterir.
+  - Kral yanlış bir cümle bağırır. Cümle üstte bir balonda yazar; yanlış kelime kırmızıyla.
+  - Tepede bulutların üstünde üç kelime belirir (doğrusu ve iki yanlış). Çocuk doğru kelimeye koşar: kral cümleyi doğru
+    söyler (balonda yeşil) ve bir an sersemler. Yanlış kelime patlar ("Try again!"), kral güler; diğer kelimeler kalır.
+  - Bu arada kral hindistancevizi atar; düşeceği yerde kırmızı halka belirir. İsabet ederse çocuk bir an sersemler
+    (kaybetmek yok). Tüy sayısı arttıkça daha sık ve aynı anda daha çok atar.
+  - Her 3 doğru düzeltmede tacından bir tüy düşer (üstteki çubukta 5 tüy). 5 tüy = 5 konu: aile kelimeleri, am / is / are,
+    isn't / aren't / am not, sorular ve kısa cevaplar, kısaltmalar. Toplam 15 düzeltme.
+- **Son.** 5. tüyde kral iner, özür diler ("I am sorry! You are a good teacher!") ve anahtarları verir. Çocuk
+  merdivenlerden inip patikadan köye yürür (ışınlanma yok), Sparky arkasından gelir; köye yaklaşınca kafesler açılır.
+  Aile kamp ateşinin önünde toplanır ve gemiyi tamir eder: beyaz bir duman bulutu, dumanlar ve yanıklar gider. Kai: "Where are you going now?"
+  Sparky: "To the school island! See you next time!" (okul adası sonraki bölüm).
+- **Telefon.** Savaşta kamera tepenin tamamını ve kralı, görev kartı, çubuk ve balonun altında kalan alana sığdırır.
+  Kısa yatay ekranda görev kartı savaş süresince gizlenir.
+
+Cümleler `GAME_CONTENT.isle5.wrong` içinde, konu başına 6 cümle: `cümle ___ | doğru | papağanın söylediği yanlış | başka bir
+yanlış`. Kayıt `state.isle = { stage: '' | 'land' | 'met' | 'fight' | 'won', f (tüy), n, fixed }`. Oyun kapatılırsa
+kazanılan tüyler kaybolmaz; oyun Sunny Hill'den açılır ve dümen yeniden adaya götürür.
+
+### Papağan Kral'la alıştırma ve skor tablosu
+
+Kral yenildikten sonra dost olur. Çocuk tepeye çıkıp onunla konuşunca alıştırma başlar ve istediği kadar sürer: kral yine
+yanlış konuşur, çocuk doğru kelimeye koşar. **5 doğru kelime = 1 tur.** Her turda 3 cümle am / is / are, 1 cümle olumsuz
+(isn't / aren't / am not) ya da soru, 1 cümle kısaltma ya da aile kelimesi; yani turların çoğu ünitenin am / is / are
+konusu. Her doğru kelimede kralın tacından bir tüy düşer, tur bitince tüyleri geri gelir. Turlar ilerledikçe hindistancevizleri
+biraz sıklaşır; kaybetmek yok. Tepeden inmek alıştırmayı bitirir.
+
+Tepede, merdivenlerin yanında **Papağan Kral'ın Panosu** durur. **Bütün öğrenciler tek tabloda**, bitirdikleri tur
+sayısına göre sıralanır: sıra (🥇 🥈 🥉 4. 5. ...), çocuğun avatarının küçük resmi, panoda görünecek adı, şubesi
+(renkli A / B / C / D etiketi) ve tur sayısı. Turlar eşitse ilk denemede doğru bilme oranı öne geçer.
+
+Papağan Kral'la **ilk alıştırmadan önce** bir **isim ve şube ekranı** açılır: avatarın resmi, "Your name:" kutusu (oyunun
+başında yazılan ilk adla dolu gelir; en çok 12 harf, yalnızca harf, boşluk, nokta, kesme ve tire) ve dört büyük düğme
+A B C D. İkisi de seçilmeden OK düğmesi açılmaz. Seçilenler cihazda kayıtlı kalır (`state.bname`, `state.cls`), bir daha
+sorulmaz; panodaki "✏️ Change" düğmesiyle değiştirilebilir. Şube öğretmenin paylaştığı bağlantıdan da gelebilir (örneğin
+`https://citron-code.github.io/Sunny-Hill/?sinif=A`); o zaman ekranda o şube seçili gelir. A–D dışındaki sınıflar
+(örneğin TEST) tabloda görünmez. Pano en son gördüğü listeyi cihazda tutar ve açılır açılmaz onu gösterir.
+
+Sorular `GAME_CONTENT.isle5.practice.pool` içinde (am / is / are 36, olumsuz 8, soru 8, kısaltma 6 cümle; savaşın
+cümleleri de kullanılır). Kayıt `state.isle.pr = { rounds, right, wrong, best }`, oyuncu kimliği `state.pid`, panodaki ad
+`state.bname`, sınıf `state.cls`.
+
+#### Online skor tablosu (Google E-Tablo, bir kez kurulur)
+
+`BOARD_URL` boşken tablo yalnızca o cihazdakileri gösterir (aynı tablet ya da bilgisayarda oynayan çocuklar). Bütün
+sınıfın tek tabloda görünmesi için:
+
+1. Google Drive'da yeni bir **Google E-Tablo** açın (adı örneğin "Sunny Hill Pano").
+2. **Uzantılar → Apps Script**'e girin. Açılan dosyadaki her şeyi silip `tools/scoreboard-apps-script.gs` dosyasının
+   içeriğini yapıştırın ve kaydedin.
+3. **Dağıt → Yeni dağıtım → Tür: Web uygulaması** seçin. "Şu kullanıcı olarak yürüt": **Ben**, "Erişimi olan":
+   **Herkes**. **Dağıt**'a basın, Google'ın istediği izinleri verin.
+4. Çıkan **Web uygulaması URL'sini** (`https://script.google.com/macros/s/.../exec`) kopyalayıp bana verin; oyundaki
+   `BOARD_URL`'ye yazılır.
+
+**Kuruldu (16.10.2026):** `BOARD_URL` öğretmenin E-Tablosuna bağlı. Betik sonradan "herkesi tek istekte" verecek şekilde
+güncellendi (`all: true`); E-Tablo'daki eski betik çalışmaya devam eder ama pano dört şubeyi ayrı ayrı ister ve yavaşlar.
+**Betiği güncellemek:** Uzantılar → Apps Script, kodu `tools/scoreboard-apps-script.gs`'nin yeni hâliyle değiştirip kaydedin;
+Dağıt → Dağıtımları yönet → kalem → Sürüm: **Yeni sürüm** → Dağıt (adres aynı kalır). Otomatik testler gerçek tabloya yazmaz
+(`ScoreBoard.url = ''`).
+
+Tablo E-Tablo'nun "Board" sayfasında birikir: her çocuk bir satır (kimlik, ilk ad, sınıf, avatar bilgisi, tur, doğru,
+yanlış, tarih). İstenmeyen bir satırı oradan silebilirsiniz. Tam ad, fotoğraf ya da e-posta gönderilmez. Skorlar
+tarayıcıdan gönderildiği için meraklı biri sahte bir sayı gönderebilir; sınıf içi kullanım için bu sorun değildir.
 
 ## Karakterler
 
@@ -301,6 +398,10 @@ node tools/drive.mjs tools/recipes/level3.mjs     # 3. bölüm baştan sona: sı
 node tools/drive.mjs tools/recipes/level3-2d.mjs  # aynısı 2D görünümde
 GL=gpu node tools/drive.mjs tools/recipes/level4.mjs  # 4. bölüm baştan sona: Sparky'nin çağrısı, dümen, gemiyi sürmek, alıştırma sandığı, gerçek sürüklemeyle nişan, şamandıra, açık denize yolculuk, Grumble, gülleler ve hasar, ıska, 5 isabet ve konuları, kaçış, son gülle, harita, limana dönüş
 node tools/drive.mjs tools/recipes/level4-2d.mjs  # aynısı 2D görünümde
+GL=gpu node tools/drive.mjs tools/recipes/level5.mjs  # 5. bölüm baştan sona: dümenden adaya yolculuk, kumsala çıkamama, iskele, kafesteki köylüler, tepeye yol, Papağan Kral, yanlış kelime, hindistancevizi, 15 düzeltme ve 5 tüy, kafeslerin açılması, gemi tamiri
+node tools/drive.mjs tools/recipes/level5-2d.mjs  # aynısı 2D görünümde
+GL=gpu node tools/drive.mjs tools/recipes/level5-practice.mjs  # Kral'la alıştırma: konuşma, iki tur (5 doğru = 1 tur, çoğu am / is / are), yanlış kelime, tepeden inince biter; pano: sınıf kodu, sıra, avatar, ilk ad, tur
+GL=gpu TAG=a node tools/drive.mjs tools/recipes/level5-tour.mjs  # adanın görsel turu: hep aynı 8 nokta (iskele, köy, kafesler, orman, merdiven, tepe, taht, kumsal), önce/sonra karşılaştırmak için; FLAT=1 ile 2D
 GL=gpu node tools/drive.mjs tools/recipes/level4-dodge.mjs  # denge: Grumble 40 saniyede kaç kez vuruyor (dümene dokunmadan, dümdüz, fareyle tıklayarak, kaçarak)
 GL=gpu node tools/drive.mjs tools/recipes/og-image.mjs # paylaşım önizleme resmi (tools/shots/og-image.png; JPEG olarak og-image.jpg yapılır)
 node tools/drive.mjs tools/recipes/restart.mjs    # baştan başlama gerçek tıklamalarla: Menu → Main menu → New Game, diyalog açıkken, sertifikadaki Play again; 3 ekran boyutunda

@@ -4,7 +4,7 @@
 // (each hit leaves our ship a little more broken), a crate for every shot (one grammar topic per hit: family, am/is/are,
 // not, questions, short answers; each hit brings back a page of the family album), a miss to load again. After five hits
 // he runs away, his last ball finds us, and he drops his treasure map: it shows the Parrot King's island, where we can fix
-// our broken ship (next time).
+// our broken ship, and we sail straight on there (level 5: tools/recipes/level5.mjs).
 // Game time is moved on with SH.step, so the result does not depend on how fast this computer draws.
 export default async function ({ evaluate, sleep, shot, savePng, send, consoleLog, viewport }) {
   const S = (e) => evaluate(e);
@@ -23,7 +23,8 @@ export default async function ({ evaluate, sleep, shot, savePng, send, consoleLo
     const qs = [];
     for (let j = 0; j < 3; j++) {
       for (let i = 0; i < 60 && await S(`!document.querySelector('.tbBlank') || document.querySelector('.tbBlank').classList.contains('filled')`); i++) await sleep(100);
-      const [sent, ans, topic] = await S(`(() => { const s = document.querySelector('.tbSent').textContent; for (const t of ['family', 'tobe', 'not', 'ask', 'short']) { const q = SH.SEA.questions(t).find((q) => q.text.replace(/_{2,}/, '?') === s); if (q) return [s, q.answer, t]; } return [s, null, '?']; })()`);
+      const [sent, ans, topic] = await S(`(() => { const s = document.querySelector('.tbSent').textContent, on = [...document.querySelectorAll('.tbBtn')].map((b) => b.dataset.v).filter(Boolean);          // (the same sentence can come with other choices: He is my ___.)
+        for (const t of ['family', 'tobe', 'not', 'ask', 'short']) { const q = SH.SEA.questions(t).find((q) => q.text.replace(/_{2,}/, '?') === s && q.options.every((o) => on.indexOf(o) >= 0)); if (q) return [s, q.answer, t]; } return [s, null, '?']; })()`);
       if (wrongFirst && j === 0) {
         await S(`[...document.querySelectorAll('.tbBtn')].find((b) => b.dataset.v && b.dataset.v !== ${JSON.stringify(ans)}).click()`); await sleep(300);
         log('  wrong answer: buttons dimmed', await S(`document.querySelectorAll('.tbBtn.dim').length`)); await shot('l4-question');
@@ -75,6 +76,9 @@ export default async function ({ evaluate, sleep, shot, savePng, send, consoleLo
   // the Fire button before any crate: no
   await S(`(() => { const b = document.getElementById('seaFire'), r = b.getBoundingClientRect(); b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 7, clientX: r.left + 20, clientY: r.top + 20 })); })()`);
   log('Fire without a crate: shakes', await S(`document.getElementById('seaFire').classList.contains('nope')`), '| toast', await S(`(document.getElementById('toast') || {}).textContent || ''`));
+  // the ship starts where it lay at the quay (no cut) and sails out of the harbour by itself; then it is yours to steer
+  { const x0 = await S('Math.round(SH.SEA.ship.x)'); let n = 0; for (; n < 40 && await S('!!SH.SEA.undock'); n++) await step(0.25);
+    log('out of the harbour by itself: from x', x0, 'to', await S('Math.round(SH.SEA.ship.x)'), 'in', (n * 0.25).toFixed(2), 's'); }
   // 3) steering with the arrow keys
   const a0 = await S('[SH.SEA.ship.x, SH.SEA.ship.y, SH.SEA.ship.a]');
   await S('SH.keys.up = 1'); await step(1); await S('SH.keys.up = 0; SH.keys.right = 1'); await step(1); await S('SH.keys.right = 0');
@@ -135,10 +139,11 @@ export default async function ({ evaluate, sleep, shot, savePng, send, consoleLo
   await savePng('l4-map-picture', await S(`SH.CaptainCert.draw(document.createElement('canvas')).toDataURL('image/png')`));
   await S(`document.getElementById('capOk').click()`); await sleep(200);
   log('Sparky:', await lines());
-  log('back in the harbour', !(await S('SH.SEA.active')), '| card:', await card(), '| saved', await S(`(() => { try { return JSON.stringify(JSON.parse(localStorage.getItem('sunnyHill.save.v1')).sea); } catch (e) { return 'x'; } })()`));
-  await shot('l4-home');
-  // 11) the wheel again: next time, the Parrot King's island; Captain Bob still shows the certificate
-  await talk('shipwheel'); log('wheel again:', await lines(), '| at sea', await S('SH.SEA.active'));
-  await talk('bob'); await lines(); log('Captain Bob: certificate', await S(`SH.game.mode === 'capcert'`)); await S(`document.getElementById('capOk').click()`); await sleep(100);
+  // 11) straight on, damaged and smoking, to the Parrot King's island (level 5 is tools/recipes/level5.mjs)
+  log('on to the island:', await S('SH.SEA.active ? SH.SEA.trip : SH.ISLE5.here() ? "there already" : false'), '| goal', JSON.stringify(await S('SH.SEA.goal')), '| card:', await card(), '| saved', await S(`(() => { try { return JSON.stringify(JSON.parse(localStorage.getItem('sunnyHill.save.v1')).sea); } catch (e) { return 'x'; } })()`));
+  await step(1); await shot('l4-on-to-the-island');
+  if (await S('!!SH.SEA.goal')) { await S('(() => { const s = SH.SEA.ship, g = SH.SEA.goal; s.x = g.x - 200; s.y = g.y; s.a = 0; })()'); await step(0.5); }
+  for (let i = 0; i < 60 && await S('SH.SEA.active || !!SH.ISLE5.off'); i++) await step(0.25);          // (it ties up by itself, then we walk off down the gangplank)          // (the crates may have led us near it already)
+  log('landed on the island', await S('SH.ISLE5.here()'), '| dialog:', await lines());
   log('errors:', JSON.stringify(consoleLog.filter((c) => c.level === 'exception' || c.level === 'error').slice(-5)));
 }
