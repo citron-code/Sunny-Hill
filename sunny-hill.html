@@ -191,10 +191,11 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
   font-size:clamp(17px,3.6vmin,30px);line-height:1.2;color:#3a2a20;pointer-events:none;text-align:center}
 @media (max-height:480px) and (orientation:landscape){body.isleSay #questCard{display:none} #isleSay{padding:4px 14px 4px 8px;border-width:3px} body.isleSay #toast{font-size:17px;padding:5px 12px}}
 #isleSay .isIcon{font-size:1.35em;line-height:1} #isleSay b{padding:0 4px;border-radius:8px}
-#isleSay b.bad{color:#d83a2a;background:#ffe2dc;text-decoration:underline wavy #d83a2a;text-underline-offset:5px}
+#isleSay b.gap{display:inline-block;min-width:2.4em;text-align:center;color:#c98a10;background:#fff4cc;border:3px dashed #e2a21b;border-radius:10px;line-height:1.15;margin:0 2px}
 #isleSay b.ok{color:#1f8a3e;background:#dcf7e2} #isleSay.right{border-color:#4cc36a}
 #isleWords .iw{position:fixed;left:0;top:0;z-index:9;will-change:transform;padding:4px 14px;background:#fff;border:4px solid #ffd23c;border-radius:16px;font-family:var(--font);font-weight:bold;
   font-size:clamp(17px,3.4vmin,30px);color:#3a2a20;box-shadow:0 4px 0 rgba(0,0,0,.18);pointer-events:none;white-space:nowrap}
+#isleWords .iw.shown{background:#3fbf5a;border-color:#fff;color:#fff;box-shadow:0 0 0 6px rgba(63,191,90,.35),0 4px 0 rgba(0,0,0,.18)}
 #seaFire{position:fixed;z-index:11;right:calc(22px + env(safe-area-inset-right));bottom:calc(24px + env(safe-area-inset-bottom));width:clamp(104px,15vmin,136px);height:clamp(104px,15vmin,136px);
   border-radius:50%;border:5px solid #fff;padding:0;background:radial-gradient(circle at 35% 28%,#eef3f7,#b8c4cf 50%,#8796a5);box-shadow:0 7px 0 #5f6d7a,0 12px 22px rgba(0,0,0,.3);
   display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font);font-weight:bold;color:var(--ink);cursor:grab;touch-action:none;
@@ -1038,29 +1039,206 @@ const GAME_CONTENT = {
     ship: [['sparky', 'Our ship is broken. We cannot sail now.'], ['sparky', 'Help the people first!']],
     kingAfter: [['parrot', 'Squawk! I am a good king now!'], ['parrot', 'You are my teacher!']],
     // practising with the king after the fight: five right words make a round (three am / is / are, one not or question, one short form or family word)
-    // sentences: sentence ___ | right word | what the parrot says | another wrong one. The fight's sentences are used too.
+    // sentences: sentence ___ | right word | two other words (the king says the sentence with a gap). The fight's sentences are used too.
     practice: {
-      start: [['parrot', "Squawk! Let's practice, teacher!"], ['parrot', 'I say it wrong. You run to the right word!'], ['sparky', 'Five right words make a round. How many rounds can you do?']],
-      again: [['parrot', "Squawk! Let's practice again!"]],
-      card: 'Round {n}! Run to the right word!', bar: 'ROUND {n}', round: 'Round {n}! Well done!',
+      start: [['parrot', "Squawk! Let's practice, teacher!"], ['parrot', 'A word is missing. You run to the right word!'], ['sparky', 'Think first! You have one try.'], ['sparky', 'Five right words make a round. How many rounds can you do?']],
+      again: [['parrot', "Squawk! Let's practice again!"], ['sparky', 'Think first! You have one try.']],
+      card: 'Round {n}! Think first. One try!', bar: 'ROUND {n}', round: 'Round {n}! Well done!',
+      miss: 'Oops! The right word is "{w}".',
       end: 'You did {n} rounds! Look at the board!', endOne: 'You did one round! Look at the board!',
-      pool: {
-        tobe: ['I ___ seven years old! | am | is | are', 'My mother ___ a teacher! | is | am | are', 'We ___ friends! | are | is | am', 'My brother ___ tall! | is | are | am',
-          'They ___ my cousins! | are | is | am', 'You ___ my best friend! | are | am | is', 'She ___ my sister! | is | are | am', 'He ___ my uncle! | is | am | are',
-          'My grandparents ___ at home! | are | is | am', 'It ___ a red apple! | is | are | am', 'I ___ happy today! | am | are | is', 'My dad ___ in the garden! | is | are | am',
-          'Kai and Lani ___ brother and sister! | are | is | am', 'The cat ___ under the table! | is | are | am', 'My aunt ___ from Türkiye! | is | am | are', 'The books ___ on the desk! | are | is | am',
-          'My pencil ___ blue! | is | are | am', 'I ___ a good student! | am | is | are', 'Grandma and Grandpa ___ seventy! | are | is | am', 'This ___ my family! | is | are | am',
-          'These ___ my parents! | are | is | am', 'Sparky ___ a funny dog! | is | are | am', 'My cousins ___ from Canada! | are | is | am', 'You and Sparky ___ brave! | are | is | am',
-          'The sun ___ hot! | is | are | am', 'I ___ in the park! | am | is | are', 'My baby brother ___ two! | is | are | am', 'We ___ at school! | are | am | is',
-          'The parrots ___ red and blue! | are | is | am', 'My mom and dad ___ at work! | are | is | am', 'He ___ my friend Ben! | is | are | am', 'It ___ my birthday! | is | am | are',
-          'The dogs ___ hungry! | are | is | am', 'I ___ from Türkiye! | am | is | are', 'My sister and I ___ twins! | are | is | am', 'My grandmother ___ kind! | is | are | am'],
-        not: ["I ___ sad! I am happy! | am not | isn't | aren't", "My dad ___ a pirate! | isn't | aren't | am not", "We ___ at home! | aren't | isn't | am not", "The cat ___ big! | isn't | aren't | am not",
-          "My cousins ___ here! | aren't | isn't | am not", "I ___ tired! | am not | aren't | isn't", "They ___ my brothers! | aren't | isn't | am not", "My sister ___ at school! | isn't | aren't | am not"],
-        ask: ['___ she your mother? Yes, she is! | Is | Are | Am', '___ they your cousins? | Are | Is | Am', '___ he your brother? | Is | Are | Am', 'Is this your dog? Yes, it ___! | is | are | am',
-          'Are you seven? Yes, I ___! | am | are | is', "Is he your uncle? No, he ___! | isn't | aren't | am not", 'Are they at school? Yes, they ___! | are | is | am', '___ you happy? | Are | Is | Am'],
-        short: ["I am seven. = ___ seven! | I'm | He's | They're", "She is my aunt. = ___ my aunt! | She's | He's | I'm", "They are my friends. = ___ my friends! | They're | She's | He's",
-          "He is my dad. = ___ my dad! | He's | She's | They're", "We are happy. = ___ happy! | We're | He's | I'm", "It is a cat. = ___ a cat! | It's | I'm | They're"],
+      pool: {          // plain sentences, close to the quiz
+        tobe: ["I ___ seven years old! | am | is | are",
+          "My mother ___ a teacher! | is | am | are",
+          "We ___ friends! | are | is | am",
+          "My brother ___ tall! | is | are | am",
+          "They ___ my cousins! | are | is | am",
+          "You ___ my best friend! | are | am | is",
+          "She ___ my sister! | is | are | am",
+          "He ___ my uncle! | is | am | are",
+          "My grandparents ___ at home! | are | is | am",
+          "I ___ happy today! | am | are | is",
+          "Kai and Lani ___ brother and sister! | are | is | am",
+          "My aunt ___ from Türkiye! | is | am | are",
+          "Grandma and Grandpa ___ seventy! | are | is | am",
+          "This ___ my family! | is | are | am",
+          "These ___ my parents! | are | is | am",
+          "My cousins ___ from Canada! | are | is | am",
+          "My baby brother ___ two! | is | are | am",
+          "My sister and I ___ twins! | are | is | am",
+          "Ali and Zeynep ___ my friends! | are | is | am",
+          "I ___ from Türkiye! | am | is | are"],
+        not: ["I ___ sad! I am happy! | am not | isn't | aren't",
+          "We ___ at home! | aren't | isn't | am not",
+          "The cat ___ big! | isn't | aren't | am not",
+          "My cousins ___ here! | aren't | isn't | am not",
+          "I ___ tired! | am not | aren't | isn't",
+          "They ___ my brothers! | aren't | isn't | am not",
+          "My sister ___ at school! | isn't | aren't | am not"],
+        ask: ["___ she your mother? Yes, she is! | Is | Are | Am",
+          "___ they your cousins? | Are | Is | Am",
+          "___ he your brother? | Is | Are | Am",
+          "Is this your dog? Yes, it ___! | is | are | am",
+          "Are you seven? Yes, I ___! | am | are | is",
+          "Is he your uncle? No, he ___! | isn't | aren't | am not",
+          "Are they at school? Yes, they ___! | are | is | am",
+          "___ you happy? | Are | Is | Am",
+          "Is she your sister? Yes, she ___! | is | are | am"],
+        short: ["I am seven. = ___ seven! | I'm | He's | They're",
+          "She is my aunt. = ___ my aunt! | She's | He's | I'm",
+          "They are my cousins. = ___ my cousins! | They're | She's | He's",
+          "He is my dad. = ___ my dad! | He's | She's | They're",
+          "We are happy. = ___ happy! | We're | He's | I'm",
+          "It is a cat. = ___ a cat! | It's | I'm | They're",
+          "It is my birthday. = ___ my birthday! | It's | I'm | She's"],
         family: [],
+      },
+      fun: {          // funny ones (most questions asked are these, so reading them is fun)
+        tobe: ["My cat ___ the boss of my house! | is | are | am",
+          "I ___ a banana! | am | is | are",
+          "Grandpa ___ a superhero! | is | are | am",
+          "The dogs ___ in my bed! | are | is | am",
+          "My socks ___ on my head! | are | is | am",
+          "My teacher ___ a robot! | is | are | am",
+          "My dad ___ a big baby! | is | am | are",
+          "We ___ hungry monkeys! | are | is | am",
+          "The pizza ___ on my head! | is | are | am",
+          "My brother ___ green today! | is | are | am",
+          "You ___ a funny chicken! | are | is | am",
+          "The elephant ___ in the kitchen! | is | are | am",
+          "My shoes ___ on the table! | are | is | am",
+          "Sparky ___ the king now! | is | are | am",
+          "The monkeys ___ in my car! | are | is | am",
+          "I ___ a little dinosaur! | am | is | are",
+          "The cake ___ for the dog! | is | are | am",
+          "My little sister ___ a tiger! | is | are | am",
+          "My hat ___ on the cat! | is | are | am",
+          "Grandpa and the dog ___ sleepy! | are | is | am",
+          "The ducks ___ in my soup! | are | is | am",
+          "My grandma ___ a pop star! | is | are | am",
+          "My uncle ___ very, very, very tall! | is | are | am",
+          "Mom and Dad ___ funny today! | are | is | am",
+          "I ___ a pink elephant! | am | is | are",
+          "The cat ___ in my school bag! | is | are | am",
+          "My pencils ___ hungry! | are | is | am",
+          "The apple ___ angry! | is | are | am",
+          "My dog ___ the teacher today! | is | are | am",
+          "We ___ in a big banana! | are | is | am",
+          "You ___ a little potato! | are | is | am",
+          "My granny ___ on a skateboard! | is | are | am",
+          "The chickens ___ at school! | are | is | am",
+          "My bed ___ in the garden! | is | are | am",
+          "The frogs ___ in my shoes! | are | is | am",
+          "Sparky ___ a cat today! | is | are | am",
+          "I ___ the king of the sofa! | am | is | are",
+          "My baby sister ___ the boss! | is | are | am",
+          "The monkey ___ my new teacher! | is | are | am",
+          "My socks ___ purple and yellow! | are | is | am",
+          "The bananas ___ on the cat! | are | is | am",
+          "My grandpa ___ a pirate! | is | are | am",
+          "My teddy bear ___ hungry! | is | are | am",
+          "The robots ___ in the kitchen! | are | is | am",
+          "Our teacher ___ a superhero! | is | are | am",
+          "My aunt ___ a dragon! | is | are | am",
+          "The cows ___ in the classroom! | are | is | am",
+          "I ___ a chocolate cake! | am | is | are",
+          "My cousins ___ little monkeys! | are | is | am",
+          "The ice cream ___ on my nose! | is | are | am",
+          "Mom ___ the queen of the kitchen! | is | are | am",
+          "Grandma and Sparky ___ best friends! | are | is | am"],
+        not: ["My dad ___ a pirate! | isn't | aren't | am not",
+          "I ___ a potato! | am not | isn't | aren't",
+          "My dad ___ a dinosaur! | isn't | aren't | am not",
+          "My cat ___ a teacher! | isn't | aren't | am not",
+          "We ___ monkeys! | aren't | isn't | am not",
+          "The cake ___ for you, Sparky! | isn't | aren't | am not",
+          "My grandparents ___ pirates! | aren't | isn't | am not",
+          "I ___ a baby! I am seven! | am not | isn't | aren't",
+          "My shoes ___ on my feet! | aren't | isn't | am not",
+          "The elephant ___ small! | isn't | aren't | am not",
+          "My brother ___ a robot! | isn't | aren't | am not",
+          "You ___ a chicken! | aren't | isn't | am not",
+          "My aunt ___ a queen! | isn't | aren't | am not",
+          "The bananas ___ blue! | aren't | isn't | am not",
+          "I ___ a cat! Meow! | am not | isn't | aren't",
+          "My teacher ___ a monkey! | isn't | aren't | am not",
+          "The dogs ___ at school! | aren't | isn't | am not",
+          "My grandma ___ a dragon! | isn't | aren't | am not",
+          "We ___ frogs! | aren't | isn't | am not",
+          "Sparky ___ a pizza! | isn't | aren't | am not",
+          "My socks ___ in my soup! | aren't | isn't | am not",
+          "I ___ an apple! | am not | isn't | aren't",
+          "The cows ___ in my bed! | aren't | isn't | am not",
+          "My baby brother ___ a teacher! | isn't | aren't | am not",
+          "You ___ a banana! | aren't | isn't | am not",
+          "My uncle ___ a baby! | isn't | aren't | am not"],
+        ask: ["___ your grandma a superhero? | Is | Are | Am",
+          "___ you a banana? | Are | Is | Am",
+          "___ the monkeys in your bed? | Are | Is | Am",
+          "___ your dad a pirate? | Is | Are | Am",
+          "___ I funny? | Am | Is | Are",
+          "___ it a big pizza? | Is | Are | Am",
+          "___ your socks on your head? | Are | Is | Am",
+          "Is your cat a teacher? No, it ___! | isn't | aren't | am not",
+          "Are you a dinosaur? No, I ___! | am not | isn't | aren't",
+          "Is Sparky a cat? No, he ___! | isn't | aren't | am not",
+          "___ the elephant in the kitchen? | Is | Are | Am",
+          "___ I a potato? | Am | Is | Are",
+          "___ your teacher a robot? | Is | Are | Am",
+          "___ the frogs in your shoes? | Are | Is | Am",
+          "Are you a chicken? No, I ___! | am not | isn't | aren't",
+          "Is your grandpa a pirate? Yes, he ___! | is | are | am",
+          "Are the cows at school? Yes, they ___! | are | is | am",
+          "Is the cake for Sparky? No, it ___! | isn't | aren't | am not",
+          "___ we monkeys? | Are | Is | Am",
+          "___ your brother green? | Is | Are | Am",
+          "Are your shoes in the soup? Yes, they ___! | are | is | am",
+          "___ the pizza on your head? | Is | Are | Am",
+          "Am I a banana? No, you ___! | aren't | isn't | am not",
+          "___ your aunt a dragon? | Is | Are | Am",
+          "Is the dog a teacher? Yes, he ___! | is | are | am",
+          "___ your grandparents superheroes? | Are | Is | Am",
+          "___ the ducks in your soup? | Are | Is | Am",
+          "Is your mom the queen? Yes, she ___! | is | are | am"],
+        short: ["I am a banana. = ___ a banana! | I'm | He's | They're",
+          "He is a dinosaur. = ___ a dinosaur! | He's | She's | I'm",
+          "She is a superhero. = ___ a superhero! | She's | He's | We're",
+          "We are monkeys. = ___ monkeys! | We're | It's | She's",
+          "They are frogs. = ___ frogs! | They're | He's | I'm",
+          "It is a green banana. = ___ a green banana! | It's | We're | He's",
+          "You are a potato. = ___ a potato! | You're | It's | He's",
+          "I am not a cat. = ___ not a cat! | I'm | He's | They're",
+          "She is a rock star. = ___ a rock star! | She's | He's | They're",
+          "He is a robot. = ___ a robot! | He's | She's | We're",
+          "They are pirates. = ___ pirates! | They're | She's | I'm",
+          "I am a chicken. = ___ a chicken! | I'm | She's | They're",
+          "He is a monkey. = ___ a monkey! | He's | She's | We're",
+          "She is a dragon. = ___ a dragon! | She's | He's | I'm",
+          "We are dinosaurs. = ___ dinosaurs! | We're | He's | It's",
+          "It is a pizza hat. = ___ a pizza hat! | It's | I'm | They're",
+          "You are a little tiger. = ___ a little tiger! | You're | It's | She's",
+          "They are hungry ducks. = ___ hungry ducks! | They're | He's | I'm",
+          "I am a superhero. = ___ a superhero! | I'm | He's | They're",
+          "He is in the soup. = ___ in the soup! | He's | She's | They're",
+          "She is on the table. = ___ on the table! | She's | He's | We're",
+          "It is on my head. = ___ on my head! | It's | I'm | They're",
+          "We are in a banana. = ___ in a banana! | We're | It's | He's",
+          "They are in my bed. = ___ in my bed! | They're | She's | I'm",
+          "You are the boss. = ___ the boss! | You're | It's | He's",
+          "He is a big baby. = ___ a big baby! | He's | She's | I'm"],
+        family: ["She is my ___! She is a superhero! | mother | father | uncle",
+          "He is my ___! He is a dinosaur! | grandfather | grandmother | sister",
+          "He is my ___! He is a pirate! | uncle | aunt | mother",
+          "She is my ___! She is a queen! | aunt | uncle | brother",
+          "He is my ___! He is a king! | father | mother | sister",
+          "She is my ___! She is a robot! | grandmother | grandfather | brother",
+          "He is my ___! He is a monkey! | brother | sister | aunt",
+          "She is my ___! She is a little dragon! | sister | brother | father",
+          "They are my ___! They are monkeys! | cousins | aunt | uncle",
+          "They are my ___! They are superheroes! | grandparents | grandmother | uncle",
+          "He is my ___! He is a baby pirate! | brother | sister | mother",
+          "She is my ___! She is a rock star! | grandmother | grandfather | brother",
+          "She is my ___! She is a pink elephant! | aunt | uncle | father",
+          "He is my ___! He is a big potato! | father | mother | aunt"],
       },
     },
     board: { title: "The Parrot King's Board", classAsk: 'Your class?', classLabel: 'Class', classPick: 'Tap your class!',
@@ -1073,7 +1251,7 @@ const GAME_CONTENT = {
       kai: { cage: [['kai', 'I am Kai. Lani is my sister.'], ['lani', 'I am Lani. Kai is my brother.'], ['kai', 'We are not happy in this cage!']], free: [['kai', 'You are our hero!'], ['lani', 'Come back soon!']] },
     },
     card: { go: "Let's sail to the Parrot King's island! Go to the ship's wheel!", sail: "Sail to the Parrot King's island! Follow the arrow!", land: 'Go to the village!',
-      met: 'Go up the hill! Find the Parrot King!', fight: 'He says it wrong! Run to the right word!', beaten: 'The Parrot King is sorry!', won: 'Next time: the school island!' },
+      met: 'Go up the hill! Find the Parrot King!', fight: 'A word is missing! Run to the right word!', beaten: 'The Parrot King is sorry!', won: 'Next time: the school island!' },
     tryAgain: 'Try again!', laugh: 'Squawk! Ha ha ha!', ouch: 'Ouch! A coconut!',
     // Papağanın yanlış cümleleri: cümle ___ | doğru kelime | papağanın söylediği yanlış | başka bir yanlış.
     // Her tüy bir konu (3 düzeltme): family, tobe (am / is / are), not, ask (soru ve kısa cevap), short (I'm / He's / They're)
@@ -7401,7 +7579,8 @@ const LAB = {
     const bar = $('bossBar');
     if (bar.classList.contains('hidden')) return;
     const qc = $('questCard'), qb = getComputedStyle(qc).display === 'none' ? 0 : qc.getBoundingClientRect().bottom;
-    const top = Math.round(Math.max(qb, 66) + 8);
+    const tr = $('topRight').getBoundingClientRect(), clear = !tr.width || (view.cw + bar.offsetWidth) / 2 + 8 < tr.left;          // (centred, it must not run into the stars and the menu button)
+    const top = Math.round(!qb && clear && matchMedia('(max-height:480px) and (orientation:landscape)').matches ? 8 : Math.max(qb, 66) + 8);          // (a phone on its side, the card hidden for the parrot's sentence: right at the top)
     bar.style.top = top + 'px'; document.body.style.setProperty('--bossBottom', (top + bar.offsetHeight) + 'px');
     if (ISLE5.sayOn) ISLE5.placeSay();
   },
@@ -10207,11 +10386,11 @@ const ISLE5 = {
   DOCK: { x0: 470, x1: 668, y0: 3418, y1: 3462 },                   // the pier on the west coast
   SHIPAT: { x: 404, y: 3440 },                                      // our ship, tied up at the pier (her bow to the north)
   VIL: { x: 880, y: 3440 },                                         // the village square, round its campfire
-  HILL: { x: 1830, y: 3420, rx: 400, ry: 250, h: 56, top: 0.72 },   // the hill; its flat top is the Parrot King's
+  HILL: { x: 1730, y: 3440, rx: 470, ry: 300, h: 56, top: 0.75 },   // the hill; its flat top is the Parrot King's (room to run about)
   PLANK: { x0: 452, h0: 42, x1: 528, h1: 5.6, y: 3440, hw: 12 },          // the gangplank from our ship to the pier
-  RAMP: { y: 3420, hw: 34 },                                        // the way up (stone stairs), on the hill's west side
-  THRONE: { x: 2052, y: 3392 },
-  BOARD: { x: 1700, y: 3304 },          // the Parrot King's board, on his hilltop
+  RAMP: { y: 3440, hw: 34 },                                        // the way up (stone stairs), on the hill's west side
+  THRONE: { x: 2002, y: 3405 },
+  BOARD: { x: 1545, y: 3298 },          // the Parrot King's board, on his hilltop
   PER: 3,                                                           // corrections for each crown feather
   FEATHER: '<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="fe5" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#e8402e"/><stop offset=".45" stop-color="#2f7fd8"/><stop offset="1" stop-color="#8fd8ff"/></linearGradient></defs>'
     + '<path d="M5.4 18.3C4.6 11.9 9.6 5.2 20.8 2.9c-.4 2.2-1.1 4.1-2 5.8l-1.6-.2 1 1.1c-.8 1.3-1.8 2.5-2.9 3.5l-1.7-.3 1 1.2C12.2 16.5 9.2 17.9 5.4 18.3z" fill="url(#fe5)" stroke="#173f86" stroke-width="1" stroke-linejoin="round"/>'
@@ -10221,7 +10400,7 @@ const ISLE5 = {
   HUTS: [[810, 3232, 0.32], [1066, 3240, -0.3], [752, 3636, 2.6], [1076, 3646, 3.4]],          // (the west ones a little inland: their roofs stayed over the sand)
   CAGES: [{ x: 784, y: 3346, who: ['nani'] }, { x: 896, y: 3318, who: ['koa'] }, { x: 1008, y: 3346, who: ['malia'] }, { x: 1084, y: 3462, who: ['kai', 'lani'] }],
   FREE: { nani: [796, 3482], koa: [846, 3504], malia: [912, 3504], kai: [962, 3482], lani: [998, 3452] },      // where they stand once free
-  PATHS: [[[668, 3440], [880, 3440]], [[880, 3440], [1120, 3432], [1300, 3424], [1440, 3420]], [[880, 3440], [880, 3300]], [[880, 3440], [880, 3600]]],
+  PATHS: [[[668, 3440], [880, 3440]], [[880, 3440], [1120, 3430], [1270, 3440]], [[880, 3440], [880, 3300]], [[880, 3440], [880, 3600]]],
   // live, not saved
   M: null, built: false, trees: [], tall: [], coconuts: [], bits: [], puffs: [], words: [], round: null, king: null, fly: null, shake: 0,
   fireT: 2.5, introT: 0, endT: 0, cageK: 0, walkK: 0, freedT: 0, playT: 0, qOrder: {}, qi: {}, cv: null, cvPr: 1, stage5: '', sayEl: null, wordEls: [],
@@ -10327,7 +10506,7 @@ const ISLE5 = {
     for (let i = 0; i < 26; i++) { const a = R() * TAU, r = H.top - 0.07 + R() * 0.03; D.push({ x: H.x + Math.cos(a) * H.rx * r, y: H.y + Math.sin(a) * H.ry * r, k: 'flowers', s: 0.8, seed: (R() * 1e4) | 0, top: 1 }); }
     // things that stand in the way: torches, logs, the totem, the canoe, the rack, the palace's dais, banners and statues
     const V = this.VIL, gx = H.x - H.rx * H.top + 14, ry = this.RAMP.y;
-    this.TORCH = [[704, 3404], [704, 3476], [1180, 3396], [1180, 3464], [1404, 3378], [1404, 3462]];
+    this.TORCH = [[704, 3404], [704, 3476], [H.x - H.rx - 40, ry - this.RAMP.hw - 14], [H.x - H.rx - 40, ry + this.RAMP.hw + 14]];          // (by the pier; at the foot of the stairs)
     const rx0 = H.x - H.rx - 6, rx1 = H.x - H.rx * H.top + 6;
     for (const f of [0.3, 0.75]) for (const s of [-1, 1]) this.TORCH.push([rx0 + (rx1 - rx0) * f, ry + s * (this.RAMP.hw + 14)]);
     this.LOGS = [[V.x - 52, V.y, Math.PI / 2], [V.x + 52, V.y, Math.PI / 2], [V.x, V.y - 50, 0]];
@@ -10356,7 +10535,7 @@ const ISLE5 = {
       this.CRABS = [[1.15, 0.972], [2.25, 0.975], [4.75, 0.97]].map(([a, k], i) => { const p = this.coastPt(a, k), q = this.coastPt(a + 0.03, k), l = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return { x: p[0], y: p[1], dx: (q[0] - p[0]) / l, dy: (q[1] - p[1]) / l, ph: i * 2.1 }; });
     }
     // parrots in the sky: round the village, over the jungle, round the hill, along the beach
-    this.BIRDS = [[880, 3440, 300, 190, 150, 0.55, 'birdR'], [1200, 3300, 320, 160, 175, -0.45, 'birdB'], [1830, 3420, 470, 300, 210, 0.38, 'birdG'], [1400, 3440, 880, 500, 120, 0.22, 'birdY'],
+    this.BIRDS = [[880, 3440, 300, 190, 150, 0.55, 'birdR'], [1200, 3300, 320, 160, 175, -0.45, 'birdB'], [1730, 3440, 560, 360, 210, 0.38, 'birdG'], [1400, 3440, 880, 500, 120, 0.22, 'birdY'],
       [1000, 3600, 260, 150, 165, -0.6, 'birdG'], [1600, 3250, 300, 200, 190, 0.5, 'birdR'], [1400, 3440, 760, 430, 230, -0.27, 'birdB']].map(([cx, cy, rx2, ry2, h, w, k], i) => ({ cx, cy, rx: rx2, ry: ry2, h, w, k, ph: i * 1.7 }));
   },
   // ---- out at sea: the way here, and the ship kept off the beach
@@ -10533,17 +10712,19 @@ const ISLE5 = {
   fightTick(dt) {
     const s = this.st(), K = this.king;
     if (s.f >= 5 && !this.prac) return;
+    if (this.missT > 0 && (this.missT -= dt) <= 0) { this.missT = 0; this.words = []; this.round = null; this.roundT = 0.5; }          // (a lost question: on to the next one)
     if (!this.round && !this.fly && (this.roundT -= dt) <= 0) this.nextRound();
     if (K.mode === 'fly' && (this.fireT -= dt) <= 0) this.throwCoconuts();
     this.moveCoconuts(dt);
     for (const w of this.words) {
       w.t += dt;
-      if (!(player.stun > 0) && Math.hypot(player.x - w.x, (player.y - w.y) * 1.2) < 34) { this.pick(w); break; }
+      if (!w.shown && !(player.stun > 0) && Math.hypot(player.x - w.x, (player.y - w.y) * 1.2) < 34) { this.pick(w); break; }
     }
     if (this.fly && (this.fly.t += dt / 0.65) >= 1) { this.fly = null; this.corrected(); }
   },
   questions(topic) {          // (practising: the practice sentences too)
-    return (GAME_CONTENT.isle5.wrong[topic] || []).concat(this.prac ? GAME_CONTENT.isle5.practice.pool[topic] || [] : []).map((l) => { const [text, ans, w1, w2] = l.split('|').map((x) => x.trim()); return { text, ans, wrong: w1, opts: [ans, w1, w2].filter(Boolean) }; });
+    const P = GAME_CONTENT.isle5.practice;
+    return (GAME_CONTENT.isle5.wrong[topic] || []).concat(this.prac ? (P.pool[topic] || []).concat(P.fun[topic] || []) : []).map((l) => { const [text, ans, w1, w2] = l.split('|').map((x) => x.trim()); return { text, ans, wrong: w1, opts: [ans, w1, w2].filter(Boolean) }; });
   },
   nextItem(topic) {
     const all = this.questions(topic), k = (this.prac ? 'p:' : '') + topic;
@@ -10554,18 +10735,19 @@ const ISLE5 = {
     const s = this.st(), topic = this.prac ? this.prac.seq[this.prac.n] : ISLE5_TOPICS[Math.min(4, s.f)], q = this.nextItem(topic), H = this.HILL;
     this.round = { topic, q };
     // the words, spread over the hilltop, not too close to you or to each other
-    const opts = q.opts.slice().sort(() => Math.random() - 0.5), spots = [];
+    const opts = q.opts.slice().sort(() => Math.random() - 0.5), spots = [], hud = this.hudTop() + 30;
     for (let k = 0; k < 300 && spots.length < opts.length; k++) {
       const a = Math.random() * TAU, r = 0.25 + Math.random() * 0.55, x = H.x + Math.cos(a) * H.rx * H.top * r, y = H.y + Math.sin(a) * H.ry * H.top * r;
       if (Math.hypot(x - player.x, y - player.y) < 140 || Math.hypot(x - this.THRONE.x, y - this.THRONE.y) < 80 || Math.hypot(x - this.BOARD.x, y - this.BOARD.y) < 75) continue;
       if (spots.some((p) => Math.hypot(p.x - x, p.y - y) < 150)) continue;
+      if (k < 200) { const p = worldToScreen(x, G3.on ? H.h + 44 : 38, y); if (p.y < hud || p.y > view.ch - 30 || p.x < 50 || p.x > view.cw - 50) continue; }          // (its label not under the boss bar and the sentence, nor off the screen)
       spots.push({ x, y });
     }
     while (spots.length < opts.length) spots.push({ x: H.x + (spots.length - 1) * 120, y: H.y + 60 });
     this.words = opts.map((w, i) => ({ w, ok: w === q.ans, x: spots[i].x, y: spots[i].y, t: -i * 0.12, sd: Math.random() * 6 }));
-    this.say(q.text, q.wrong, false);
+    this.say(q.text, null, false);
     this.king.shout = 1.2; Sfx.tone(988, 0.12, 'square', 0.05); Sfx.tone(784, 0.16, 'square', 0.05, 0.12);
-    Speech.speak(q.text.replace(/_{2,}/, q.wrong), { who: 'parrot' });
+    Speech.speak(q.text.replace(/_{2,}/, '...'), { who: 'parrot' });          // (a pause where the word is missing)
     Hud.cardKey = ''; Hud.refresh();
   },
   pick(w) {
@@ -10576,8 +10758,18 @@ const ISLE5 = {
     } else {
       this.words.splice(this.words.indexOf(w), 1);
       this.puffs.push({ x: w.x, y: w.y, h: this.HILL.h + 26, t: 0, s: 1.2 });
+      if (this.prac) {          // practising: one try. The question is lost (it does not count for the round): the right word lights up, Sparky says it right, and you are dizzy for a moment
+        const q = this.round.q, ok = this.words.find((x) => x.ok);
+        this.prac.wrong++; const pr = this.st().pr; if (pr) pr.wrong++;
+        for (const x of this.words) if (!x.ok && x !== w) this.puffs.push({ x: x.x, y: x.y, h: this.HILL.h + 26, t: 0, s: 1 });
+        this.words = ok ? [Object.assign(ok, { shown: true })] : [];
+        this.missT = 2.6; this.say(q.text, q.ans, true);
+        player.stun = 1.5; player.inv = Math.max(player.inv || 0, 2.6); player.path = null; player.goal = null; player.moving = false;
+        Sfx.play('no'); Toast.show('❌ ' + fmt(C.practice.miss, { w: q.ans }), true);
+        K.laugh = 1.4; Speech.speak(q.text.replace(/_{2,}/, q.ans), { who: 'sparky' });
+        Save.save(); return;
+      }
       Sfx.play('no'); Toast.show('❌ ' + C.tryAgain, true);
-      if (this.prac) { this.prac.wrong++; const pr = this.st().pr; if (pr) pr.wrong++; }
       K.laugh = 1.4; Speech.speak(C.laugh, { who: 'parrot' });
     }
   },
@@ -10681,13 +10873,13 @@ const ISLE5 = {
     const K = this.king;
     if (!K || !this.onTop(player.x, player.y)) return;
     this.prac = { n: 0, rounds: 0, right: 0, wrong: 0, offT: 0, seq: this.roundSeq() };
-    this.inFight = true; this.round = null; this.words = []; this.coconuts = []; this.fly = null; this.roundT = 0.6; this.fireT = 3.2;
+    this.inFight = true; this.round = null; this.words = []; this.coconuts = []; this.fly = null; this.missT = 0; this.roundT = 0.6; this.fireT = 3.2;
     K.mode = 'fly'; K.t = 0;
     Hud.cardKey = ''; Hud.refresh();
   },
   endPractice() {            // walking off his hilltop: the practice ends, the board learns how many rounds you did
     const P = this.prac, C = GAME_CONTENT.isle5.practice, K = this.king;
-    this.prac = null; this.inFight = false; this.round = null; this.words = []; this.coconuts = []; this.fly = null; this.say(null);
+    this.prac = null; this.inFight = false; this.round = null; this.words = []; this.coconuts = []; this.fly = null; this.missT = 0; this.say(null);
     if (K) K.mode = 'throne';
     ScoreBoard.submit();
     Hud.cardKey = ''; Hud.refresh();
@@ -10756,7 +10948,7 @@ const ISLE5 = {
     bar.classList.toggle('calm', n >= 5);
     requestAnimationFrame(() => LAB.placeBar());
   },
-  say(text, word, right) {   // the parrot's sentence under the boss bar: his wrong word in red; then the right one in green
+  say(text, word, right) {   // the parrot's sentence under the boss bar: a gap to fill; then the right word in green
     const e = $('isleSay');
     if (!e) return;
     this.sayOn = !!text;
@@ -10766,7 +10958,7 @@ const ISLE5 = {
     e.textContent = '';
     e.appendChild(el('span', 'isIcon', '🦜'));
     const tx = el('span', 'isText');
-    tx.appendChild(document.createTextNode(a || '')); tx.appendChild(el('b', right ? 'ok' : 'bad', word)); tx.appendChild(document.createTextNode(b || ''));
+    tx.appendChild(document.createTextNode(a || '')); tx.appendChild(right ? el('b', 'ok', word) : el('b', 'gap', '?')); tx.appendChild(document.createTextNode(b || ''));          // (a gap to fill; then the right word, green)
     e.appendChild(tx);
     e.classList.remove('hidden'); e.classList.toggle('right', !!right);
     this.placeSay();
@@ -10789,7 +10981,7 @@ const ISLE5 = {
       if (!w) { if (!e.classList.contains('hidden')) e.classList.add('hidden'); continue; }
       const bob = Math.sin(game.t * 2.2 + w.sd), p = worldToScreen(w.x, G3.on ? this.HILL.h + 44 + bob * 4 : 38 - bob * 3, w.y);          // (on its cloud: the flat view draws it 34 above the ground)
       if (e.textContent !== w.w) e.textContent = w.w;
-      e.classList.remove('hidden');
+      e.classList.toggle('shown', !!w.shown); e.classList.remove('hidden');
       e.style.transform = 'translate(' + Math.round(p.x - e.offsetWidth / 2) + 'px,' + Math.round(p.y - e.offsetHeight / 2) + 'px)';
     }
   },
@@ -11414,7 +11606,7 @@ const ISLE5 = {
       ring(c.tx, c.ty, y, 4 + 30 * k, 1, 0.2, 0.12, 0.3 + 0.2 * k, LAB.M.disc);
       for (const rr of [34, 36]) ring(c.tx, c.ty, y, rr, 1, 0.25, 0.15, 0.6 + 0.4 * k);
     }
-    for (const w of this.words) { if (w.t < 0) continue; const p = (t * 1.1 + w.sd) % 1; ring(w.x, w.y, H.h, 30 + p * 26, 1, 0.92, 0.3, 0.8 * (1 - p)); }
+    for (const w of this.words) { if (w.t < 0) continue; const p = (t * 1.1 + w.sd) % 1; ring(w.x, w.y, H.h, 30 + p * 26, w.shown ? 0.3 : 1, w.shown ? 0.85 : 0.92, w.shown ? 0.4 : 0.3, 0.8 * (1 - p)); }
     for (const p of this.puffs) {
       if (p.t < 0) continue;
       const k = p.t / 1.1;
@@ -11432,13 +11624,10 @@ const ISLE5 = {
     if (this.fr && this.fr.t === game.t) return this.fr;
     const H = this.HILL, K = this.king, pts = [];
     for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; pts.push({ x: H.x + Math.cos(a) * H.rx * H.top * 0.92, z: H.y + Math.sin(a) * H.ry * H.top * 0.92, h: H.h }); }
+    for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; pts.push({ x: H.x + Math.cos(a) * H.rx * H.top * 0.8, z: H.y + Math.sin(a) * H.ry * H.top * 0.8, h: H.h + 80 }); }          // (the words' labels, over their clouds)
     if (K) pts.push({ x: K.x, z: K.y, h: K.h + 128 });
     pts.push({ x: player.x, z: player.y, h: this.standY(player.x, player.y) + 70 });
-    if (!this.ins || game.t - this.ins.t > 0.25 || this.ins.w !== view.cw || this.ins.h !== view.ch) {
-      let top = 8;
-      for (const id of ['questCard', 'bossBar', 'isleSay']) { const e = $(id); if (e && !e.classList.contains('hidden') && getComputedStyle(e).display !== 'none') top = Math.max(top, e.getBoundingClientRect().bottom + 6); }
-      this.ins = { t: game.t, w: view.cw, h: view.ch, top: Math.min(top, view.ch * 0.55) };
-    }
+    this.hudTop();
     const p = CAM3.pitch, sp = Math.sin(p), cp = Math.cos(p), th = Math.tan(CAM3.fov / 2), asp = view.cw / view.ch, ty = 10 + (this.camH || H.h * 0.85);
     const top = 1 - 2 * this.ins.top / view.ch, bot = -1 + 2 * 10 / view.ch, left = -1 + 2 * 8 / view.cw, right = 1 - 2 * 8 / view.cw;
     let z0 = 1e9, z1 = -1e9; for (const q of pts) { z0 = Math.min(z0, q.z); z1 = Math.max(z1, q.z); }
@@ -11459,7 +11648,18 @@ const ISLE5 = {
   },
   view3D() { const C = this.C; return { x0: C.x - this.RX - 60, x1: C.x + this.RX - 160, z0: C.y - this.RY + 90, z1: C.y + this.RY - 60 }; },
   view2D() { const R = this.REG; return { x0: R.x0 + 200, y0: R.y0 + 60, x1: R.x1 - 200, y1: R.y1 - 40 }; },
-  fit2D() { return clamp(Math.min(view.w / 660, view.h / 600), 0.55, 1); },          // the flat view's zoom in the fight: the whole hilltop and the king above it
+  hudTop() {                 // where the card, the boss bar and the sentence end (screen pixels from the top)
+    const now = performance.now() / 1000;          // (real time: the HUD moves on the page whether the game runs or not)
+    if (!this.ins || now - this.ins.t > 0.25 || this.ins.w !== view.cw || this.ins.h !== view.ch) {
+      let top = 8;
+      for (const id of ['questCard', 'bossBar', 'isleSay']) { const e = $(id); if (e && !e.classList.contains('hidden') && getComputedStyle(e).display !== 'none') top = Math.max(top, e.getBoundingClientRect().bottom + 6); }
+      this.ins = { t: now, w: view.cw, h: view.ch, top: Math.min(top, view.ch * 0.55) };
+    }
+    return this.ins.top;
+  },
+  // the flat view in the fight: the whole hilltop (the words' labels and the king above it) in the part of the screen the HUD leaves free
+  fit2D() { const H = this.HILL; return clamp(Math.min((view.cw - 16) / view.scale / (2 * H.rx * H.top + 60), (view.ch - this.hudTop() - 10) / view.scale / (2 * H.ry * H.top + 70)), 0.4, 1); },
+  cam2D(sc) { return this.HILL.y - 12 - (this.hudTop() + view.ch) / 2 / sc; },          // (the camera's top edge, in the world)
   // ---- out at sea: the same island, drawn where it lies
   drawAtSea(R, t) {
     if (!G3.on) return;
@@ -11806,7 +12006,7 @@ const ISLE5 = {
       c.fillStyle = 'rgba(255,40,30,' + (0.25 + 0.2 * k).toFixed(3) + ')'; c.beginPath(); c.ellipse(co.tx, co.ty, rad, rad * 0.8, 0, 0, TAU); c.fill();
       c.strokeStyle = 'rgba(255,60,50,' + (0.6 + 0.4 * k).toFixed(3) + ')'; c.lineWidth = 4; c.beginPath(); c.ellipse(co.tx, co.ty, 36, 36 * 0.8, 0, 0, TAU); c.stroke();
     }
-    for (const w of this.words) if (w.t >= 0) { const p = (t * 1.1 + w.sd) % 1; c.strokeStyle = 'rgba(255,220,80,' + (0.8 * (1 - p)).toFixed(3) + ')'; c.lineWidth = 4; c.beginPath(); c.ellipse(w.x, w.y, 30 + p * 26, (30 + p * 26) * 0.7, 0, 0, TAU); c.stroke(); }
+    for (const w of this.words) if (w.t >= 0) { const p = (t * 1.1 + w.sd) % 1; c.strokeStyle = (w.shown ? 'rgba(70,200,100,' : 'rgba(255,220,80,') + (0.8 * (1 - p)).toFixed(3) + ')'; c.lineWidth = 4; c.beginPath(); c.ellipse(w.x, w.y, 30 + p * 26, (30 + p * 26) * 0.7, 0, 0, TAU); c.stroke(); }
     c.fillStyle = 'rgba(0,0,0,.1)';
     for (const b of this.BIRDS || []) { const p = this.birdAt(b, t); c.beginPath(); c.ellipse(p.x, p.y, 10, 4, 0, 0, TAU); c.fill(); }
     // everything standing, nearest last
@@ -13823,7 +14023,7 @@ function updateCamera(dt, snap) {
   } else ty = (SHIP.camFocus ? SHIP.camFocus.y : player.y) - 40 - vh / 2;
   if (SHIP.camFocus && !Dialog.open) fx = SHIP.camFocus.x;
   if (SEA.active && SEA.ship) { const f = SEA.camFocus(); fx = f.x; ty = f.y - vh / 2; }
-  if (ISLE5.inFight && ISLE5.here() && !SEA.active && !Dialog.open) { fx = ISLE5.HILL.x; ty = ISLE5.HILL.y - 75 - vh / 2; }          // (the Parrot King's fight: the whole hilltop)
+  if (ISLE5.inFight && ISLE5.here() && !SEA.active && !Dialog.open) { fx = ISLE5.HILL.x; ty = ISLE5.cam2D(sc); }          // (the Parrot King's fight: the whole hilltop, under the HUD)
   const tx = fx - vw / 2;
   let x = snap ? tx : lerp(cam.x, tx, 1 - Math.exp(-dt * 6));
   let y = snap ? ty : lerp(cam.y, ty, 1 - Math.exp(-dt * 6));

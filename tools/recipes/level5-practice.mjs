@@ -1,6 +1,7 @@
 // After the Parrot King is beaten: practising with him (five right words make a round, mostly am / is / are) and his board on
 // the hilltop (place, avatar, name, section, rounds; everyone in one table). Before the first practice a screen asks for the name
-// and class (section A-D) the board uses; they stay on the device. Two rounds, one wrong word, walking off the hill ends the
+// and class (section A-D) the board uses; they stay on the device. Two rounds; one try: a wrong word loses the question (it does
+// not count), the right word shows in green, you are dizzy for a moment. Walking off the hill ends the
 // practice; the board's button changes name and class; after a reload nothing is asked again. FLAT=1: the flat view.
 export default async function ({ evaluate, sleep, shot, consoleLog }) {
   const S = (e) => evaluate(e), log = (...a) => console.log(...a), T = process.env.FLAT ? '-2d' : '';
@@ -25,11 +26,22 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   log('saved: name', await S('SH.state.bname'), '| class', await S('SH.state.cls'), '| screen closed', await S(`document.getElementById('prof').classList.contains('hidden')`));
   log('the king:', await lines());
   log('practising:', await S('!!SH.ISLE5.prac'), '| bar', await S(`document.getElementById('bbName').textContent`), '| card', await S(`(Hud.cardKey = '', Hud.refresh(), document.getElementById('qcText').textContent)`));
+  log('questions while practising (the fight\'s + plain + funny):', await S(`JSON.stringify(['tobe', 'not', 'ask', 'short', 'family'].map((t) => t + ' ' + SH.ISLE5.questions(t).length))`));
   let topics = [], wrongOnce = false;
   for (let i = 0; i < 12 && (await S('SH.ISLE5.prac ? SH.ISLE5.prac.rounds : 0')) < 2; i++) {
-    for (let k = 0; k < 40 && !(await S('SH.ISLE5.words.length > 0 && SH.ISLE5.words.every((w) => w.t >= 0)')); k++) await step(0.2);
+    for (let k = 0; k < 40 && !(await S('!SH.ISLE5.missT && SH.ISLE5.words.length > 0 && SH.ISLE5.words.every((w) => w.t >= 0 && !w.shown)')); k++) await step(0.2);
     topics.push(await S('SH.ISLE5.round && SH.ISLE5.round.topic'));
-    if (!wrongOnce) { wrongOnce = true; await S(`(() => { SH.player.stun = 0; const w = SH.ISLE5.words.find((w) => !w.ok); if (w) SH.tp(w.x, w.y); })()`); await step(0.2); log('  a wrong word: wrong count', await S('SH.ISLE5.prac.wrong')); }
+    if (!wrongOnce) {
+      wrongOnce = true; const n0 = await S('SH.ISLE5.prac.n');
+      await S(`(() => { SH.player.stun = 0; const w = SH.ISLE5.words.find((w) => !w.ok); if (w) SH.tp(w.x, w.y); })()`); await step(0.2);
+      log('  a wrong word: wrong count', await S('SH.ISLE5.prac.wrong'), '| words left', await S(`JSON.stringify(SH.ISLE5.words.map((w) => w.w + (w.shown ? ' (shown)' : '')))`), '| the right one green', await S(`!!document.querySelector('#isleWords .iw.shown:not(.hidden)')`), '| dizzy', await S('SH.player.stun > 0'), '| toast', await S(`document.getElementById('toast').textContent`), '| banner', await S(`document.getElementById('isleSay').textContent`));
+      await S('SH.game.paused = true'); await shot('l5p-miss' + T); await S('SH.game.paused = false');
+      await S(`(() => { const w = SH.ISLE5.words.find((w) => w.shown); if (w) SH.tp(w.x, w.y); })()`); await step(0.3);
+      log('  running onto the green word does not count:', await S('!SH.ISLE5.fly'), '| still dizzy after 0.5 s', await S('SH.player.stun > 0'));
+      for (let k = 0; k < 30 && await S('SH.ISLE5.missT > 0'); k++) await step(0.2);
+      log('  the question is lost: right words this round still', await S('SH.ISLE5.prac.n'), '(was', n0 + ') | dizzy over', await S('!(SH.player.stun > 0)'));
+      continue;
+    }
     await S(`(() => { SH.player.stun = 0; SH.player.inv = 0; const w = SH.ISLE5.words.find((w) => w.ok); if (w) SH.tp(w.x, w.y); })()`); await step(0.2);
     for (let k = 0; k < 10 && await S('!!SH.ISLE5.fly'); k++) await step(0.1);
     await step(0.3);
