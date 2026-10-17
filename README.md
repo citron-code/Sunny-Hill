@@ -240,8 +240,10 @@ Korsandan sonraki yolculuğun devamı. İçerik yine 1. ünitenin tekrarı: aile
 - **Savaş.** Tepeye çıkınca sarmaşıklar dönüş yolunu kapatır, kral havalanır. Tepenin üstünde yüksekten, kanat
   çırparak uçar (kanatlar hızlı iner, yavaş kalkar; arada süzülür). Uçarken kuyruğu arkaya uzanır, ayaklarını toplar,
   dönüşlerde yana yatar. 2D görünümde de kanat çırpar, çocuğa doğru bakar; savaşta kamera bütün tepeyi gösterir.
-  - Kral yanlış bir cümle bağırır. Cümle üstte bir balonda yazar; yanlış kelime kırmızıyla.
-  - Tepede bulutların üstünde üç kelime belirir (doğrusu ve iki yanlış). Çocuk doğru kelimeye koşar: kral cümleyi doğru
+  - Kral **boşluklu** bir cümle söyler ("She is my ...!"; boşlukta kısa bir duraklama). Cümle üstte bir balonda yazar,
+    eksik kelimenin yerinde kesik çizgili sarı bir kutu ("?") durur. (17.10.2026'ya kadar kral yanlış kelimeyi söylüyordu;
+    o kelime seçenekler arasında da olduğu için kafa karıştırıyordu.)
+  - Tepede bulutların üstünde üç kelime belirir (doğrusu ve iki yanlış). Çocuk boşluğa uyan kelimeye koşar: kral cümleyi doğru
     söyler (balonda yeşil) ve bir an sersemler. Yanlış kelime patlar ("Try again!"), kral güler; diğer kelimeler kalır.
   - Bu arada kral hindistancevizi atar; düşeceği yerde kırmızı halka belirir. İsabet ederse çocuk bir an sersemler
     (kaybetmek yok). Tüy sayısı arttıkça daha sık ve aynı anda daha çok atar.
@@ -251,8 +253,12 @@ Korsandan sonraki yolculuğun devamı. İçerik yine 1. ünitenin tekrarı: aile
   merdivenlerden inip patikadan köye yürür (ışınlanma yok), Sparky arkasından gelir; köye yaklaşınca kafesler açılır.
   Aile kamp ateşinin önünde toplanır ve gemiyi tamir eder: beyaz bir duman bulutu, dumanlar ve yanıklar gider. Kai: "Where are you going now?"
   Sparky: "To the school island! See you next time!" (okul adası sonraki bölüm).
-- **Telefon.** Savaşta kamera tepenin tamamını ve kralı, görev kartı, çubuk ve balonun altında kalan alana sığdırır.
-  Kısa yatay ekranda görev kartı savaş süresince gizlenir.
+- **Telefon.** Savaşta kamera tepenin tamamını ve kralı, görev kartı, çubuk ve balonun altında kalan alana sığdırır
+  (kelimelerin etiketleri de bu alanda kalır; 2D görünüm de aynı hesabı yapar). Kısa yatay ekranda görev kartı savaş
+  süresince gizlenir ve kralın çubuğu ekranın en üstüne çıkar. Bir kelime yalnızca ekranda görünen bir yerde belirir.
+- **Tepenin boyu (17.10.2026).** Koşacak yer az geliyordu: tepe büyütüldü ve biraz batıya kaydı (`HILL` 1730, 3440;
+  yarıçap 470 × 300; düz üstü 353 × 225, eskisinin yaklaşık 1,5 katı). Doğusu zaten denize dayandığı için denize eskisinden
+  daha çok taşmaz. Taht, pano, merdiven başındaki meşaleler ve köyden gelen yol onunla birlikte taşındı.
 
 Cümleler `GAME_CONTENT.isle5.wrong` içinde, konu başına 6 cümle: `cümle ___ | doğru | papağanın söylediği yanlış | başka bir
 yanlış`. Kayıt `state.isle = { stage: '' | 'land' | 'met' | 'fight' | 'won', f (tüy), n, fixed }`. Oyun kapatılırsa
@@ -260,11 +266,18 @@ kazanılan tüyler kaybolmaz; oyun Sunny Hill'den açılır ve dümen yeniden ad
 
 ### Papağan Kral'la alıştırma ve skor tablosu
 
-Kral yenildikten sonra dost olur. Çocuk tepeye çıkıp onunla konuşunca alıştırma başlar ve istediği kadar sürer: kral yine
-yanlış konuşur, çocuk doğru kelimeye koşar. **5 doğru kelime = 1 tur.** Her turda 3 cümle am / is / are, 1 cümle olumsuz
+Kral yenildikten sonra dost olur. Çocuk tepeye çıkıp onunla konuşunca alıştırma başlar ve istediği kadar sürer: kral
+cümleyi boşluklu söyler, çocuk boşluğa uyan kelimeye koşar. **5 doğru kelime = 1 tur.** Her turda 3 cümle am / is / are, 1 cümle olumsuz
 (isn't / aren't / am not) ya da soru, 1 cümle kısaltma ya da aile kelimesi; yani turların çoğu ünitenin am / is / are
 konusu. Her doğru kelimede kralın tacından bir tüy düşer, tur bitince tüyleri geri gelir. Turlar ilerledikçe hindistancevizleri
 biraz sıklaşır; kaybetmek yok. Tepeden inmek alıştırmayı bitirir.
+
+**Tek hak (17.10.2026):** Alıştırmada her soru için tek hak vardır. Yanlış kelimeye koşulursa o soru kaybedilir ve tura
+sayılmaz: doğru kelime yeşil yanar, cümlenin doğru hâli üstte yeşil yazılır ve Sparky onu okur, çocuk bir buçuk saniye
+sersemler (başının üstünde yıldızlar), sonra yeni soru gelir. Yani bir tur, **ilk denemede doğru bilinen 5 soru**dur.
+(İlk tabloda bazı çocuklar her kelimeye sırayla koşup %50 civarında doğru yapıyordu; üç seçenekte rastgele koşmak tam bu
+oranı verir.) Papağan Kral'la ilk karşılaşmadaki 15 düzeltmelik hikâye kısmında kural aynı kaldı: yanlış kelime yalnızca
+"Try again!" der.
 
 Tepede, merdivenlerin yanında **Papağan Kral'ın Panosu** durur. **Bütün öğrenciler tek tabloda**, bitirdikleri tur
 sayısına göre sıralanır: sıra (🥇 🥈 🥉 4. 5. ...), çocuğun avatarının küçük resmi, panoda görünecek adı, şubesi
@@ -277,8 +290,11 @@ sorulmaz; panodaki "✏️ Change" düğmesiyle değiştirilebilir. Şube öğre
 `https://citron-code.github.io/Sunny-Hill/?sinif=A`); o zaman ekranda o şube seçili gelir. A–D dışındaki sınıflar
 (örneğin TEST) tabloda görünmez. Pano en son gördüğü listeyi cihazda tutar ve açılır açılmaz onu gösterir.
 
-Sorular `GAME_CONTENT.isle5.practice.pool` içinde (am / is / are 36, olumsuz 8, soru 8, kısaltma 6 cümle; savaşın
-cümleleri de kullanılır). Kayıt `state.isle.pr = { rounds, right, wrong, best }`, oyuncu kimliği `state.pid`, panodaki ad
+Sorular iki listede: sade cümleler (quize yakın) `GAME_CONTENT.isle5.practice.pool` içinde (am / is / are 20, olumsuz 7,
+soru 9, kısaltma 7), komik cümleler `GAME_CONTENT.isle5.practice.fun` içinde (am / is / are 52, olumsuz 26, soru 28,
+kısaltma 26, aile 14; örneğin "I ___ a banana!", "My teacher ___ a robot!", "She is my ___! She is a superhero!").
+Savaşın cümleleri de kullanılır; hepsiyle birlikte 219 cümle var ve sorulanların yaklaşık üçte ikisi komik. Her boşluğa
+yalnızca bir seçenek uyar; aile sorularında bunu he / she / they belirler. Kayıt `state.isle.pr = { rounds, right, wrong, best }`, oyuncu kimliği `state.pid`, panodaki ad
 `state.bname`, sınıf `state.cls`.
 
 #### Online skor tablosu (Google E-Tablo, bir kez kurulur)

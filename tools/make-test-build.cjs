@@ -1,4 +1,5 @@
-// Makes a test copy of the game with its own save (it never touches the real game's progress), a small TEST label
+// Makes a test copy of the game with its own save (it never touches the real game's progress), its own Parrot King's board
+// (it shows the online board but never writes to it: test rounds stay on this device), a small TEST label
 // and a TEST menu at the bottom of the screen. Not for parents: it is never committed or published.
 //   node tools/make-test-build.cjs [output file]
 //     the new levels: every new game starts with the first eight quests done (level 2 is open)
@@ -19,6 +20,12 @@ const rep = (a, b) => { if (!h.includes(a)) throw new Error('not found: ' + a.sl
 rep(`<title>Sunny Hill</title>`, `<title>Sunny Hill (${LABEL})</title>`);
 rep(`    document.title = GAME_CONTENT.title;`, `    document.title = GAME_CONTENT.title + ' (${LABEL})';`);
 rep(`  saveKey: 'sunnyHill.save.v1',`, `  saveKey: '${KEY}',     // TEST copy: its own save`);
+// the Parrot King's board: a TEST copy shows the real online board but never writes to it; its own rounds stay on this device
+rep(`  KEY: 'sunnyHill.board.v1', url: BOARD_URL,`, `  KEY: '${KEY.replace(/\.v1$/, '.board.v1')}', url: BOARD_URL,     // TEST copy: its own board on this device`);
+rep(`    if (this.url && e.cls) fetch(this.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(e) }).catch(() => {});`,
+  `    // TEST copy: nothing is sent to the teacher's online board`);
+rep(`    $('bdNote').textContent = [C.hint, note].filter(Boolean).join(' ');`,
+  `    $('bdNote').textContent = [C.hint, note, '(TEST: turların yalnızca bu cihazda kalır, online tabloya gönderilmez.)'].filter(Boolean).join(' ');`);
 if (!FULL) {
   rep(`function defaultState() {
   return {`, `// TEST copy: every new game starts with the first eight quests done, so level 2 can be tried at once

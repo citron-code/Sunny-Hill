@@ -1,6 +1,6 @@
 // Level 5 (the Parrot King's island): after Grumble's map the ship's wheel takes you there (straight on from level 4, or
 // from the harbour). Out at sea the island comes into view; at its pier you go on foot. The villagers are in cages (the
-// king put them there); he is on his hill. Up there he says things wrong ("I is the king!"): run to the right word among
+// king put them there); he is on his hill. Up there he says a sentence with a gap ("She is my ...!"): run to the right word among
 // three on clouds, while his coconuts fall (red rings; a hit: a moment of stars). Three right words, a crown feather;
 // five feathers (family, am/is/are, not, questions, short forms), and he says sorry, the cages open, the villagers mend
 // our ship. Next time: the school island. Game time is moved on with SH.step, so the result does not depend on how fast
@@ -41,7 +41,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog, viewport }) 
   await step(0.3); await shot('l5-village');
   for (const id of ['nani', 'koa', 'malia', 'kai']) { await talk('v5_' + id); log('  ' + id + ':', await lines()); }
   // 4) up the hill: the way up is on its west side (the rocky sides are too steep)
-  log('from the south, the way up goes round by the ramp:', await S('(() => { const p = SH.findPath(1830, 3730, 1830, 3420); return !!p && p.some((q) => q.x < 1560 && Math.abs(q.y - 3420) < 60); })()'));
+  log('from the south, the way up goes round by the ramp:', await S('(() => { const H = SH.ISLE5.HILL, R = SH.ISLE5.RAMP, p = SH.findPath(H.x, H.y + H.ry + 40, H.x, H.y); return !!p && p.some((q) => q.x < H.x - H.rx * H.top + 20 && Math.abs(q.y - R.y) < 60); })()'));
   await walk(1500, 3420); await shot('l5-ramp');
   await walk(1700, 3420);
   log('the king:', await lines(), '| stage', await S('SH.state.isle.stage'), '| vines close the way down', await S('SH.ISLE5.barrier'), '| music', await S('SH.ISLE5.music()'));
