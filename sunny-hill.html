@@ -1154,11 +1154,32 @@ const GAME_CONTENT = {
     tt: { name: 'This & That Corner', ask: 'Look! What do you say?', words: ['This', 'That', 'These', 'Those'], hints: ['near + 1', 'far + 1', 'near + 3', 'far + 3'],
       right: ['Yes!', 'Great!', 'Super!', 'Well done!'], look: 'Look:', round: '{n} / {total}', best: 'Best: {n}', more: 'One more round?', again: 'Continue', ok: 'Done', score: '{n} / {total} right!', onList: 'Games: {n}! It is on the student list!',
       coach: {
-        arrive: ['Oh! This and That! My favorite game. Heh.', 'Can I watch? I am very quiet. Like a ninja. Heh.', 'I heard a THIS and a THAT. So I came. Heh.', 'Again? Great. I love this game. And pizza. Heh.'],
-        right: ['Yes! Good eyes. Better than my eyes. Heh.', 'Correct! You are a This and That ninja. Heh.', 'Yes! I knew it. I always know. Heh.', 'Good! My job is easy today. Heh.', 'Yes! High five! Air high five. Heh.'],
-        hint: ['No problem! Near, and one: THIS. Heh.', 'No problem! Far, and one: THAT. Heh.', 'No problem! Near, and many: THESE. Heh.', 'No problem! Far, and many: THOSE. Heh.'],
-        joke: ['I make mistakes too. Every day. Heh.', 'Mistakes are good. My brain says thank you. Heh.', 'Yesterday I called my shoes THIS. Two shoes! Heh.', 'Next one! I believe in you. And in pizza. Heh.'],
-        end: ['Good practice, {name}! Practice, practice, practice. Heh.', 'Nice work, {name}! One more? I have time. I always have time. Heh.', 'You played {n} times! Wow. My record is one. Heh.', 'Good job, {name}! My brain is tired. Your brain is strong. Heh.'] },
+        arrive: ['Oh! This and That! My favorite game. Heh.', 'Can I watch? I am very quiet. Like a ninja. Heh.', 'I heard a THIS and a THAT. So I came. Heh.', 'Is this the This and That Corner? I love it here. And pizza. Heh.',
+          'Hello, {name}! I was very busy. Busy sleeping. Heh.', 'This, that, these, those. My four best friends. Heh.', 'I am here! Did you miss me? Heh.', 'Practice time? I brought my best smile. Heh.'],
+        right: ['Yes! Good eyes. Better than my eyes. Heh.', 'Correct! You are a This and That ninja. Heh.', 'Yes! I knew it. I always know. Heh.', 'Good! My job is easy today. Heh.', 'Yes! High five! Air high five. Heh.',
+          'Right! You make my day. Heh.', 'Correct! I want to clap. OK, I am clapping. Heh.', 'Yes! Easy for you. Heh.', 'Good! You are faster than me. Heh.', 'Right! I am a proud teacher. Very proud. Heh.',
+          'Yes! My brain says wow. Heh.', 'Correct! Tell your friends. Heh.'],
+        hint: [['No problem! Near, and one: THIS. Heh.', 'Look again. It is near you. Only one. So: THIS. Heh.', 'One thing, very near. That is THIS. Easy, right? Heh.'],
+          ['No problem! Far, and one: THAT. Heh.', 'Look again. It is far away. Only one. So: THAT. Heh.', 'One thing, far away. That is THAT. Funny word, right? Heh.'],
+          ['No problem! Near, and many: THESE. Heh.', 'Look again. They are near you. Many. So: THESE. Heh.', 'Many things, very near. Those are... no! THESE. Heh.'],
+          ['No problem! Far, and many: THOSE. Heh.', 'Look again. They are far away. Many. So: THOSE. Heh.', 'Many things, far away. That is THOSE. Heh.']],
+        joke: ['I make mistakes too. Every day. Heh.', 'Mistakes are good. My brain says thank you. Heh.', 'Yesterday I called my shoes THIS. Two shoes! Heh.', 'Next one! I believe in you. And in pizza. Heh.',
+          'Once I said THESE is my car. I have one car. Heh.', 'My cat makes mistakes too. Big ones. Heh.', 'Try again. The tables are not going anywhere. Heh.', 'That was a good try. A very good try. Heh.'],
+        run3: ['Three in a row! Are you a robot? Heh.', 'Three in a row! I need sunglasses. You shine. Heh.', 'Three! You are on fire. I am... warm. Heh.'],
+        run5: ['Five in a row! Wow. Can you teach my class? Heh.', 'Five in a row! I am speechless. Almost. Heh.', 'Five! The tables are scared of you now. Heh.'],
+        idle: ['Take your time. I am very patient. Most of the time. Heh.', 'Hm. Near or far? One or many? Look at the tables. Heh.', 'No hurry. I am not going anywhere. I live here. Heh.', 'Green table near, orange table far. Just saying. Heh.'],
+        round: ['Round two! I am still here. I have no other plans. Heh.', 'Another round? Great. I love this game. Heh.', 'One more! You are a This and That machine. Heh.', 'Again! My favorite word. After pizza. Heh.'],
+        // a joke about the thing on the table, after a right answer now and then: [one, many] (the lesson again: this / these)
+        things: { cookie: ['A cookie! Can I have it? No? OK. Heh.', 'Cookies! Can I have one? No? OK. Heh.'], banana: ['A banana! Bongo says hello. Heh.', 'Bananas! Bongo is very happy now. Heh.'],
+          dog: ['A dog! Not as cute as Sparky. Do not tell him. Heh.', 'Dogs! Sparky has new friends. Heh.'], cat: ['A cat! It is looking at me. I am scared. Heh.', 'Cats! Many cats. I am more scared. Heh.'],
+          apple: ['An apple! For the teacher? Thank you! Heh.', 'Apples! For the teacher? Many thanks! Heh.'], clock: ['A clock! Is it time for lunch? Heh.', 'Clocks! So many. And I am still late. Heh.'],
+          bus: ['A bus! Beep beep! Heh.', 'Buses! Beep beep, beep beep! Heh.'], balloon: ['A balloon! Do not let it go. Heh.', 'Balloons! Hold them tight. Heh.'],
+          'teddy bear': ['A teddy bear! Mine is at home. Shh. Heh.', 'Teddy bears! A teddy bear party. Heh.'], lollipop: ['A lollipop! Not in class. Maybe after class. Heh.', 'Lollipops! For after class. Heh.'],
+          chair: ['A chair! I need one. My legs are tired. Heh.', 'Chairs! Good. Everybody sit down. Heh.'], ball: ['A ball! Football after this? Heh.', 'Balls! Let us play. After this. Heh.'],
+          computer: ['A computer! No games in class. Only this one. Heh.', 'Computers! A computer lab! Heh.'], pencil: ['A pencil! Write your name. Heh.', 'Pencils! Write many names. Heh.'],
+          tree: ['A tree! It never talks in class. Good tree. Heh.', 'Trees! Very quiet students. Heh.'], book: ['A book! My favorite thing. After pizza. Heh.', 'Books! A library! Heh.'] },
+        end: ['Good practice, {name}! Practice, practice, practice. Heh.', 'Nice work, {name}! One more? I have time. I always have time. Heh.', 'You played {n} times! Wow. My record is one. Heh.', 'Good job, {name}! My brain is tired. Your brain is strong. Heh.',
+          'Great practice! Now this, that, these, those are your friends. Heh.', 'Well done, {name}! Tell your family about THIS. And THAT. Heh.', 'You worked hard! I watched hard. Heh.', 'Good game, {name}! See you at school. Heh.'] },
       sign: 'THIS · THAT · THESE · THOSE', near: 'NEAR', far: 'FAR', one: 'ONE', many: 'MANY', free: [['book', 'books', '📕'], ['ball', 'balls', '⚽']],
       intro: [['sparky', 'Woof! This is the This and That Corner!'], ['sparky', 'Walk near the tables and far away. Look at the words!'], ['sparky', 'Then stand on the star and play!']],
       poster: [['sparky', 'THIS: one thing, near me.'], ['sparky', 'THESE: many things, near me.'], ['sparky', 'THAT: one thing, far away.'], ['sparky', 'THOSE: many things, far away.']] },
@@ -13031,20 +13052,23 @@ const ISLE6 = {
       return;
     }
     if (R.wait > 0 && (R.wait -= dt) <= 0) { if (R.n >= 10) this.ttEnd(); else this.ttNext(); }
-    if (R.endSay > 0 && (R.endSay -= dt) <= 0) { const C = GAME_CONTENT.school.tt.coach, p = (this.st().tt.plays | 0); this.tchBubble(fmt(C.end[(p - 1) % C.end.length], { n: p })); }
+    if (R.endSay > 0 && (R.endSay -= dt) <= 0) { const C = GAME_CONTENT.school.tt.coach, p = (this.st().tt.plays | 0); this.tchBubble(fmt(this.coachPick(C.end, 'end'), { n: p })); }
+    if (!R.done && R.picked < 0 && R.wait <= 0 && this.coachHere() && (R.idle = (R.idle || 0) + dt) > 10 && !R.nudged) { R.nudged = 1; this.tchBubble(this.coachPick(GAME_CONTENT.school.tt.coach.idle, 'idle')); }          // (a child who waits long: a nudge)
   },
   ttStart() {
     const A = this.TT; if (this.tt && this.tt.on) return;
     player.x = A.star.x; player.y = A.star.y; player.path = null; player.goal = null; player.moving = false; resetTrail(-0.7, 0.7);
+    const again = !!this.tt;
     this.tt = { on: true, n: 0, right: 0, near: null, bag: this.ttBag(), last: -1, wait: 0 };
     Talk.hide(); this.ttUI(); $('tt').classList.remove('hidden'); document.body.classList.add('ttOn');
     this.ttNext();
+    if (again && this.coachHere()) this.tchBubble(this.coachPick(GAME_CONTENT.school.tt.coach.round, 'round'));          // (Continue: a word for the new round)
   },
   ttBag() { const b = [0, 1, 2, 3, 0, 1, 2, 3, (Math.random() * 4) | 0, (Math.random() * 4) | 0]; for (let i = b.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b; },          // (each of the four words at least twice)
   ttNext() {
     const R = this.tt, C = GAME_CONTENT.school, T = C.quiz.things, k = R.bag[R.n];
     let i; do i = (Math.random() * T.length) | 0; while (i === R.last && T.length > 1); R.last = i;
-    R.thing = T[i]; R.near = !(k & 1); R.many = k >= 2; R.answer = k; R.picked = -1; R.wait = 0;
+    R.thing = T[i]; R.near = !(k & 1); R.many = k >= 2; R.answer = k; R.picked = -1; R.wait = 0; R.idle = 0;
     this.ttShow(); Sfx.play('pop');
     $('ttQ').textContent = C.tt.ask; $('ttS').textContent = ''; $('ttN').textContent = fmt(C.tt.round, { n: R.n + 1, total: 10 });
     this.ttButtons();
@@ -13124,11 +13148,11 @@ const ISLE6 = {
     return (this.tchS = [{ k: 'gate', x: this.TEACHER.x, y: this.TEACHER.y, t: 15 }, { k: 'water', x: B[0] + B[2] / 2 + 16, y: B[1] + 8, t: 10 }, { k: 'list', x: Li.x - 40, y: Li.y + 50, t: 7 },
       { k: 'bell', x: Be.x - 22, y: Be.y - 6, t: 4 }, { k: 'nap', x: Bn[0], y: Bn[1] + 24, t: 20, bench: Bn }, { k: 'keeper', x: G[0] + 22, y: G[1], t: 26 }, { k: 'crab', x: 0, y: 0, t: 0 }]);
   },
-  tchSay(key, quiet) {          // a word, when you are near enough to hear it
+  tchSay(key) {          // a word on his round, when you are near enough to hear it: a bubble beside him (not a message in the middle of the screen)
     const T = this.tch, l = GAME_CONTENT.school.tchSay[key];
     if (!T || !l || Math.hypot(player.x - T.x, player.y - T.y) > 480) return;
-    if (!quiet) Toast.show('💬 ' + l);
-    Speech.speak(l, { who: 'teacher' });
+    if (this.bub && this.bub.t > 0.6 && (this.tt && this.tt.on)) return;          // (at the corner his own words come first)
+    this.tchBubble(l);
   },
   tchTick(dt) {
     this.bubTick(dt);
@@ -13171,21 +13195,36 @@ const ISLE6 = {
     if (!on) { T.coach = 0; T.path = null; this.tchLeave(T); return; }          // (you stopped: on with his round, the next thing)
     if (T.path) {
       const p = T.path[T.pi];
-      if (!p) { T.path = null; T.k = 'coach'; const n = (this.st().tt && this.st().tt.plays) | 0; this.tchBubble(GAME_CONTENT.school.tt.coach.arrive[n % 4]); }
+      if (!p) { T.path = null; T.k = 'coach'; this.tchBubble(fmt(this.coachPick(GAME_CONTENT.school.tt.coach.arrive, 'arrive'))); }
       else if (this.kidWalk(T, p.x, p.y, dt, 170)) T.pi++;
       return;
     }
     T.cheerT = Math.max(0, (T.cheerT || 0) - dt); T.wave = T.cheerT > 0;
     const R = this.tt, at = this.bubbleOn() || R.near == null ? player : R.near ? this.TT.near : this.TT.far; this.kidLook(T, at.x, at.y);
   },
-  coachSay(ok, R) {          // his word after an answer (null: he is not there yet; not every right answer)
-    const T = this.tch, C = GAME_CONTENT.school.tt.coach; if (!T || T.k !== 'coach' || T.path) return null;
-    if (ok) { R.okN = (R.okN | 0) + 1; if (R.okN % 2 !== 1) return null; T.cheerT = 1.4; return C.right[(R.okN >> 1) % C.right.length]; }
-    R.badN = (R.badN | 0) + 1;
-    return R.badN % 2 === 0 ? C.hint[R.answer].replace(/ Heh\.$/, '') + ' ' + C.joke[((R.badN >> 1) - 1) % C.joke.length] : C.hint[R.answer];          // (every other time a joke about himself; one 'Heh.')
+  coachPick(L, k) {          // one of his lines: a different one each time (never the same twice in a row)
+    const last = (this.coachLast = this.coachLast || {}); let i = Math.floor(Math.random() * L.length);
+    if (L.length > 1 && i === last[k]) i = (i + 1) % L.length;
+    last[k] = i; return L[i];
   },
-  tchBubble(text, quiet) {          // a bubble over his head; said in his voice when nothing else is being said
-    this.bub = { text, t: 1.6 + text.length * 0.06 };
+  coachHere() { const T = this.tch; return !!T && T.k === 'coach' && !T.path; },
+  coachSay(ok, R) {          // his word after an answer (null: he is not there yet, or he keeps quiet this time)
+    const T = this.tch, C = GAME_CONTENT.school.tt.coach; if (!this.coachHere()) return null;
+    if (ok) {
+      R.okN = (R.okN | 0) + 1; R.run = (R.run | 0) + 1;
+      if (R.run === 3 || R.run === 5) { T.cheerT = 1.8; return this.coachPick(C['run' + R.run], 'run' + R.run); }          // (three, five in a row)
+      if (R.okN % 2 !== 1) return null;
+      T.cheerT = 1.4;
+      const tj = C.things[R.thing[0]];
+      if (tj && !R.thingSaid && Math.random() < 0.6) { R.thingSaid = 1; return tj[R.many ? 1 : 0]; }          // (a joke about the thing: once a round)
+      return this.coachPick(C.right, 'right');
+    }
+    R.run = 0; R.badN = (R.badN | 0) + 1;
+    const h = this.coachPick(C.hint[R.answer], 'hint' + R.answer);
+    return R.badN % 2 === 0 ? h.replace(/ Heh\.$/, '') + ' ' + this.coachPick(C.joke, 'joke') : h;          // (every other time a joke about himself; one 'Heh.')
+  },
+  tchBubble(text, quiet) {          // a bubble over his head (only while he is on the screen); said in his voice when nothing else is being said
+    this.bub = { text, t: 1.8 + text.length * 0.06 };
     let e = $('tchB'); if (!e) { e = el('div', 'hidden'); e.id = 'tchB'; e.appendChild(el('b', '', charName('teacher'))); e.appendChild(el('span')); document.body.appendChild(e); }
     e.lastChild.textContent = text; e.classList.remove('hidden'); this.bubPos();
     if (!quiet && !Speech.cur) Speech.speak(text.replace(/\b[A-Z]{2,}\b/g, (w) => w.toLowerCase()), { who: 'teacher' });          // (THIS is said as a word, not spelled)
@@ -13194,7 +13233,8 @@ const ISLE6 = {
   bubPos() {          // the bubble follows his head on the screen
     const e = $('tchB'), T = this.tch; if (!e || !T) return;
     const d = personModel3(LOOKS.teacher).d, h = G3.on ? (d.hy + d.hyr) * CS3 + 16 : -personTop(LOOKS.teacher) + 12, p = worldToScreen(T.x, h, T.y);
-    const w = e.offsetWidth || 240, hh = e.offsetHeight || 60, x = clamp(p.x - w / 2, 8, view.cw - w - 8), y = clamp(p.y - hh, 70, view.ch - hh - 160);
+    const off = p.x < -10 || p.x > view.cw + 10 || p.y < 30 || p.y > view.ch + 40; e.classList.toggle('hidden', off);          // (he is not on the screen: no bubble)
+    const w = e.offsetWidth || 240, hh = e.offsetHeight || 60, x = clamp(p.x - w / 2, 8, view.cw - w - 8), y = clamp(p.y - hh, 70, view.ch - hh - (this.tt && this.tt.on ? 160 : 20));
     e.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'; e.style.setProperty('--tail', Math.round(clamp(p.x - x, 24, w - 24)) + 'px');
   },
   bubTick(dt) { if (!this.bub) return; this.bub.t -= dt; if (this.bub.t <= 0 || !this.here()) { this.bub = null; const e = $('tchB'); if (e) e.classList.add('hidden'); } else this.bubPos(); },
@@ -13233,7 +13273,7 @@ const ISLE6 = {
       R.a += R.dir * 0.01 * (112 * dt / sl) * (T.lungeT > 0 ? 1.8 : 1);          // (a quick side-step when he lunges)
       const np = this.coastPt(R.a, R.k); R.dx = (np[0] - R.x) || R.dx; R.dy = (np[1] - R.y) || R.dy; const dl = Math.hypot(R.dx, R.dy) || 1; R.dx /= dl; R.dy /= dl; R.x = np[0]; R.y = np[1];
       const dist = Math.hypot(R.x - T.x, R.y - T.y);
-      if (T.lungeT > 0) { T.lungeT -= dt; this.kidWalk(T, R.x, R.y, dt, 240); T.act = 'pick'; if (T.lungeT <= 0) { T.missed++; if (T.missed <= 2) this.tchSay('miss', T.missed > 1); } }
+      if (T.lungeT > 0) { T.lungeT -= dt; this.kidWalk(T, R.x, R.y, dt, 240); T.act = 'pick'; if (T.lungeT <= 0) { T.missed++; if (T.missed <= 2) this.tchSay('miss'); } }
       else { this.kidWalk(T, R.x - R.dx * 22, R.y - R.dy * 22, dt, 100); T.nextLunge -= dt; if (T.nextLunge <= 0 && dist < 80) { T.lungeT = 0.35; T.nextLunge = 2.4; Sfx.tone(300, 0.12, 'triangle', 0.03, 0, 200); } }
     } else if (R.t < 12.4) {          // into the sea: plop
       R.k += dt * 0.06; const np = this.coastPt(R.a, R.k); R.x = np[0]; R.y = np[1];
@@ -15753,7 +15793,13 @@ function voiceScore(v) {
 const Speech = {
   ok: typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined',
   status: 'unknown',      // 'unknown' while the list loads, then 'ok' or 'none'
-  english: [], cast: {}, cur: null, bad: {}, fails: {}, waited: false, onChange: null,
+  english: [], cast: {}, cur: null, bad: {}, fails: {}, waited: false, onChange: null, pins: null,
+  pinned() { if (!this.pins) { try { this.pins = JSON.parse(localStorage.getItem('sunnyHill.voices.v1') || '{}') || {}; } catch (e) { this.pins = {}; } } return this.pins; },
+  pin(key, v) {          // the voice a character first spoke with on this device stays theirs
+    const P = this.pinned(); if (!v || P[key]) return;
+    if (typeof performance !== 'undefined' && performance.now() < 2500) return;          // (the first moments: the list may still be loading)
+    P[key] = v.name; try { localStorage.setItem('sunnyHill.voices.v1', JSON.stringify(P)); } catch (e) { /* no storage: for this visit */ }
+  },
   rate() { return state.settings.slow ? SETTINGS.rateSlow : SETTINGS.rateNormal; },
   build() {
     let vs = [];
@@ -15779,6 +15825,8 @@ const Speech = {
       });
     }
     for (const k of ['male', 'other', 'female', 'child']) if (pools[k].length) { this.cast.teacher = { v: pools[k][0], real: k === 'male' }; break; }          // (Batuhan Teacher: the best English man's voice there is)
+    { const P = this.pinned(), byName = new Map(en.map((v) => [v.name, v]));          // (each keeps the voice it first spoke with, while that voice is there: no one changes voice when another voice comes or goes)
+      for (const who of Object.keys(P)) { const v = byName.get(P[who]); if (v) this.cast[who] = { v, real: voiceKind(v) === (VOICE_KIND[who] || 'female') }; } }
     if (before !== this.status && this.onChange) this.onChange(this.status);
   },
   // A child voice already sounds young and a man's voice already sounds deep, so they only get a nudge.
@@ -15794,11 +15842,11 @@ const Speech = {
     if (this.status === 'none') { VoiceWarn.show(); return false; }
     const synth = window.speechSynthesis, who = o.who || 'narrator';
     try {
-      const entry = this.cast[VOICE_KIND[who] ? who : 'narrator'];
+      const key = VOICE_KIND[who] ? who : 'narrator', entry = this.cast[key];
       const u = new SpeechSynthesisUtterance(text);
       if (entry) { u.voice = entry.v; u.lang = entry.v.lang; } else u.lang = 'en-US';   // list still loading: ask for English
       u.rate = this.rate(); u.pitch = clamp(this.pitchFor(who, entry), 0.1, 2); u.volume = 1;
-      u.onstart = () => { if (this.cur === u && o.onStart) o.onStart(); };
+      u.onstart = () => { if (entry) this.pin(key, entry.v); if (this.cur === u && o.onStart) o.onStart(); };          // (it spoke: that voice is theirs now)
       u.onboundary = (e) => { if (this.cur === u && o.onBoundary && (!e.name || e.name === 'word')) o.onBoundary(e.charIndex); };
       u.onend = () => { if (this.cur === u) { this.cur = null; if (o.onEnd) o.onEnd(); } };
       u.onerror = (e) => {

@@ -58,8 +58,11 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   log('the end:', await S(`document.getElementById('ttN').textContent + ' | ' + document.getElementById('ttQ').textContent + ' | ' + document.getElementById('ttS').textContent`), '| buttons', await S(`[...document.querySelectorAll('#ttBtns button')].map((b) => b.textContent).join(' / ')`), '| saved', await S('JSON.stringify(SH.state.school.tt)'), '| no ✕', await S(`!document.querySelector('#tt .ttX')`));
   await shot('l6-tt-end' + T);
   await S(`document.querySelector('#ttBtns .again').click()`); await step(0.2);
-  log('Continue: a new round', await S(`document.getElementById('ttN').textContent`), '| Batuhan Teacher stays', await S('SH.ISLE6.tchNow().k'));
-  for (let r = 0; r < 10; r++) { await S(`document.querySelectorAll('#ttBtns button')[SH.ISLE6.tt.answer].click()`); for (let i = 0; i < 40 && await S('SH.ISLE6.tt.picked >= 0 && !SH.ISLE6.tt.done'); i++) await step(0.25); }
+  log('Continue: a new round', await S(`document.getElementById('ttN').textContent`), '| Batuhan Teacher stays', await S('SH.ISLE6.tchNow().k'), '| says', await bub());
+  await step(11); log('a child who waits long:', await bub());
+  const said2 = [];
+  for (let r = 0; r < 10; r++) { await S(`document.querySelectorAll('#ttBtns button')[SH.ISLE6.tt.answer].click()`); said2.push(await bub()); for (let i = 0; i < 40 && await S('SH.ISLE6.tt.picked >= 0 && !SH.ISLE6.tt.done'); i++) await step(0.25); }
+  log('round 2, all right, he says:\n    ' + said2.map((x, i) => (i + 1) + '. ' + (x || '-')).join('\n    '));
   log('round 2:', await S(`document.getElementById('ttN').textContent + ' | ' + document.getElementById('ttQ').textContent`), '| games', await S('SH.state.school.tt.plays'));
   await S(`document.querySelector('#ttBtns .done').click()`); await step(0.2);
   await step(0.5); log('after the game Batuhan Teacher goes on:', JSON.stringify(await S('(({ k, coach }) => ({ k, coach }))(SH.ISLE6.tchNow())')));
