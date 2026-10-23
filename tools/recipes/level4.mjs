@@ -36,7 +36,7 @@ export default async function ({ evaluate, sleep, shot, savePng, send, consoleLo
     for (let i = 0; i < 50 && await S(`SH.game.mode === 'minigame'`); i++) await sleep(100);
     return qs;
   };
-  const toCrate = () => S(`(() => { const c = SH.SEA.crates[0], s = SH.SEA.ship; s.x = c.x - 120; s.y = c.y; s.a = 0; s.v = 0; })()`);
+  const toCrate = () => S(`(() => { const c = SH.SEA.crates[0], s = SH.SEA.ship; if (!c) return; s.x = c.x - 120; s.y = c.y; s.a = 0; s.v = 0; })()`);
   // sail up to the next crate (waiting for one to float up), until its questions open
   const openCrate = async () => {
     for (let i = 0; i < 60; i++) {
