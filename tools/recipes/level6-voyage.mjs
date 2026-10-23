@@ -33,6 +33,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   log('on the pier at', await pos(), '| Sparky:', await lines(), '| card', await card());
   // 2) back to the Parrot King's island from the school's pier (coming from the north)
   await S(`SH.tp(${await S('SH.ISLE6.DOCK.x0 + 70')}, ${await S('SH.ISLE6.SHIPAT.y')})`); await step(0.3);
+  await S('SH.ISLE6.STAY = false');          // (this week its ship stays, see level6-ships.mjs; here, as next week)
   await talk('ship6'); log('the school\'s ship asks:', await picks()); await pick('isle5'); log(await lines());
   log('going on board:', await S('!!SH.ISLE6.aboard'));
   for (let i = 0; i < 40 && await S('!!SH.ISLE6.aboard'); i++) { await step(0.2); if (i === 4) { await S('SH.game.paused = true'); await shot('l6v-board' + T); await S('SH.game.paused = false'); } }

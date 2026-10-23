@@ -331,9 +331,14 @@ Papağan Kral'dan sonra gemi **okul adasına** gider. Ada Sunny Hill kadar büy�
 `ISLE6.REG`; denizde Papağan Kral'ın adasının kuzeydoğusunda). Ortasında tek büyük bina var: iki katlı, kırmızı
 kiremit çatılı, saat kuleli **Island School** (kulenin saati gerçek saati gösterir). Binanın içi gelecek hafta yapılacak.
 
-- **Yolculuk.** Evdeki dümen artık "Where shall we sail?" diye sorar: Papağan Kral'ın adası (alıştırma ve pano için)
-  ya da okul adası. Papağan Kral'ın iskelesindeki gemiyle de okul adasına, okul adasının iskelesindeki gemiyle de
-  Papağan Kral'ın adasına gidilir. Adadan ayrılırken çocuk iskele tahtasından gemiye çıkar, gemi kendiliğinden kuzeye
+- **Yolculuk.** Gemiye her binişte "Where shall we sail?" diye sorulur, bulunulan yer dışındaki her yer seçilebilir:
+  evdeki dümende Papağan Kral'ın adası ya da okul adası; Papağan Kral'ın iskelesinde **Sunny Hill (home)** ya da okul
+  adası; okul adasının iskelesinde Sunny Hill ya da Papağan Kral'ın adası. Eve dönüşte Sparky'nin oku limanı gösterir,
+  liman ağzına gelince gemi kendiliğinden içeri girip rıhtıma yanaşır; ekran parlar, çocuk evdeki geminin dümenindedir
+  ("Woof! We are home!"), iskele tahtasından inip köye yürüyebilir.
+- **Bu hafta okul adasından çıkış yok (23.10.2026, öğretmenin isteği).** `ISLE6.STAY = true`: okul adasının gemisi
+  kalkmaz, Sparky "This week we stay at school! ... Our ship sails again next week." der. Gelecek hafta `false` yapılınca
+  gemi yine sorar ve kalkar. Adadan ayrılırken çocuk iskele tahtasından gemiye çıkar, gemi kendiliğinden kuzeye
   açılır, sonra dümen çocuğundur (kesme yok). Yanaşma da kesmesizdir; gemi iskeleye kuzeyden gelirse önce iskelenin
   batısından aşağı iner, altından dönüp yanaşır (iskelenin üstünden geçmez).
 - **Kapı ve Batuhan Teacher.** İskelenin kara ucunda tuğla direkli, mavi çatılı bir kapı var; önünde **Batuhan Teacher**
@@ -564,6 +569,7 @@ GL=gpu node tools/drive.mjs tools/recipes/level6-thisthat.mjs  # This & That Cor
 GL=gpu node tools/drive.mjs tools/recipes/level6-teacher.mjs  # Batuhan Teacher'ın turu: quizden önce kapıda; sonra kapı, çiçek sulama, liste, bankta uyku (konuşunca uyanır), zil, kalecilik (şut kurtarır), yengeç kovalama (yengeç kaçar, denize girer, kumda devam eder), kapı; FLAT=1 ile 2D
 GL=gpu node tools/drive.mjs tools/recipes/level6-garden.mjs  # quizden sonra şapka çıkar, üniforma giyilir (sonradan gelen de alır); top ve gol, salıncak, kaydırak, tahterevalli (Sparky ile), seksek, dört sınıf arkadaşı, çeşme, otobüs, bayrak, kum havuzu, öğrenci listesi (isim/şube ekranı, şubelere göre liste, panodaki adlar, Papağan panosu yalnız turları gösterir), gardırop; FLAT=1 ile 2D
 GL=gpu node tools/drive.mjs tools/recipes/level6-return.mjs  # quizi geçmiş biri adaya geri gelince (kayıttan, Devam ile): kapıdan girip çıkabiliyor; yeni oyunda kapı yine kapalı
+GL=gpu node tools/drive.mjs tools/recipes/level6-ships.mjs  # gemi her binişte sorar: Papağan adasından eve (limana yanaşma, dümende, köye inilebilir), evden okul adasına, bu hafta okul adasının gemisi kalkmaz (STAY), STAY kapalıyken okul adasından Papağan adasına; FLAT=1 ile 2D
 GL=gpu node tools/drive.mjs tools/recipes/level6-voyage.mjs  # yolculuklar: evdeki dümenin seçimi, okul adasına yanaşma ve iniş, okul adasından Papağan Kral'a (kuzeyden yanaşma), Papağan Kral'dan okul adasına
 GL=gpu node tools/drive.mjs tools/recipes/resume.mjs  # kaldığın yerden devam: ev, okul bahçesi, papağan köyü, papağan tepesi (merdiven dibi), Dr. Fizz'in salonu
 GL=gpu TAG=a node tools/drive.mjs tools/recipes/level5-tour.mjs  # adanın görsel turu: hep aynı 8 nokta (iskele, köy, kafesler, orman, merdiven, tepe, taht, kumsal), önce/sonra karşılaştırmak için; FLAT=1 ile 2D
