@@ -1169,7 +1169,9 @@ const GAME_CONTENT = {
     door: [['sparky', 'The door is closed.'], ['sparky', 'School starts next week!']],
     bell: 'Ding! Ding! Ding!',
     card: { go: 'Go to the ship! Sail to the school island!', sail: 'Sail to the school island! Follow the arrow!', gate: 'Talk to Batuhan Teacher at the gate!', quiz: 'Answer the questions. Then hand in your paper!', garden: 'Play in the school garden!' },
-    pick: { title: 'Where shall we sail?', isle5: "The Parrot King's island", school: 'The school island', no: 'Not now' },
+    pick: { title: 'Where shall we sail?', isle5: "The Parrot King's island", school: 'The school island', home: 'Sunny Hill (home)', no: 'Not now' },
+    // this week the children stay on the school island (ISLE6.STAY): its ship does not sail
+    stay: [['sparky', 'Woof! This week we stay at school!'], ['sparky', 'Play in the garden. Practice at the This and That Corner!'], ['sparky', 'Our ship sails again next week.']],
     // the gate's quiz: n questions, need right answers open the gate. A paper: mix.demo this / that / these / those (each with
     // a little picture: a child pointing at one thing or three, near the hand or far away), mix.vocab unit-2 words,
     // mix.unit1 unit-1 review (the Parrot King's sentences). questions: the teacher's own, if there are n of them
@@ -1445,6 +1447,8 @@ const GAME_CONTENT = {
   sea: {
     told: [['sparky', 'Woof! Our ship is ready, Captain {name}!'], ['sparky', "Let's sail! Go to the ship's wheel!"]],
     go: [['sparky', "Woof! Let's sail, Captain {name}!"]],
+    homeSail: [['sparky', "Woof! Let's sail home to Sunny Hill!"], ['sparky', 'Follow my arrow!']], homeCard: 'Sail home to Sunny Hill! Follow the arrow!',
+    homeBack: [['sparky', 'Woof! We are home! Hello, Sunny Hill!']],
     sail: [['sparky', 'Woof! We are at sea!'], ['sparky', 'Steer the ship. Look! A crate!'], ['sparky', 'Sail to the crate!']],
     back: [['sparky', "Woof! Let's find Captain Grumble!"], ['sparky', 'Sail out to sea! Follow my arrow!']],
     out: [['sparky', 'Great shot, Captain {name}!'], ['sparky', 'Now we are ready.'], ['sparky', "Let's sail out to sea! Follow my arrow!"]],
@@ -9994,17 +9998,23 @@ const SEA = {
     Dialog.show(say, () => { this.crateT = 0.4; Hud.cardKey = ''; Hud.refresh(); this.fireUI(); });
   },
   isle() { return this.trip === 'school' ? ISLE6 : ISLE5; },          // (the island this trip goes to)
-  depart(I, T) {            // from island I's pier (you are at the wheel now): out to the north by itself, then sail on to island T
+  depart(I, T) {            // from island I's pier (you are at the wheel now): out to the north by itself, then sail on to island T (or 'home')
     const o = I.seaOff(), d = I.seaDock();
-    this.reset(); this.active = true; this.trip = T === ISLE6 ? 'school' : 'isle'; this.from = I; this.AREA = this.AREA_W;
+    this.reset(); this.active = true; this.trip = T === 'home' ? 'home' : T === ISLE6 ? 'school' : 'isle'; this.from = I; this.AREA = this.AREA_W;
     this.ship = { x: d.x, y: d.y, a: -Math.PI / 2, v: 0, turn: 0, bank: 0, slow: 0, inv: 0, recoil: 0, aimA: -Math.PI / 2, fs: -1 };
     this.undock = { vert: true, t: 0, T: 3.4, y0: d.y, y1: d.y - 720, x: d.x };
-    this.goal = T.seaDock();
+    this.goal = T === 'home' ? { x: SHIP.AFLOAT, y: SHIP.FLOAT_Y } : T.seaDock();          // (home: Sunny Hill's quay)
     CAM3.x += o.x; CAM3.z += o.y; cam.x += o.x; cam.y += o.y;          // (no cut: the island's coordinates become the sea's)
     this.fr = null; this.ins = null; this.zoom = G3.on ? (I.zoom || 1.15) : 0; this.k2 = G3.on ? 0 : 1; this.fogK = 1; this.lift = I.camH || 0;
     const h = SHIP.helmSpot(); player.x = h.x; player.y = h.y; player.path = null; player.goal = null; player.moving = false; sparky.x = h.x - 40; sparky.y = h.y;
     I.off = null; I.aboard = null;
     Talk.hide(); Hud.cardKey = ''; Hud.refresh(); this.fireUI();
+  },
+  arriveHome() {           // tied up at Sunny Hill's quay: a flash, you at the ship's wheel at home, Sparky's word
+    this.end();
+    const h = SHIP.helmSpot(); player.x = h.x; player.y = h.y; player.dir = 'up'; player.path = null; player.goal = null; player.moving = false;
+    sparky.x = h.x + 50; sparky.y = h.y; sparky.moving = false; resetTrail(1, 0); snapCamera();          // (Sparky on the deck beside you)
+    Dialog.show(GAME_CONTENT.sea.homeBack, () => { Hud.cardKey = ''; Hud.refresh(); });
   },
   end() {                  // back in the harbour, at the wheel
     this.active = false; this.trip = null; this.reset();
@@ -10046,7 +10056,7 @@ const SEA = {
       Dialog.show(GAME_CONTENT.sea.out, () => { Hud.cardKey = ''; Hud.refresh(); });
       Hud.cardKey = ''; Hud.refresh();
     }
-    if (this.trip && this.goal && !this.dock && !this.undock && Math.hypot(this.goal.x - this.ship.x, this.goal.y - this.ship.y) < 560) this.beginDock();
+    if (this.trip && this.goal && !this.dock && !this.undock && (this.trip === 'home' ? this.ship.x < this.START.x + 520 && Math.abs(this.ship.y - this.goal.y) < 700 : Math.hypot(this.goal.x - this.ship.x, this.goal.y - this.ship.y) < 560)) this.beginDock();          // (home: anywhere off the harbour mouth)
     if (!this.trip && this.goal && !this.pirate && Math.hypot(this.goal.x - this.ship.x, this.goal.y - this.ship.y) < 900) { this.goal = null; this.spawnPirate(true); }
     this.moveBalls(dt); this.moveShots(dt); this.crateTick(dt); this.mapTick(dt); this.smoke(dt);
     if (this.endT > 0 && (this.endT -= dt) <= 0) this.finish();
@@ -10060,14 +10070,16 @@ const SEA = {
         pts.push({ x: h00 * p0.x + h10 * m0.x + h01 * p1.x + h11 * m1.x, y: h00 * p0.y + h10 * m0.y + h01 * p1.y + h11 * m1.y, d: 0 });
       }
     };
-    if (S.y < g.y + 160) {          // (from the north: down the west side of the pier, round under it, then up into the berth)
+    const home = this.trip === 'home', endA = home ? Math.PI : -Math.PI / 2;          // (home: into the harbour, the bow to the quay)
+    if (home) seg(S, S.a, g, endA, 40);
+    else if (S.y < g.y + 160) {          // (from the north: down the west side of the pier, round under it, then up into the berth)
       const Wp = { x: Math.min(S.x, g.x - 360), y: g.y + 40 }, A = { x: g.x - 130, y: g.y + 380 };
       seg(S, S.a, Wp, Math.PI / 2, 24); seg(Wp, Math.PI / 2, A, -Math.PI / 2 + 0.75, 24); seg(A, -Math.PI / 2 + 0.75, g, -Math.PI / 2, 20);
     }
     else seg(S, S.a, g, -Math.PI / 2, 40);          // (it ends pointing north, as it lies at the pier)
     let len = 0; for (let i = 1; i < pts.length; i++) pts[i].d = (len += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
     const v0 = Math.max(60, S.v), T = clamp(1.6 * len / v0, 3.5, 6.5);
-    this.dock = { t: 0, T, pts, len, c: clamp(v0 * T / len, 0, 2.6), hold: 0 };
+    this.dock = { t: 0, T, pts, len, c: clamp(v0 * T / len, 0, 2.6), hold: 0, endA };
     this.steer = null; this.aim = null;
   },
   dockTick(dt) {
@@ -10077,12 +10089,12 @@ const SEA = {
     const d = f * D.len; let i = 1; while (i < P.length - 1 && P[i].d < d) i++;
     const p = P[i - 1], q = P[i], k = clamp((d - p.d) / Math.max(1e-6, q.d - p.d), 0, 1);
     S.x = p.x + (q.x - p.x) * k; S.y = p.y + (q.y - p.y) * k;
-    const turn = wrapA((u >= 1 ? -Math.PI / 2 : Math.atan2(q.y - p.y, q.x - p.x)) - S.a);
+    const turn = wrapA((u >= 1 ? D.endA : Math.atan2(q.y - p.y, q.x - p.x)) - S.a);
     S.a = wrapA(S.a + turn * Math.min(1, dt * 6)); S.v = df * D.len; S.turn = 0;
     S.bank += (clamp(turn * 0.5, -0.09, 0.09) * (1 - u) - S.bank) * Math.min(1, dt * 4);
     S.aimA = wrapA(S.aimA + clamp(wrapA(S.a - S.aimA), -6 * dt, 6 * dt));
     if ((this.wakeT -= dt) <= 0 && S.v > 30) { this.wakeT = 0.09; this.wake.push({ x: S.x - Math.cos(S.a) * 170, y: S.y - Math.sin(S.a) * 170, t: 0, s: Math.min(1, S.v / 250) }); }
-    if (u >= 1) { S.v = 0; S.a = -Math.PI / 2; if ((D.hold += dt) > 0.7) { this.dock = null; this.isle().arrive(); } }
+    if (u >= 1) { S.v = 0; S.a = D.endA; if ((D.hold += dt) > 0.7) { this.dock = null; if (this.trip === 'home') this.arriveHome(); else this.isle().arrive(); } }
   },
   face2(o, dt) {             // the flat view draws a ship from the side: it turns round smoothly when its heading crosses north-south
     const c = Math.cos(o.a);
@@ -10162,7 +10174,7 @@ const SEA = {
     } else if (tx * Math.cos(this.ship.a) + ty * Math.sin(this.ship.a) < 0) { tx = -tx; ty = -ty; }
     return [tx, ty];
   },
-  dest() { return this.trip && this.goal && !this.dock ? (this.isle ? this.isle() : ISLE5) : null; },          // (the island this trip goes to)
+  dest() { return this.trip && this.trip !== 'home' && this.goal && !this.dock ? (this.isle ? this.isle() : ISLE5) : null; },          // (the island this trip goes to)
   coastSlide(S, I, dt, ix, iy) {          // the ship touches an island's coast: it never sticks there
     const o = I.seaOff();
     if (this.steer && I.coastD(this.steer.x - o.x, this.steer.y - o.y) > -60) { this.steer = null; ix = iy = 0; }          // (a tap on the land: let go)
@@ -12570,6 +12582,7 @@ const ISLE6 = {
   PLANK: { x0: 282, h0: 42, x1: 358, h1: 5.6, y: 5500, hw: 12 },    // the gangplank from our ship to the pier
   GATE: { x: 596, y: 5500 },
   FENCE: { x0: 470, x1: 582 },                                      // the picket fence along the pier's land end (both sides), up to the gate                                        // the gate across the pier, where it meets the beach
+  STAY: true,          // this week the children stay on the school island: its ship does not sail (the teacher's wish, 2026-10-23); false: it sails again
   TEACHER: { x: 530, y: 5480 },                                     // Batuhan Teacher, in front of the gate
   SCHOOL: { x0: 1500, x1: 2300, y0: 5040, y1: 5360, h: 150, door: 1900 },          // the school (its front faces south)
   TOWER: { x: 1900, y: 5306, hw: 46, hd: 46, h: 270 },              // the clock tower over the door
@@ -12791,7 +12804,7 @@ const ISLE6 = {
   // ---- the quest card, Sparky's arrow, people to talk to
   card() {
     const s = this.st(), K = GAME_CONTENT.school.card;
-    if (SEA.active) return SEA.trip === 'school' ? ['sparky', K.sail] : ISLE5.card();
+    if (SEA.active) return SEA.trip === 'school' ? ['sparky', K.sail] : SEA.trip === 'home' ? ['sparky', GAME_CONTENT.sea.homeCard] : ISLE5.card();
     if (ISLE5.here()) return ISLE5.card();
     if (!this.here()) return ['sparky', K.go];
     if (SchoolQuiz.open) return ['teacher', K.quiz];
@@ -13434,6 +13447,7 @@ const ISLE6 = {
   },
   shipTalk() {
     Dialog.focus = null;
+    if (this.STAY) { Dialog.show(GAME_CONTENT.school.stay); return; }          // (this week: no sailing from school)
     SeaPick.show('school');
   },
   ring() {                   // the school bell: ding, ding
@@ -14329,10 +14343,10 @@ const SeaPick = {
   show(from) {               // from: 'home' (the harbour's wheel), 'isle5' (the Parrot King's pier), 'school' (the school's pier)
     const C = GAME_CONTENT.school.pick, list = $('spList');
     list.innerHTML = '';
-    const opts = from === 'home' ? ['isle5', 'school'] : from === 'isle5' ? ['school'] : ['isle5'];
+    const opts = from === 'home' ? ['isle5', 'school'] : from === 'isle5' ? ['home', 'school'] : ['home', 'isle5'];          // (every other place)
     for (const k of opts) {
       const b = el('button', 'btn spIsle ' + k);
-      b.appendChild(el('span', 'spIcon', k === 'school' ? '🏫' : '🦜')); b.appendChild(el('span', 'spName', C[k]));
+      b.appendChild(el('span', 'spIcon', k === 'school' ? '🏫' : k === 'home' ? '🏡' : '🦜')); b.appendChild(el('span', 'spName', C[k]));
       b.addEventListener('click', () => { Sfx.play('tap'); this.hide(); this.go(from, k); });
       list.appendChild(b);
     }
@@ -14344,8 +14358,8 @@ const SeaPick = {
   hide() { $('seaPick').classList.add('hidden'); setMode('play'); },
   go(from, to) {
     if (from === 'home') { if (to === 'isle5') ISLE5.voyage(true); else { SEA.trip = 'school'; SEA.start(); } return; }
-    const I = from === 'isle5' ? ISLE5 : ISLE6, T = to === 'isle5' ? ISLE5 : ISLE6;
-    Dialog.show(to === 'school' ? GAME_CONTENT.school.sail : GAME_CONTENT.isle5.sail, () => ISLE6.boardShip.call(I, T));
+    const I = from === 'isle5' ? ISLE5 : ISLE6, T = to === 'home' ? 'home' : to === 'isle5' ? ISLE5 : ISLE6;
+    Dialog.show(to === 'home' ? GAME_CONTENT.sea.homeSail : to === 'school' ? GAME_CONTENT.school.sail : GAME_CONTENT.isle5.sail, () => ISLE6.boardShip.call(I, T));
   },
 };
 
