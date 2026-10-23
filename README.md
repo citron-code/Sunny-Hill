@@ -314,11 +314,153 @@ sınıfın tek tabloda görünmesi için:
 güncellendi (`all: true`); E-Tablo'daki eski betik çalışmaya devam eder ama pano dört şubeyi ayrı ayrı ister ve yavaşlar.
 **Betiği güncellemek:** Uzantılar → Apps Script, kodu `tools/scoreboard-apps-script.gs`'nin yeni hâliyle değiştirip kaydedin;
 Dağıt → Dağıtımları yönet → kalem → Sürüm: **Yeni sürüm** → Dağıt (adres aynı kalır). Otomatik testler gerçek tabloya yazmaz
-(`ScoreBoard.url = ''`).
+(`ScoreBoard.url = ''`; ayrıca test tarayıcısında `window.SH_TEST` varken oyun hiçbir şey göndermez).
+
+**Okulun öğrenci listesi de aynı tabloyu kullanır** (23.10.2026; betikte değişiklik gerekmez): okul adasındaki quizi
+geçen çocuğun satırında "look" sütununa `"school":1` eklenir. This & That Corner'da kaç oyun oynadığı da aynı sütunda `"ttp"` olarak durur (puan gönderilmez). Papağan Kral'ın panosu yalnızca turu olan satırları,
+okulun listesi yalnızca `school` olanları gösterir. Papağan'la hiç oynamamış ama quizi geçmiş bir çocuk 0 turla bir
+satır olarak eklenir. E-Tablo'da bu işareti silmek o çocuğu okul listesinden çıkarır.
 
 Tablo E-Tablo'nun "Board" sayfasında birikir: her çocuk bir satır (kimlik, ilk ad, sınıf, avatar bilgisi, tur, doğru,
 yanlış, tarih). İstenmeyen bir satırı oradan silebilirsiniz. Tam ad, fotoğraf ya da e-posta gönderilmez. Skorlar
 tarayıcıdan gönderildiği için meraklı biri sahte bir sayı gönderebilir; sınıf içi kullanım için bu sorun değildir.
+
+## 6. bölüm: Okul adası (1. kısım: kapı ve bahçe)
+
+Papağan Kral'dan sonra gemi **okul adasına** gider. Ada Sunny Hill kadar büyüktür (oyun dünyasında kendi bölgesi,
+`ISLE6.REG`; denizde Papağan Kral'ın adasının kuzeydoğusunda). Ortasında tek büyük bina var: iki katlı, kırmızı
+kiremit çatılı, saat kuleli **Island School** (kulenin saati gerçek saati gösterir). Binanın içi gelecek hafta yapılacak.
+
+- **Yolculuk.** Evdeki dümen artık "Where shall we sail?" diye sorar: Papağan Kral'ın adası (alıştırma ve pano için)
+  ya da okul adası. Papağan Kral'ın iskelesindeki gemiyle de okul adasına, okul adasının iskelesindeki gemiyle de
+  Papağan Kral'ın adasına gidilir. Adadan ayrılırken çocuk iskele tahtasından gemiye çıkar, gemi kendiliğinden kuzeye
+  açılır, sonra dümen çocuğundur (kesme yok). Yanaşma da kesmesizdir; gemi iskeleye kuzeyden gelirse önce iskelenin
+  batısından aşağı iner, altından dönüp yanaşır (iskelenin üstünden geçmez).
+- **Kapı ve Batuhan Teacher.** İskelenin kara ucunda tuğla direkli, mavi çatılı bir kapı var; önünde **Batuhan Teacher**
+  durur. Görünümü öğretmenin gönderdiği model çizimine göre, **kendine ait bir 3D model** (`teacherModel3`; diğer karakterlerin ortak
+  kalıbı değil): büyük kafa ve kafanın alt yarısında yüz (küçük badem gözler, kalın kaşlar, turuncu burun, küçük gülümseme),
+  köşeli (low-poly) dağınık siyah saç ve alnı örten büyük perçemler, yanlara çıkık kulaklar ve gümüş halka küpeler, uzun
+  bacaklar, köşeli beyaz gömlek, ince siyah kravat, siyah pantolon, beyaz tabanlı ve beyaz bağcıklı siyah bilekli spor
+  ayakkabı. Parçaları diğer karakterlerinkiyle aynı olduğu için yürür, konuşur, el sallar. 2D görünümde de uzun bacaklı ve
+  yüzü aşağıda çizilir. Sesi erkek sesi. Konuşması öğretmenin kendisi gibi: eğlenceli, biraz alaycı, rahat ("Heh.", "The best teacher on this island. Also the only teacher on this island."); İngilizcesi yine 2. sınıf düzeyinde. Onunla konuşurken ve quiz kâğıdı açıkken kendi müziği çalar: Undertale'deki Sans'ın havasında, ama oyunun kendi bestesi (ré minör, swing; Undertale tınısında çip sesleri: kare dalga yürüyen bas, yankılı kare dalga melodi, ara vuruşlarda pulse akorlar, davul makinesi; `Music.playTeacher`). Konuşma bitince köy müziği kaldığı yerden devam eder. Quizden sonra her konuşmada sıradaki knock-knock şakasını anlatır, çocuk "Who's there?" diye cevap verir (`GAME_CONTENT.school.jokes`). İskelenin kumsal üstündeki ucunun iki yanında, kapı direklerine kadar beyaz bir çit var; adaya yalnızca kapıdan girilir. Kapı kapalıyken kimse geçemez (çocuk iskeleden kenara inip kapının etrafından da dolaşamaz). Öğretmen uzaktaki çocuğa el sallar (eli kafasının yanında, biraz kameraya dönük; düz görünümde önden). Öğretmen çocuğu karşılar
+  ve bir **quiz** verir.
+- **Quiz kâğıdı.** Ekranda çizgili bir kâğıt açılır: başlık, çocuğun adı, tarih, 30 numaralı soru. Her soruda boşluklu
+  bir cümle ve seçenekler var; 🔊 düğmesi cümleyi okur. Hepsi işaretlenince "Hand in" açılır. Öğretmen kırmızı kalemle
+  okur: ✓ ya da ✗, yanlışların doğrusu kırmızıyla, puan (ör. 26 / 30) ve damga (PASSED! ya da TRY AGAIN).
+  **24 doğru** kapıyı açar. Geçemeyen öğretmenle yeniden konuşur, yeni sorularla yeni bir kâğıt alır.
+- **Sorular (22.10.2026).** Her kâğıt: 14 **this / that / these / those** sorusu (öğretmenin özellikle istediği konu),
+  8 **2. ünite kelime** sorusu (school, classroom, desk, teacher, uniform, classmate, music room, gym, art room, computer
+  lab, principal, nurse, cafeteria) ve 8 **1. ünite tekrarı** (Papağan Kral'ın cümleleri). this / that / these / those
+  sorularının her birinde küçük bir resim var: bir çocuk bir şeyi işaret ediyor; şey elin hemen yanında ve büyükse yakın
+  (this / these), noktalı çizginin ucunda ve küçükse uzak (that / those); bir tane ya da üç tane. Böylece her boşluğa tek bir
+  kelime uyar. Birkaç komik soru da var ("That is a pink elephant!", "These are dancing bananas!"). Karışım
+  `GAME_CONTENT.school.quiz.mix`, kelimeler `things`, `vocab`, `funny` içinde. Öğretmen kendi 30 sorusunu
+  `questions` içine yazarsa onlar kullanılır (resim için sona `| near:✏️` ya da `| far:🍎🍎🍎`).
+- **Geçince: şapkalar çıkar, okul üniforması giyilir.** Öğretmen tebrik eder; çocuk şapka, taç ya da kaptan şapkası
+  takıyorsa "No hats at Island School. Please take off your hat." der (şapkalar çıkar), sonra **okul üniformasını** verir:
+  beyaz polo tişört, göğsünde (çocuğun solunda, bakanın sağında) küçük kırmızı bir **K** harfi. Ekran parlar, konfeti,
+  "You have a school uniform!". Üniforma gardıropta da bir eşya olur (`uniform`, kilitliyken 🏫); çocuk kendi şortunu,
+  eteğini ya da pantolonunu giymeye devam eder (elbise etek olur). Quizi üniformadan önce geçmiş çocuklar üniformayı
+  öğretmenle bir sonraki konuşmada alır.
+- **Sonra.** Öğretmen: içeri girebilirsin ama okul henüz başlamadı, gelecek hafta başlıyor; okul bahçesinde
+  oyna. Kapının kanatları açılır. Bahçede: avlu (çeşme, bayrak direği, zil, banklar, lambalar, çiçeklikler,
+  bisiklet parkı, seksek), oyun parkı (kaydırak, salıncaklar, tahterevalli, kum havuzu), futbol sahası (kaleler, top),
+  sarı bir okul otobüsü, ağaçlar, kumsal (deniz yıldızları, yengeçler, kelebekler). Okulun kapısı kapalı
+  ("School starts next week!"); zil çalınabilir.
+- **Bahçede oyun (23.10.2026).** Oyun aletleri artık gerçekten çalışır (önceden salıncaklar yana doğru ve kendi
+  kendine sallanıyordu, top boyanmış gibi duruyordu):
+  - **Top:** üstüne yürüyünce vurulur, yuvarlanır, sekip zıplar, direklerden ve sahanın kenarından seker; Sparky de
+    koşarken çarparsa vurur. Kaleye girerse konfeti ve "GOAL! One goal!" (sayı İngilizce okunur; `state.school.goals`),
+    top fileye gider, sonra ortaya döner.
+  - **Salıncak, kaydırak, tahterevalli:** yanına gelince **Play** düğmesi (🎈). Çocuk oturur: salıncak gittikçe yükselir
+    (bacaklar gidip gelir), kaydırakta merdivenden çıkıp kayar ("Wheee!", eller havada; kendiliğinden biter),
+    tahterevallide karşı uçta Sparky oturur ("Up and down!"). Yürümek, joystick ya da ekrana dokunmak çocuğu indirir.
+    Binerken Sparky kenarda bekler. Kimse binmezken aletler durur.
+  - **Seksek:** kareler sırayla basılınca sayılar söylenir ve yanar (1, 2, 3, 4-5 iki ayak, 6, 7-8 iki ayak); sona
+    gelince "Hooray! One to eight!".
+  - **Çeşme** (Look): bozuk para atılır, suda halkalar, "Make a wish!". **Otobüs** ve **bayrak**: "This is the school
+    bus!", "This is the school flag!". **Kum havuzu**: "These are sand toys!".
+  - **Sınıf arkadaşları:** üniformalı dört çocuk. İsimleri bilerek Türkçe değil (öğretmenin sınıflarında aynı adlı
+    öğrenciler var): **Amy, Ben, Zoe, Sam**. Kendi başlarına oynarlar (`ISLE6.kidsTick`):
+    - **Ben** sahada topla oynar: topun arkasına geçer, sahada bir yere paslar ya da kaleye şut çeker (onun golleri
+      çocuğun gol sayısına eklenmez; yakındaysan "Goal! Yay!" der). Çocuk topa yaklaşınca birkaç adım geri çekilip izler.
+    - **Zoe** soldaki salıncakta sallanır (gittikçe yükselir, sonra yavaşlar), arada iner, el sallar, yine biner.
+    - **Sam** seksek oynar: kareler üzerinde zıplaya zıplaya gidip döner, bastığı kareler yanar. Çocuk seksekteyken
+      kenarda bekler.
+    - **Amy** avluda dolaşır: otobüse, bayrağa, öğrenci listesine bakar, çeşmeye para atar (suda halkalar).
+    Konuşunca dururlar ve çocuğa dönerler (Zoe salıncaktan iner); 2. ünitenin kelimeleri ve this / that / these ile
+    konuşurlar (ör. "These are the swings. That is the slide."); her konuşmada sıradaki sözleri. Boştayken yaklaşan
+    çocuğa dönüp el sallarlar; gol atılınca ya da seksek bitince hepsi sevinir.
+  - Çeşmenin havuzu çizildiği kadar büyük bir engel oldu (önceden çocuk suyun içine yürüyebiliyordu); kaydırağın
+    çatısı ve salıncak çerçevesi oturan çocuğun büyük kafasına göre yükseltildi.
+  - **Kaydırak yeniden yapıldı** (öğretmenin isteğiyle; önceki hâlinde oluğun yan duvarları eğimi izlemiyor, tepede
+    havada iki yeşil çubuk gibi duruyordu): dört yuvarlak sarı direkli bir kule, mavi platform, iki yanında turuncu
+    paneller, direkleri bağlayan bir çerçeve üstünde dört yana eğimli, saçaklı, kırmızı-beyaz dilimli çatı (tepesinde sarı top ve bayrak), platformun arkasına dayalı merdiven, oluğun başında tutunma demiri, eğim boyunca yan
+    duvarlı yeşil oluk ve altta iki kısa ayak üstünde düz bir çıkış. Çocuk merdivenden çıkar, platformda yürür, oturur,
+    kayar ve çıkışta iner.
+- **This & That Corner (23.10.2026).** this / that / these / those alıştırması için bir köşe (öğretmenin isteği):
+  iskeleden avluya giden yolun güneyinde, otobüsün batısında, açık mavi karolu bir alan.
+  - Yerde sarı bir **yıldız** (çocuk burada durur), çevresinde yeşil bir "yakın" halkası ve içinde **yeşil örtülü masa**;
+    noktalı bir çizginin ucunda uzakta **turuncu örtülü masa**; yanında kuralın **posteri** (NEAR / FAR x ONE / MANY,
+    işaret eden çocuk ve elmalarla; Look ile Sparky okur: "THIS: one thing, near me." ...).
+  - **Gezerken:** yakın masada üç kitap, uzak masada bir top durur. Her masanın üstündeki etiket, çocuğun durduğu yerden
+    ne denmesi gerektiğini gösterir ve çocuk yürüdükçe değişir: yakındayken "THESE are books." / "THIS is a ball.",
+    uzaktayken "THOSE are books." / "THAT is a ball." (yakın kelimeler yeşil, uzak kelimeler turuncu). İlk gelişte
+    Sparky köşeyi anlatır.
+  - **Oyun (yıldızda Play):** 10 tur. Yakın ya da uzak masada bir ya da üç eşya belirir (quizdeki eşyalar: kalem,
+    kitap, elma, oyuncak ayı...). Altta dört büyük düğme: **This** (near + 1) ve **These** (near + 3) yeşil, **That**
+    (far + 1) ve **Those** (far + 3) turuncu. Her turda dört kelime en az iki kez çıkar. Cevaptan sonra cümle yazılır
+    ve okunur ("Those are lollipops."); yanlışsa doğru düğme parlar ve neden yazılır ("Look: far + 3 → Those").
+    **Giriş ve çıkış:** çocuk köşeye yürür, yıldızda Play'e basar. Tur sırasında yıldızda kalır (joystick gizlenir) ve
+    tur ortasında çıkış düğmesi yoktur. Her 10 soruluk turun sonunda küçük harflerle tur sonucu (yıldızlar, "8 / 10
+    right!", en iyi puan) ve büyük harflerle **"One more round?"** sorusu çıkar: **▶ Continue** hemen yeni tura başlar,
+    **✔ Done** oyunu kapatır, çocuk yıldızda kalır ve yürüyebilir (öğretmenin isteği: "round sonunda tamam mı devam mı
+    diye sorulsun"; menüden ışınlanma denendi, beğenilmedi, kaldırıldı). Klavyede 1-4 tuşları; Esc kapatır.
+    2D görünümde de aynı.
+  - **Batuhan Teacher yanına gelir:** çocuk oyuna başlayınca öğretmen o an ne yapıyorsa bırakır (uyuyorsa uyanır,
+    yengeçten vazgeçer), koşarak gelir (adanın öbür ucundan yaklaşık 10 saniye) ve yıldızın solunda durup masalara bakar.
+    Başının üstünde bir konuşma balonu çıkar, cümle okunduktan sonra kendi sesiyle söyler. Hiç yargılamaz ama şakacı
+    havası hep sürer (öğretmenin isteği): gelince "Oh! This and That! My favorite game. Heh."; doğru cevapların
+    bazılarında bir şaka ("Yes! Good eyes. Better than my eyes. Heh."); yanlışta "No problem!" ve ipucu ("Far, and many:
+    THOSE."), arada kendisiyle ilgili bir şaka ("Yesterday I called my shoes THIS. Two shoes! Heh."); sonunda puan değil
+    emek ("Good practice, Ayşe! Practice, practice, practice. Heh."). Oyun kapanınca turuna devam eder. Sözleri
+    `GAME_CONTENT.school.tt.coach` içinde.
+  - **Öğrenci listesinde oyun sayısı:** her bitirilen oyundan sonra öğrencinin This & That Corner'da kaç oyun oynadığı
+    öğrenci listesine gider ("Games: 3! It is on the student list!"). Listede ve okulun kapısındaki panoda her ismin
+    yanında oyun sayısı yazar ("12 games", panoda "12×"); her şubede en çok oynayan üstte. **Puan listede gösterilmez**
+    (öğretmenin isteği: düşük puanı görünen öğrenci üzülmesin); puan ve yıldızlar yalnızca oyun sonunda çocuğun kendi
+    ekranında. Tabloda "look" sütununda `"ttp": 3` olarak durur (Apps Script değişmedi).
+  - Kayıt: `state.school.tt = { plays, best }`, `ttSeen`.
+- **Batuhan Teacher adada gezer (23.10.2026).** Quizden önce (ve üniforma ile öğrenci listesi bitene kadar) kapıda
+  bekler. Sonra kendi turunu yapar, aradaki yolları çocuklar gibi yürür (ağaçların arasından, kapıdan):
+  kapıda bekler ve el sallar → okulun önündeki çiçekleri sulama kovasıyla sular ("Water for the flowers.") → öğrenci
+  listesini okur → okulun zilini çalar → futbol sahasının kuzeyindeki bankta uyuklar (önünde ağaç yok, kameradan
+  açıkça görünür; gözleri kapalı, başının üstünde büyük Zzz; konuşunca "Hm? Oh! I was not sleeping. I was...
+  thinking. Heh.") → sahada soldaki kalede tembel bir kaleci olur (topu yavaşça izler;
+  ona çekilen şut kurtarılır: "Saved! Heh."; yanından gol olursa "Hey! I was blinking.") → güney kumsalındaki
+  **yengeci** görür ("Oh! A crab! Come here, little crab!"), yengeç kumsal boyunca kaçar, öğretmen peşinden koşar,
+  birkaç kez atılır ve ıskalar ("Missed! Heh."), sonunda yengeç denize kaçar ("OK, you win, crab. I am a teacher, not
+  a crab catcher.") ve biraz ilerideki kumda yaşamaya devam eder → yine kapıya. Yakınında duran çocuğu bekler, nerede
+  olursa olsun konuşulabilir (şakaları aynı). Söyledikleri yalnızca çocuk yakındaysa duyulur ve yazılır.
+- **Öğrenci listesi (23.10.2026).** Okulun kapısının sağında, küçük kırmızı çatılı mavi bir ilan panosu: **OUR
+  STUDENTS**. Üstünde quizi geçen çocukların adları dört sütunda, şubelerine göre (Class A kırmızı, B mavi, C yeşil,
+  D sarı) yazar; çocuğun kendi adı sarıyla işaretlidir (bir şubede 7'den fazla ad varsa "+3 more"). **Look** ile liste
+  açılır: Papağan Kral'ın panosu gibi bir pencere, şube şube başlıklar ("Class B · 2 students") ve her çocuğun avatarı
+  okul üniformasıyla. Liste Papağan panosuyla aynı online tablodan gelir, okul adasına her gelişte yenilenir. Quizi
+  geçen çocuk üniformadan sonra adını ve şubesini daha önce yazmadıysa öğretmen ister ("Now write your name and class.
+  It is for the student list.") ve Papağan panosundaki ekran açılır; sonra "Your name is on the student list now!".
+  Quizi önceden geçmiş çocuklar listeye öğretmenle bir sonraki konuşmada, panoya baktıklarında ya da adaya
+  geldiklerinde (adları ve şubeleri zaten yazılıysa) eklenir.
+- Kayıt: `state.school = { stage: 'land' | 'pass', met, tries, best, passedAt, yard, uniform, listed, goals, joke, kt }`.
+- **Telefon.** Kâğıt dik ve yan telefonda ekrana sığar, kayar; dar ekranda damga kâğıdın altında görünür.
+
+## Kaldığın yerden devam
+
+Oyun, çocuğun bu cihazda en son nerede olduğunu kaydeder (`state.at = { w, x, y }`; yürürken birkaç saniyede bir ve sayfa
+kapanırken). "Devam"da oradan sürer: ev adasında aynı yer; okul adasında ve Papağan Kral'ın adasında iskeleye inilir
+(Sparky'nin sözü) ve çocuk kaldığı yere geçer; Papağan Kral'ın tepesindeyse (bir savaş sürüyor olabilir) merdivenin dibinde;
+Dr. Fizz'in salonundaysa salonun kapısında başlar. Denizdeyken ya da oyun çocuğu yürütürken (gemiden iniş, biniş) yer
+kaydedilmez; son iyi yer geçerlidir. Test: `tools/recipes/resume.mjs`.
 
 ## Karakterler
 
@@ -417,6 +559,13 @@ node tools/drive.mjs tools/recipes/level4-2d.mjs  # aynısı 2D görünümde
 GL=gpu node tools/drive.mjs tools/recipes/level5.mjs  # 5. bölüm baştan sona: dümenden adaya yolculuk, kumsala çıkamama, iskele, kafesteki köylüler, tepeye yol, Papağan Kral, yanlış kelime, hindistancevizi, 15 düzeltme ve 5 tüy, kafeslerin açılması, gemi tamiri
 node tools/drive.mjs tools/recipes/level5-2d.mjs  # aynısı 2D görünümde
 GL=gpu node tools/drive.mjs tools/recipes/level5-practice.mjs  # Kral'la alıştırma: konuşma, iki tur (5 doğru = 1 tur, çoğu am / is / are), yanlış kelime, tepeden inince biter; pano: sınıf kodu, sıra, avatar, ilk ad, tur
+GL=gpu node tools/drive.mjs tools/recipes/level6.mjs  # okul adası: iskele, kapalı kapı, Batuhan Teacher, kâğıt quiz (20/30 kalır, 30/30 geçer), kapı açılır, bahçe, okulun kapısı, zil, yeniden yükleme
+GL=gpu node tools/drive.mjs tools/recipes/level6-thisthat.mjs  # This & That Corner: Sparky'nin ilk sözü, yürüdükçe değişen etiketler (yakın/uzak), poster, 10 turluk oyun (8 doğru 2 yanlış, 1-4 tuşu), her turda doğru masada doğru sayıda eşya, puan, yıldız, en iyi puan, Again, kapatma; FLAT=1 ile 2D
+GL=gpu node tools/drive.mjs tools/recipes/level6-teacher.mjs  # Batuhan Teacher'ın turu: quizden önce kapıda; sonra kapı, çiçek sulama, liste, bankta uyku (konuşunca uyanır), zil, kalecilik (şut kurtarır), yengeç kovalama (yengeç kaçar, denize girer, kumda devam eder), kapı; FLAT=1 ile 2D
+GL=gpu node tools/drive.mjs tools/recipes/level6-garden.mjs  # quizden sonra şapka çıkar, üniforma giyilir (sonradan gelen de alır); top ve gol, salıncak, kaydırak, tahterevalli (Sparky ile), seksek, dört sınıf arkadaşı, çeşme, otobüs, bayrak, kum havuzu, öğrenci listesi (isim/şube ekranı, şubelere göre liste, panodaki adlar, Papağan panosu yalnız turları gösterir), gardırop; FLAT=1 ile 2D
+GL=gpu node tools/drive.mjs tools/recipes/level6-return.mjs  # quizi geçmiş biri adaya geri gelince (kayıttan, Devam ile): kapıdan girip çıkabiliyor; yeni oyunda kapı yine kapalı
+GL=gpu node tools/drive.mjs tools/recipes/level6-voyage.mjs  # yolculuklar: evdeki dümenin seçimi, okul adasına yanaşma ve iniş, okul adasından Papağan Kral'a (kuzeyden yanaşma), Papağan Kral'dan okul adasına
+GL=gpu node tools/drive.mjs tools/recipes/resume.mjs  # kaldığın yerden devam: ev, okul bahçesi, papağan köyü, papağan tepesi (merdiven dibi), Dr. Fizz'in salonu
 GL=gpu TAG=a node tools/drive.mjs tools/recipes/level5-tour.mjs  # adanın görsel turu: hep aynı 8 nokta (iskele, köy, kafesler, orman, merdiven, tepe, taht, kumsal), önce/sonra karşılaştırmak için; FLAT=1 ile 2D
 GL=gpu node tools/drive.mjs tools/recipes/level4-dodge.mjs  # denge: Grumble 40 saniyede kaç kez vuruyor (dümene dokunmadan, dümdüz, fareyle tıklayarak, kaçarak)
 GL=gpu node tools/drive.mjs tools/recipes/og-image.mjs # paylaşım önizleme resmi (tools/shots/og-image.png; JPEG olarak og-image.jpg yapılır)
