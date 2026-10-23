@@ -514,6 +514,12 @@ Türkçe sesle okumaz; metin ekranda kalır ve veliye Chrome veya Edge ile açma
 
 Veli ekranında hangi seslerin bulunduğu yazar; "Dinle" butonu birkaç karakteri sırayla konuşturur.
 
+- **Batuhan Teacher** cihazdaki en iyi İngilizce erkek sesini alır, biraz kalın (Chrome'da Google UK English Male,
+  Edge'de Guy, iPad'de Daniel). Erkek sesi yoksa başka bir sesi kalınlaştırılarak kullanılır. Sınıf arkadaşları (Amy,
+  Ben, Zoe, Sam) diğer çocuklar gibi çocuk sesleriyle, her biri kendi perdesinde konuşur. (23.10.2026'ya kadar bu beşine
+  ses atanmıyordu, tarayıcının varsayılan sesiyle konuşuyorlardı.) Apple'ın eski robotik sesleri (Fred, Ralph...) yalnızca
+  başka ses yoksa seçilir. Test: `tools/recipes/voices-cast.mjs` (tipik cihazların ses listeleriyle kimin hangi sesi aldığını yazar).
+
 ## Metinleri değiştirmek
 
 Oyundaki bütün İngilizce metinler dosyanın başındaki `GAME_CONTENT` nesnesinde.

@@ -6649,7 +6649,7 @@ const LOOKS = {
 };
 const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
 // pitch per speaker (see Speech.pitchFor)
-const VOICE = { narrator: 1, cat: 1.45, frog: 1.15, rabbit: 1.5, duck: 1.2, scarecrow: 0.95, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3, fizz: 1.15, bongo: 0.6, tess: 1.2, pirate: 0.72, parrot: 1.75, nani: 1.05, koa: 0.85, malia: 1.15, kai: 1.45, lani: 1.55 };
+const VOICE = { narrator: 1, cat: 1.45, frog: 1.15, rabbit: 1.5, duck: 1.2, scarecrow: 0.95, sparky: 1.5, milo: 1.3, leo: 1.5, pip: 1.45, pop: 1.35, nomi: 1.4, mom: 1.15, lily: 1.15, rosa: 1.05, dad: 0.85, max: 0.85, bob: 0.7, owl: 0.8, player: 1.3, fizz: 1.15, bongo: 0.6, tess: 1.2, pirate: 0.72, parrot: 1.75, nani: 1.05, koa: 0.85, malia: 1.15, kai: 1.45, lani: 1.55, teacher: 0.88, amy: 1.4, ben: 1.3, zoe: 1.5, sam: 1.35 };
 const NPC_DEFS = [
   Object.assign({ id: 'milo' }, ATP('milo', 104, 37)),
   Object.assign({ id: 'leo', planted: AT('milo', 146, 45) }, ATP('milo', 64, 40)),     // beside Milo (he used to stand where the sign is now)
@@ -15722,8 +15722,8 @@ const VOICE_KIND = {
 const VOICE_ORDER = {
   female: ['narrator', 'mom', 'rosa', 'lily', 'tess', 'malia', 'nani'],
   male: ['dad', 'bob', 'max', 'owl', 'fizz', 'bongo', 'pirate', 'koa'],
-  child: ['milo', 'pip', 'nomi', 'leo', 'pop', 'sparky', 'player', 'kai', 'lani', 'parrot'],
-};
+  child: ['milo', 'pip', 'nomi', 'leo', 'pop', 'sparky', 'player', 'kai', 'lani', 'parrot', 'amy', 'ben', 'zoe', 'sam'],
+};          // (Batuhan Teacher: the best man's voice, given out on its own in Speech.build)
 const VOICE_NAMES = {
   child: /\b(Ana|Maisie)\b/i,
   male: /\b(Male|Guy|Andrew|Brian|Christopher|Eric|Roger|Steffan|Ryan|Thomas|William|Liam|Connor|Mitchell|Wayne|Prabhat|Abeo|Chilemba|Elimu|Sam|James|Daniel|Alex|Fred|Tom|David|Mark|George|Oliver|Arthur|Aaron|Gordon|Lee|Rishi|Matthew|Joey|Justin|Kevin|Russell|Evan|Nathan|Tony|Jacob|Davis|Jason|Ralph)\b/i,
@@ -15747,6 +15747,7 @@ function voiceScore(v) {
   if (/^en-US/i.test(l)) s += 12; else if (/^en-GB/i.test(l)) s += 10; else if (/^en-(AU|CA|IE|NZ)/i.test(l)) s += 4;
   if (v.localService) s += 4;
   if (VOICE_NOVELTY.test(n)) s -= 200;
+  if (/^(Fred|Ralph|Junior|Bruce|Agnes|Kathy|Princess|Vicki)\b/.test(n)) s -= 25;          // (Apple's old robotic voices: a modern one first, Daniel before Fred)
   return s;
 }
 const Speech = {
@@ -15777,6 +15778,7 @@ const Speech = {
         }
       });
     }
+    for (const k of ['male', 'other', 'female', 'child']) if (pools[k].length) { this.cast.teacher = { v: pools[k][0], real: k === 'male' }; break; }          // (Batuhan Teacher: the best English man's voice there is)
     if (before !== this.status && this.onChange) this.onChange(this.status);
   },
   // A child voice already sounds young and a man's voice already sounds deep, so they only get a nudge.
