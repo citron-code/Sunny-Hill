@@ -422,6 +422,11 @@ kiremit çatılı, saat kuleli **Island School** (kulenin saati gerçek saati g�
     **✔ Done** oyunu kapatır, çocuk yıldızda kalır ve yürüyebilir (öğretmenin isteği: "round sonunda tamam mı devam mı
     diye sorulsun"; menüden ışınlanma denendi, beğenilmedi, kaldırıldı). Klavyede 1-4 tuşları; Esc kapatır.
     2D görünümde de aynı.
+  - **Batuhan Teacher'ın sözleri (23.10.2026'da çoğaltıldı):** her durum için birçok söz, aynısı arka arkaya gelmez: geliş,
+    doğru cevaplar, üst üste üç ve beş doğru ("Three in a row! Are you a robot?"), masadaki eşyaya göre şakalar (bir ya da
+    çok: "A cookie! Can I have it?" / "Cookies! Can I have one?"), yanlışta üç farklı ipucu söyleyişi ve kendisiyle ilgili
+    şakalar, 10 saniye cevap vermeyen çocuğa bir dürtme ("Near or far? One or many?"), yeni turda bir söz, sonda emeği
+    öven sözler. Hepsi `GAME_CONTENT.school.tt.coach` içinde; yargılamaz, hep şakacı.
   - **Batuhan Teacher yanına gelir:** çocuk oyuna başlayınca öğretmen o an ne yapıyorsa bırakır (uyuyorsa uyanır,
     yengeçten vazgeçer), koşarak gelir (adanın öbür ucundan yaklaşık 10 saniye) ve yıldızın solunda durup masalara bakar.
     Başının üstünde bir konuşma balonu çıkar, cümle okunduktan sonra kendi sesiyle söyler. Hiç yargılamaz ama şakacı
@@ -446,7 +451,9 @@ kiremit çatılı, saat kuleli **Island School** (kulenin saati gerçek saati g�
   **yengeci** görür ("Oh! A crab! Come here, little crab!"), yengeç kumsal boyunca kaçar, öğretmen peşinden koşar,
   birkaç kez atılır ve ıskalar ("Missed! Heh."), sonunda yengeç denize kaçar ("OK, you win, crab. I am a teacher, not
   a crab catcher.") ve biraz ilerideki kumda yaşamaya devam eder → yine kapıya. Yakınında duran çocuğu bekler, nerede
-  olursa olsun konuşulabilir (şakaları aynı). Söyledikleri yalnızca çocuk yakındaysa duyulur ve yazılır.
+  olursa olsun konuşulabilir (şakaları aynı). Söyledikleri yalnızca çocuk yakındaysa duyulur ve başının üstündeki konuşma balonunda yazılır (ekranın ortasında
+  mesaj olarak değil: öğretmenin isteği, önemli bir şey olmuş gibi görünüyordu); kendisi ekranda değilse balon çıkmaz,
+  yalnızca sesi duyulur.
 - **Öğrenci listesi (23.10.2026).** Okulun kapısının sağında, küçük kırmızı çatılı mavi bir ilan panosu: **OUR
   STUDENTS**. Üstünde quizi geçen çocukların adları dört sütunda, şubelerine göre (Class A kırmızı, B mavi, C yeşil,
   D sarı) yazar; çocuğun kendi adı sarıyla işaretlidir (bir şubede 7'den fazla ad varsa "+3 more"). **Look** ile liste
@@ -519,6 +526,11 @@ Veli ekranında hangi seslerin bulunduğu yazar; "Dinle" butonu birkaç karakter
   Ben, Zoe, Sam) diğer çocuklar gibi çocuk sesleriyle, her biri kendi perdesinde konuşur. (23.10.2026'ya kadar bu beşine
   ses atanmıyordu, tarayıcının varsayılan sesiyle konuşuyorlardı.) Apple'ın eski robotik sesleri (Fred, Ralph...) yalnızca
   başka ses yoksa seçilir. Test: `tools/recipes/voices-cast.mjs` (tipik cihazların ses listeleriyle kimin hangi sesi aldığını yazar).
+- **Sesler değişmez (23.10.2026).** Bir karakter bir cihazda ilk kez hangi sesle konuştuysa o ses onun olarak saklanır
+  (`localStorage` 'sunnyHill.voices.v1') ve hep o kullanılır. Önceden sesler cihazın listesindeki sıraya göre dağıtılıyordu;
+  bir internet sesi bir an hata verince ya da liste geç yüklenince sıra kayıyor, Sparky dahil birçok karakterin sesi "durduk
+  yere" değişiyordu (öğrencilerin fark ettiği). Artık yalnızca o ses cihazda gerçekten yokken geçici olarak başka bir ses
+  konuşur, ses geri gelince eskisi döner. Test: `tools/recipes/voices-stay.mjs`.
 
 ## Metinleri değiştirmek
 
