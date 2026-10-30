@@ -26,6 +26,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
     log(id, 'spot', JSON.stringify(p), '| free', await S(`SH.circleFree(${p.x}, ${p.y + 22}, 13)`), '| path', await S(`!!SH.findPath(${id === 'potion' ? '2752, 600' : '1200, 1100'}, ${p.x}, ${p.y + 22})`), '| nearest', await S('(() => { const o = SH.nearestInteractable(); return o ? o.id + " " + o.label : null; })()'));
     await S("document.getElementById('toast').classList.add('hidden')"); await shot('fun-spot-' + id + T);
   }
+  log('the lab: its exit spot free', await S('SH.circleFree(2830, 566, 13)'), '| the way from the bridge to its door', await S('!!SH.findPath(2540, 622, 2830, 540)'));
   // fishing
   let c0 = await coins();
   await S(`SH.interact(SH.interactables().find((o) => o.id === 'fun_fish'))`); await sleep(300);

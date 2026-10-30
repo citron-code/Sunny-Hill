@@ -8148,7 +8148,7 @@ MINI.familyResult = function (C, done) {   // Görev 8c: the game reads the chil
    a kite on the meadow, colour potions with Dr. Fizz. A game on its own screen (#fun). Fishing and apples ask this / that /
    these / those: those answers give Sunny Coins (when you are a pupil of the school island). ---- */
 const FUN = {
-  SPOT: { fish: { x: 1782, y: 1330 }, apples: ATP('orchard', -40, 44), kite: { x: 230, y: 952 }, potion: { x: 2808, y: 600 } },
+  SPOT: { fish: { x: 1782, y: 1330 }, apples: ATP('orchard', -40, 44), kite: { x: 230, y: 952 }, potion: { x: 2915, y: 586 } },          // (the potion table: by the lab's wall, east of its door, off the path to it)
   st() { return state.fun || (state.fun = { fish: {}, apples: 0, balloons: 0, potions: 0 }); },
   open1() { return !!state.finished; },
   place() {
@@ -9665,7 +9665,7 @@ const LAB = {
     const A = this.HALL;
     flashScreen(); Sfx.play('pop');
     this.barrels.length = 0; this.bits.length = 0; this.puffs.length = 0; this.attack = null; player.stun = 0; player.inv = 0;
-    jumpTo((A.door0 + A.door1) / 2, A.y1 + 46, 'down');
+    { const o = SCHOOLIN.freeBy((A.door0 + A.door1) / 2, A.y1 + 46); jumpTo(o[0], o[1], 'down'); }          // (out in front of the door; never inside something standing there)
     Hud.refresh();
   },
   roar() { Sfx.tone(95, 1.1, 'sawtooth', 0.09, 0, 55); Sfx.tone(140, 0.9, 'square', 0.04, 0.05, 70); Sfx.tone(70, 1.2, 'triangle', 0.16, 0, 40); },
