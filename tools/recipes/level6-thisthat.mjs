@@ -12,7 +12,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   if (process.env.FLAT) { await S('SH.setView3(false)'); await sleep(300); }
   await S(`Object.assign(SH.state, { stars: 8, quest: 8, finished: true, done: ['brother','family','chores','animals','where','bedtime','truefalse','final'] });
     SH.state.lab = { stage: 'done', bananas: 8, told: 1, roared: 1 }; SH.state.ship = { stage: 'ready', got: ['max','dad','mom','nomi','lily','bob','owl','rosa'], capt: 1, sailed: 1 };
-    SH.state.sea = { stage: 'won', hits: 5, told: 1, dmg: 0, map: 1 }; SH.state.isle = { stage: 'won', f: 5, n: 0, fixed: 1 }; SH.state.school = { stage: 'pass', met: 1, yard: 1, uniform: 1, listed: 1 };
+    SH.state.sea = { stage: 'won', hits: 5, told: 1, dmg: 0, map: 1 }; SH.state.isle = { stage: 'won', f: 5, n: 0, fixed: 1 }; SH.state.school = { stage: 'pass', met: 1, yard: 1, uniform: 1, listed: 1, coinTold: 1, kim: { done: 1 }, home: SH.ISLE6.today(), day: { d: SH.ISLE6.today(), in: 1, n: 9, home: 1 } };          // (today's line-up and all nine lessons are over: the garden as usual)
     SH.state.unlocked = ['uniform']; SH.state.wear = { uniform: true }; SH.state.bname = 'Ayşe'; SH.state.cls = 'B'; SH.refreshPlayerLook(); SH.Save.save();`);
   await S('SH.ISLE6.land()'); await lines(); await S('SH.game.paused = true');
   const A = await S('JSON.stringify(SH.ISLE6.TT)').then(JSON.parse);
@@ -38,7 +38,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   log('the bar:', await S(`!document.getElementById('tt').classList.contains('hidden')`), '|', await S(`document.getElementById('ttN').textContent + ' ' + document.getElementById('ttQ').textContent`), '| buttons', await S(`[...document.querySelectorAll('#ttBtns button')].map((b) => b.textContent).join(' / ')`));
   log('you stay on the star:', await S(`(() => { SH.keys.up = 1; SH.step(1 / 30, 20); SH.keys.up = 0; return Math.round(Math.hypot(SH.player.x - ${A.star.x}, SH.player.y - ${A.star.y})); })()`), 'away | nothing else to talk to', await S('SH.interactables().length === 0'));
   await shot('l6-tt-ask' + T);
-  const kinds = [];
+  const kinds = []; log('coins before:', await S('SH.Coins.get()'));
   for (let r = 0; r < 10; r++) {
     const q = await S(`JSON.stringify((({ near, many, answer, thing }) => ({ near, many, answer, thing: thing[0] }))(SH.ISLE6.tt))`).then(JSON.parse);
     const shown = await S(`JSON.stringify(SH.ISLE6.ttSlots2D('near').concat(SH.ISLE6.ttSlots2D('far')))`).then(JSON.parse);
@@ -54,6 +54,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
     for (let i = 0; i < 40 && await S('SH.ISLE6.tt.picked >= 0 && !SH.ISLE6.tt.done'); i++) await step(0.25);
   }
   log('the rounds:\n  ' + kinds.join('\n  '));
+  log('coins after the round:', await S('SH.Coins.get()'), '| this round', await S('SH.ISLE6.tt.coins')); await sleep(900); log('   with the bonus:', await S('SH.Coins.get()'));
   await step(2.6); log('Batuhan Teacher at the end:', await bub()); await shot('l6-tt-coach-end' + T);
   log('the end:', await S(`document.getElementById('ttN').textContent + ' | ' + document.getElementById('ttQ').textContent + ' | ' + document.getElementById('ttS').textContent`), '| buttons', await S(`[...document.querySelectorAll('#ttBtns button')].map((b) => b.textContent).join(' / ')`), '| saved', await S('JSON.stringify(SH.state.school.tt)'), '| no ✕', await S(`!document.querySelector('#tt .ttX')`));
   await shot('l6-tt-end' + T);
