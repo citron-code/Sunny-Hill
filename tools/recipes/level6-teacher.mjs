@@ -21,12 +21,13 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   await S('SH.tp(1150, 5300)'); await step(40);
   log('before the quiz, after 40 s:', JSON.stringify(await tch()));
   // after it: his round (you far away, in the playground)
-  await story({ stage: 'pass', met: 1, tries: 1, best: 30, yard: 1, uniform: 1, listed: 1 });
+  await story({ stage: 'pass', met: 1, tries: 1, best: 30, yard: 1, uniform: 1, listed: 1, coinTold: 1, kim: { done: 1 }, home: new Date().toLocaleDateString('tr-TR'), day: { d: new Date().toLocaleDateString('tr-TR'), in: 1, n: 9, home: 1 } });          // (today's line-up and all nine lessons are over: the garden as usual)
   const seen = [], far = 'SH.tp(1150, 5300)';
   await S(far);
   let last = '', napTalk = '', saved = '', crab = null;
   for (let i = 0; i < 520; i++) {
     await step(0.5);
+    if (await S('SH.Dialog.open')) { const w = await lines(); if (i < 6) log('   (words on the way:', w, ')'); }          // (Sparky's words, if any, do not stop the round)
     const t = await tch();
     if (t.k !== last) { last = t.k; seen.push(t.k + (t.walking ? '' : ' @' + t.x + ',' + t.y)); }
     if (t.k === 'water' && !seen.includes('shot water')) { seen.push('shot water'); await S(`SH.tp(${t.x + 30}, ${t.y + 110})`); await step(0.1); await S("SH.ISLE6.tchSay('water')"); await step(0.2); log('watering:', await bub(), '|', await mid()); await shot('l6-tch-water' + T); await S(far); }
