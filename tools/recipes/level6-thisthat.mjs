@@ -68,9 +68,9 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   await S(`document.querySelector('#ttBtns .done').click()`); await step(0.2);
   await step(0.5); log('after the game Batuhan Teacher goes on:', JSON.stringify(await S('(({ k, coach }) => ({ k, coach }))(SH.ISLE6.tchNow())')));
   log('closed:', await S(`document.getElementById('tt').classList.contains('hidden')`), '| can walk', await S(`(() => { SH.keys.down = 1; SH.step(1 / 30, 15); SH.keys.down = 0; return Math.round(SH.player.y - ${A.star.y}); })()`), '| tags back', await tags());
-  // the student list shows how many games (no scores: the teacher's wish), most games first in each class
+  // the student list shows how many games (no scores: the teacher's wish); the sheet also gets right answers / questions, for the teacher's average (tools/board-tt.cjs), most games first in each class
   await sleep(1400);          // (the 'New best!' word comes a moment after the score)
-  log('sent to the list: games', await S('ScoreBoard.entry().look.ttp'), '| no score sent', await S('ScoreBoard.entry().look.tt === undefined'), '| on this device', await S(`JSON.stringify(ScoreBoard.local().map((x) => x.name + ' ' + x.look.ttp))`), '| toast', await S(`document.getElementById('toast').textContent`));
+  log('sent to the list: games', await S('ScoreBoard.entry().look.ttp'), '| no score on the list', await S('ScoreBoard.entry().look.tt === undefined'), '| for the teacher only: right / questions', await S('ScoreBoard.entry().look.ttr + " / " + ScoreBoard.entry().look.ttq'), '| on this device', await S(`JSON.stringify(ScoreBoard.local().map((x) => x.name + ' ' + x.look.ttp))`), '| toast', await S(`document.getElementById('toast').textContent`));
   await S(`localStorage.setItem(ScoreBoard.KEY + '.online', JSON.stringify([
     { id: 'k1', name: 'Ava', cls: 'B', look: { school: 1, ttp: 6 }, wear: [], rounds: 0 }, { id: 'k2', name: 'Tom', cls: 'B', look: { school: 1 }, wear: [], rounds: 2 },
     { id: 'k3', name: 'Finn', cls: 'B', look: { school: 1, ttp: 1 }, wear: ['cape'], rounds: 0 }, { id: 'k4', name: 'Ella', cls: 'A', look: { school: 1, ttp: 3 }, wear: [], rounds: 0 },
