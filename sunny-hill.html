@@ -14860,7 +14860,7 @@ const ISLE6 = {
   },
   ttEnd() {          // the score, stars, your best
     const R = this.tt, C = GAME_CONTENT.school.tt, s = this.st(); R.near = null; R.done = 1; this.ttShow();
-    s.tt = s.tt || {}; s.tt.plays = (s.tt.plays | 0) + 1; s.tt.best = Math.max(s.tt.best | 0, R.right); Save.save();
+    s.tt = s.tt || {}; s.tt.plays = (s.tt.plays | 0) + 1; s.tt.best = Math.max(s.tt.best | 0, R.right); s.tt.r = (s.tt.r | 0) + R.right; s.tt.q = (s.tt.q | 0) + 10; Save.save();          // (r / q: all the right answers and questions so far, for the teacher's average)
     const bonus = 5 + (R.right >= 9 ? 5 : 0); R.coins = (R.coins | 0) + bonus; setTimeout(() => Coins.add(bonus), 700);          // (Sunny Coins: five for the round, five more for 9 or 10 right)
     if (this.passed() && ScoreBoard.ready()) { this.listMe(); setTimeout(() => Toast.show('🏫 ' + fmt(C.onList, { n: s.tt.plays })), 1200); }
     if (this.tch && this.tch.k === 'coach' && !this.tch.path) R.endSay = 2.4;          // (then Batuhan Teacher's word)          // (the student list shows how many games: not the score)
@@ -18731,9 +18731,9 @@ const ScoreBoard = {
   ready() { return !!(this.cleanName(state.bname) && this.cls()); },
   wear() { const w = state.wear || {}; return ['uniform', 'cape', 'glasses', 'hat', 'crown', 'captain', 'tie'].filter((id) => w[id] && (state.unlocked || []).indexOf(id) >= 0); },
   entry() { const p = (state.isle && state.isle.pr) || {}; return { id: this.me(), name: this.name(), cls: this.cls(), look: this.lookOut(), wear: this.wear(), rounds: p.rounds | 0, right: p.right | 0, wrong: p.wrong | 0, t: Date.now() }; },
-  lookOut() {          // (school: 1 = passed the school quiz: on the student list; ttp: how many This & That Corner games)
+  lookOut() {          // (school: 1 = passed the school quiz: on the student list; ttp: how many This & That Corner games; ttr / ttq: right answers / questions there, for the teacher only: no list shows them)
     const l = Object.assign({}, state.look || {}), sc = state.school;
-    if (sc && sc.stage === 'pass') { l.school = 1; if (sc.tt && sc.tt.plays) l.ttp = sc.tt.plays | 0; }
+    if (sc && sc.stage === 'pass') { l.school = 1; if (sc.tt && sc.tt.plays) l.ttp = sc.tt.plays | 0; if (sc.tt && sc.tt.q) { l.ttr = sc.tt.r | 0; l.ttq = sc.tt.q | 0; } }
     return l;
   },
   ttPlays(x) { return Math.max(0, (x && x.look && x.look.ttp) | 0); },          // (how many games at the This & That Corner: no scores on the list, the teacher's wish)
