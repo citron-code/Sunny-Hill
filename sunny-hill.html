@@ -11777,7 +11777,7 @@ const SEA = {
     this.ship = null; this.pirate = null; this.buoy = null; this.loaded = false; this.aim = null; this.steer = null; this.page = null; this.quiz = false;
     for (const k of ['balls', 'shots', 'crates', 'drops', 'rings', 'bits', 'wake', 'puffs']) this[k].length = 0;
     this.crateT = 0; this.endT = 0; this.outT = 0; this.shake = 0; this.aimTold = false; this.tipped = false; this.hurtTold = false;
-    this.goal = null; this.mapItem = null; this.mapDropped = false; this.smokeT = 0; this.dock = null; this.undock = null; this.fogK = 1; this.from = null; this.lift = 0;
+    this.goal = null; this.mapItem = null; this.mapDropped = false; this.smokeT = 0; this.dock = null; this.undock = null; this.fogK = 1; this.from = null; this.lift = 0; this.slideT = 0;
     this.AREA = this.trip ? this.AREA_W : this.AREA_N;
     if ($('seaFire')) $('seaFire').classList.remove('aiming');
   },
@@ -11893,16 +11893,24 @@ const SEA = {
     const S = this.ship, A = this.AREA;
     let vx = keys.right - keys.left, vy = keys.down - keys.up, spf = 1;
     if (!vx && !vy && Joy.m > 0) { vx = Joy.vx; vy = Joy.vy; spf = Joy.speed; }
+    if (this.slideT > 0 && (this.slideT -= dt) > 0 && (vx || vy)) {          // (just after touching a coast: keys or a stick held into that island are let go, so it glides along; held round a bay it stuck)
+      const ci = this.coastInfo(this.slideI, S.x, S.y);
+      if ((vx * ci.nx + vy * ci.ny) / Math.hypot(vx, vy) < 0.15) vx = vy = 0;
+    }
+    const I = this.dest();
+    let isle = false;          // (a tap on the island you are going to, or right by its coast: sail to its pier, round the coast)
     if (vx || vy) this.steer = null;
     else if (this.steer) {            // sailing to where the mouse (or a finger) pointed
-      const dx = this.steer.x - S.x, dy = this.steer.y - S.y, d = Math.hypot(dx, dy);
+      const o = I && I.seaOff();
+      isle = !!I && I.coastD(this.steer.x - o.x, this.steer.y - o.y) > -260;
+      const T = isle ? this.goal : this.steer, dx = T.x - S.x, dy = T.y - S.y, d = Math.hypot(dx, dy);
       if (d < 70 || game.t - this.steer.t > 14) this.steer = null; else { vx = dx / d; vy = dy / d; spf = clamp(d / 260, 0.45, 1); }
     }
-    const ix = vx, iy = vy;          // (what the child steers: the keys, the joystick, a tap)
-    { const I = this.dest(); if (I && !ix && !iy) {          // (no steering, near the island you are going to but not by its pier: the ship sails itself round to it)
+    const ix = isle ? 0 : vx, iy = isle ? 0 : vy;          // (what the child steers: the keys, the joystick, a tap)
+    if (I && !ix && !iy) {          // (no steering, near the island you are going to but not by its pier: the ship sails itself round to it)
       const ci = this.coastInfo(I, S.x, S.y);
       if (ci.d < 520 && Math.hypot(this.goal.x - S.x, this.goal.y - S.y) > 560) { const [tx, ty] = this.roundDir(I, S.x, S.y, ci.nx, ci.ny, true), k = clamp((300 - ci.d) / 200, -0.8, 0.8); vx = tx + ci.nx * k; vy = ty + ci.ny * k; }
-    } }
+    }
     const m = 200;                    // near the edge of the sea the ship turns back on its own
     if (S.x < A.x0 + m) vx += 1.6; else if (S.x > A.x1 - m) vx -= 1.6;
     if (S.y < A.y0 + m) vy += 1.6; else if (S.y > A.y1 - m) vy -= 1.6;
@@ -11950,6 +11958,7 @@ const SEA = {
   dest() { return this.trip && this.trip !== 'home' && this.goal && !this.dock ? (this.isle ? this.isle() : ISLE5) : null; },          // (the island this trip goes to)
   coastSlide(S, I, dt, ix, iy) {          // the ship touches an island's coast: it never sticks there
     const o = I.seaOff();
+    this.slideT = 1.2; this.slideI = I;
     if (this.steer && I.coastD(this.steer.x - o.x, this.steer.y - o.y) > -60) { this.steer = null; ix = iy = 0; }          // (a tap on the land: let go)
     const ci = this.coastInfo(I, S.x, S.y);
     if ((ix || iy) && ix * ci.nx + iy * ci.ny > 0.15) return;          // (steering away from the island: as you like)
@@ -21078,6 +21087,48 @@ const Where = {
     return false;
   },
 };
+/* ---- a newer Sunny Hill on the web: a tablet can keep an old copy for weeks (a tab left open, or a tab the browser brings
+   back from its cache). A parent sent a photo of one from before the school island: the ship would not sail on from the
+   Parrot King's island. So the game asks the web for its own file when it opens, and when the child comes back to it
+   after a while; if its code is not this one, it opens the new one (on the title screen, or while you walk about: you are
+   where you were). Over the web only; never twice for the same new copy. */
+const Update = {
+  mine: '', newer: '', until: 0, busy: false, away: 0,
+  init() {
+    if (!/^https?:$/.test(location.protocol) || !window.fetch || !window.DOMParser) return;
+    this.mine = this.sum(document);
+    this.look();
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.away = performance.now();
+      else if (this.away && performance.now() - this.away > 120000) this.look();
+    });
+    setInterval(() => this.tick(), 1000);
+  },
+  sum(doc) {                 // the game's code (its one big script), as a short name
+    let s = '', h = 2166136261;
+    for (const e of doc.querySelectorAll('script:not([src])')) if (e.textContent.length > s.length) s = e.textContent;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return s ? (h >>> 0).toString(36) + s.length.toString(36) : '';
+  },
+  look() {
+    if (this.busy) return;
+    this.busy = true; this.until = performance.now() + 60000;          // (a new copy opens only in the minute after this)
+    fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).then((t) => {
+      this.busy = false;
+      const h = t ? this.sum(new DOMParser().parseFromString(t, 'text/html')) : '';
+      if (h && h !== this.mine) this.newer = h;
+    }).catch(() => { this.busy = false; });
+  },
+  tick() {
+    if (!this.newer || performance.now() > this.until || !(game.mode === 'title' || game.mode === 'play' && Where.now())) return;
+    try {
+      if (sessionStorage.getItem('sunnyHill.update') === this.newer) return;          // (opened once already and still not it: never round and round)
+      sessionStorage.setItem('sunnyHill.update', this.newer);
+    } catch (e) { return; }
+    Where.keep();
+    const u = new URL(location.href); u.searchParams.set('v', this.newer); location.replace(u.href);
+  },
+};
 function enterWorld(first) {
   $('title').classList.add('hidden');
   snapCamera();
@@ -21121,6 +21172,7 @@ function boot() {
   window.addEventListener('pagehide', () => Where.keep());          // (where you were, for next time)
   Hud.refresh();
   showEntry();
+  Update.init();
   requestAnimationFrame(frame);
 }
 
@@ -21128,7 +21180,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys, LAB, SHIP, Parts, shoreC,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, SCHOOLIN, SchoolQuiz, SeaPick, Where, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, SCHOOLIN, SchoolQuiz, SeaPick, Where, Update, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');

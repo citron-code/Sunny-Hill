@@ -33,7 +33,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   log('on the pier at', await pos(), '| Sparky:', await lines(), '| card', await card());
   // 2) back to the Parrot King's island from the school's pier (coming from the north)
   await S(`SH.tp(${await S('SH.ISLE6.DOCK.x0 + 70')}, ${await S('SH.ISLE6.SHIPAT.y')})`); await step(0.3);
-  await S('SH.ISLE6.STAY = false');          // (this week its ship stays, see level6-ships.mjs; here, as next week)
+  await S('SH.ISLE6.STAY = false; SH.state.school.coinTold = 1');          // (this week its ship stays, see level6-ships.mjs; here, as next week; Sparky's word on coins: heard)
   await talk('ship6'); log('the school\'s ship asks:', await picks()); await pick('isle5'); log(await lines());
   log('going on board:', await S('!!SH.ISLE6.aboard'));
   for (let i = 0; i < 40 && await S('!!SH.ISLE6.aboard'); i++) { await step(0.2); if (i === 4) { await S('SH.game.paused = true'); await shot('l6v-board' + T); await S('SH.game.paused = false'); } }
@@ -41,7 +41,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
   await S('SH.game.paused = true'); await shot('l6v-depart' + T); await S('SH.game.paused = false');
   for (let i = 0; i < 30 && await S('!!SH.SEA.undock'); i++) await step(0.25);
   await S('(() => { const S = SH.SEA.ship, g = SH.SEA.goal; S.x = g.x + 200; S.y = g.y - 380; S.a = Math.PI / 2; })()'); await step(0.3);
-  log('docking from the north:', await S('!!SH.SEA.dock'), '| its way passes south of the pier', await S('(() => { const D = SH.SEA.dock, g = SH.SEA.goal; return !!D && D.pts.some((p) => p.y > g.y + 300); })()'), '| never over the pier', await S('(() => { const D = SH.SEA.dock, g = SH.SEA.goal; return !!D && D.pts.every((p) => !(p.x > g.x + 40 && Math.abs(p.y - g.y) < 120)); })()'));
+  log('docking from the north:', await S('!!SH.SEA.dock'), '| its way passes south of the pier', await S('(() => { const D = SH.SEA.dock, g = SH.SEA.goal; return !!D && D.st[0].pts.some((p) => p.y > g.y + 300); })()'), '| never over the pier', await S('(() => { const D = SH.SEA.dock, g = SH.SEA.goal; return !!D && D.st[0].pts.every((p) => !(p.x > g.x + 40 && Math.abs(p.y - g.y) < 120)); })()'));
   for (let i = 0; i < 60 && await S('SH.SEA.active'); i++) await step(0.25);
   for (let i = 0; i < 40 && await S('!!SH.ISLE5.off'); i++) await step(0.25);
   log('on the Parrot King\'s pier:', await S('SH.ISLE5.here()'), '| Sparky:', await lines());
