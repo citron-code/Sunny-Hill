@@ -35,6 +35,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9ddc6e;fon
 #game{position:fixed;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;cursor:pointer}
 #gl{position:fixed;left:0;top:0;width:100%;height:100%;display:none}
 body.g3 #gl{display:block}
+/* a soft darkening toward the corners over the 3D view (the eye rests in the middle), like a camera's lens */
+body.g3.vig #game{background:radial-gradient(ellipse 75% 70% at 50% 46%,rgba(0,0,0,0) 62%,rgba(16,30,48,.2) 100%)}
 #fx{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:60}
 .hidden{display:none!important}
 #splash{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .45s;
@@ -74,6 +76,12 @@ body.g3 #gl{display:block}
 #starBox,#bananaBox,#partsBox,#coinBox,#camBtn{font-size:24px;font-weight:bold;padding:0 16px;height:56px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 #coinBox{color:#a86b00;font-family:inherit;cursor:pointer}
 #camBtn{font-family:inherit;cursor:pointer;font-size:28px;padding:0 12px}
+/* the drawn icons on the top bar and in the dialog */
+.hic{width:30px;height:30px;flex:0 0 auto;display:block;fill:none;stroke:#4a3222;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hic .fl{fill:#4a3222;stroke:none}
+.hic.star{fill:#ffc93c;stroke:#c9781a;stroke-width:1.6}
+.hic.hw{width:60%;height:60%;stroke:#fff}
+.hic.hw .fl{fill:#fff}
 #funBig{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.6);z-index:37;font:bold 76px var(--font);color:#fff;-webkit-text-stroke:3px #3a2a20;text-shadow:0 6px 0 rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:transform .25s,opacity .25s;white-space:nowrap} #funBig.on{opacity:1;transform:translate(-50%,-50%) scale(1)} #funBig.go{color:#ffd23c}
 .sc{display:inline-block;width:.9em;height:.9em;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6b8,#ffd23c 45%,#e8a400);border:2px solid #a86b00;box-shadow:inset 0 0 0 2px rgba(255,240,150,.9);vertical-align:-.12em;box-sizing:border-box;flex:none}
 #partsBox{font-family:inherit;color:inherit;cursor:pointer;animation:bob 1.6s ease-in-out infinite}
@@ -410,24 +418,40 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 .gbtn.orange:active{box-shadow:0 2px 0 #b8541b,0 6px 12px rgba(0,0,0,.25)}
 .gbtn .gi{font-size:34px;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
 /* ---------- main menu over the live village ---------- */
-#title{z-index:35;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 35%,rgba(20,40,30,.42) 100%),linear-gradient(rgba(140,210,255,.3),rgba(0,0,0,0) 35%)}
+#title{z-index:35;background:radial-gradient(ellipse 60% 55% at 50% 44%,rgba(255,250,225,.28) 0%,rgba(255,250,225,0) 70%),radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 40%,rgba(14,32,44,.5) 100%),linear-gradient(rgba(120,196,255,.34),rgba(0,0,0,0) 30%,rgba(0,0,0,0) 72%,rgba(10,30,40,.3))}
 #titleBox{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;width:min(600px,100%)}
 .titleL,.titleR{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
-.logo{position:relative;padding-top:18px}
-.logoSun{position:absolute;left:-34px;top:-10px;width:112px;height:112px;z-index:0;animation:sunBob 4s ease-in-out infinite}
-.sunRays{position:absolute;inset:0;border-radius:50%;animation:spin 24s linear infinite;
-  background:repeating-conic-gradient(from 0deg,rgba(255,206,64,.95) 0deg 11deg,rgba(255,206,64,0) 11deg 30deg);
-  -webkit-mask:radial-gradient(circle,transparent 38%,#000 39%,#000 70%,transparent 71%);mask:radial-gradient(circle,transparent 38%,#000 39%,#000 70%,transparent 71%)}
-.sunFace{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:58px;line-height:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.18))}
+.logo{position:relative;padding-top:18px;--ls:clamp(52px,12vw,104px);padding-left:calc(var(--ls)*.9)}          /* (--ls: the letters' size; the sun sits left of them) */
+.logoSun{position:absolute;left:calc(var(--ls)*-.15);top:calc(18px - var(--ls)*.5);width:calc(var(--ls)*1.5);height:calc(var(--ls)*1.5);z-index:0;animation:sunBob 4s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(140,70,0,.35))}
+.logoSun svg{width:100%;height:100%;overflow:visible}
+.sunGlow{transform-box:view-box;transform-origin:50% 50%;animation:sunGlow 3.2s ease-in-out infinite}
+@keyframes sunGlow{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.06);opacity:1}}
+.sunBack{transform-box:view-box;transform-origin:50% 50%;animation:spin 44s linear infinite reverse}
+.sunFront{transform-box:view-box;transform-origin:50% 50%;animation:spin 28s linear infinite}
+.sunEyes{transform-box:fill-box;transform-origin:50% 50%;animation:sunBlink 4.6s infinite}
+@keyframes sunBlink{0%,90%,96%,100%{transform:scaleY(1)}93%{transform:scaleY(.1)}}
+.sunTw{transform-box:fill-box;transform-origin:50% 50%;animation:twinkle 3.4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{transform:scale(0) rotate(0deg);opacity:0}40%{transform:scale(1) rotate(45deg);opacity:1}70%{transform:scale(.15) rotate(90deg);opacity:0}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes sunBob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-6px) rotate(6deg)}}
-#titleText{position:relative;z-index:1;margin:0;font-family:var(--logo);font-size:clamp(54px,12.5vw,100px);line-height:1;font-weight:900;letter-spacing:2px;color:#ffe066;white-space:nowrap;
-  -webkit-text-stroke:5px #5a2f14;paint-order:stroke fill;
-  text-shadow:0 5px 0 #ff9f2b,0 9px 0 #d9731f,0 12px 0 #5a2f14,0 22px 26px rgba(0,0,0,.4)}
-#titleText span{display:inline-block;animation:letterBob 2.8s ease-in-out infinite}
+/* the logo: each letter is three layers — a thick dark outline with a soft shadow, an orange side, and a glossy face */
+#titleText{position:relative;z-index:1;margin:0;font-family:var(--logo);font-size:var(--ls);line-height:1;font-weight:700;letter-spacing:3px;color:transparent;white-space:nowrap}
+#titleText span{position:relative;display:inline-block;animation:letterBob 2.8s ease-in-out infinite}
+#titleText span::before,#titleText span::after{content:attr(data-ch);position:absolute;left:0;top:0;pointer-events:none}
+#titleText span::before{top:4px;color:#5a2f14;-webkit-text-stroke:12px #5a2f14;text-shadow:0 7px 0 #3e1f0c,0 20px 24px rgba(0,0,0,.42)}
+#titleText span::after{background:linear-gradient(105deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.9) 50%,rgba(255,255,255,0) 58%) no-repeat,linear-gradient(180deg,#fffdf0 4%,#fff07a 30%,#ffd23c 56%,#ffab26 92%);
+  background-size:400% 100%,100% 100%;background-position:120% 0,0 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 5px 0 #f0861c);animation:shine 6.5s ease-in-out infinite;animation-delay:calc(var(--i,0) * .07s)}          /* (a gleam crosses the letters one after another) */
+@keyframes shine{0%,70%{background-position:120% 0,0 0}100%{background-position:-20% 0,0 0}}
 @keyframes letterBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.ribbon{position:relative;display:inline-block;padding:8px 30px;background:linear-gradient(#ff7a5c,#e8503a);color:#fff;font-weight:bold;font-size:22px;
-  border-radius:10px;box-shadow:0 5px 0 #a8321f,0 12px 18px rgba(0,0,0,.25);text-shadow:0 2px 0 rgba(0,0,0,.22);white-space:nowrap}
+/* a banner with folded tails under the logo */
+.ribbon{position:relative;display:inline-block;padding:9px 34px 10px;background:linear-gradient(#ff8f6e,#ee5a3e 55%,#dc4630);color:#fff;font-weight:800;font-size:22px;letter-spacing:.6px;
+  border-radius:6px;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 5px 0 #a8321f,0 12px 18px rgba(0,0,0,.25);text-shadow:0 2px 0 rgba(0,0,0,.22);white-space:nowrap}
+.ribbon::before,.ribbon::after{content:'';position:absolute;top:12px;width:30px;height:100%;background:linear-gradient(#d84a33,#b8341f);z-index:-1;filter:drop-shadow(0 5px 0 #8a2615)}
+.ribbon::before{left:-20px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,38% 50%)}
+.ribbon::after{right:-20px;clip-path:polygon(0 0,100% 0,62% 50%,100% 100%,0 100%)}
+.ribbon .rStar{display:inline-block;margin:0 10px;color:#ffe066;font-size:.8em;transform:translateY(-1px);text-shadow:0 2px 0 rgba(120,30,10,.4)}
+@media (max-width:440px){.ribbon{font-size:19px;padding:8px 20px 9px}.ribbon .rStar{margin:0 7px}.ribbon::before{left:-16px}.ribbon::after{right:-16px}}
 .contBtn{min-height:104px;justify-content:flex-start;padding:0 18px 0 12px;text-align:left}
 #tMe{width:74px;height:74px;border-radius:50%;border:4px solid #fff;flex:0 0 auto;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 .contText{display:flex;flex-direction:column;flex:1 1 auto;min-width:0;gap:2px}
@@ -436,19 +460,22 @@ body.dev-tablet{--joy:168px;--knob:74px;--act:132px}
 .contInfo span{white-space:nowrap}
 .contInfo .ciName{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .tSmall{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.pill{min-height:56px;min-width:56px;padding:0 18px;border:4px solid #fff;border-radius:28px;background:rgba(255,255,255,.9);cursor:pointer;
-  font-family:var(--font);font-weight:bold;font-size:22px;color:var(--ink);box-shadow:0 5px 0 rgba(0,0,0,.18),0 10px 18px rgba(0,0,0,.2);
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;min-width:56px;padding:0 18px;border:4px solid #fff;border-radius:28px;
+  background:linear-gradient(#ffffff,#eef6ff);cursor:pointer;
+  font-family:var(--font);font-weight:bold;font-size:22px;color:var(--ink);box-shadow:0 5px 0 rgba(40,70,110,.22),0 10px 18px rgba(0,0,0,.2);
   touch-action:manipulation;transition:transform .08s}
+.pill .ic{width:26px;height:26px;flex:0 0 auto;fill:none;stroke:#3b6fb6;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pill .ic .fl{fill:#3b6fb6;stroke:none}
+.gbtn .gic{width:34px;height:34px;flex:0 0 auto;filter:drop-shadow(0 2px 0 rgba(0,0,0,.22))}
 .pill:active{transform:translateY(3px) scale(.96)}
-#titleCredit{color:#fff;font-size:20px;font-weight:bold;text-shadow:0 2px 3px rgba(0,0,0,.6)}
+#titleCredit{color:#fff;font-size:18px;font-weight:bold;letter-spacing:.4px;padding:4px 16px;border-radius:14px;background:rgba(20,40,55,.32);text-shadow:0 1px 2px rgba(0,0,0,.5)}
 @media (max-height:560px) and (min-aspect-ratio:5/4){
   #title.overlay{padding:8px 12px}
   #titleBox{flex-direction:row;align-items:center;gap:20px;width:min(940px,100%)}
   .titleL{flex:0 1 auto;width:auto;min-width:0;gap:12px}
   .titleR{flex:1 1 0;min-width:0;gap:10px}
-  #titleText{font-size:clamp(42px,8vw,88px);letter-spacing:1px}
-  .logoSun{width:84px;height:84px;left:-24px;top:-6px}
-  .sunFace{font-size:44px}
+  .logo{--ls:clamp(42px,7.4vw,84px)}
+  #titleText{letter-spacing:1px}
   .ribbon{font-size:20px;padding:6px 16px}
   .gbtn{min-height:62px;font-size:26px;padding:0 16px}
   .gbtn .gi{font-size:28px}
@@ -640,6 +667,7 @@ body.isleSay #toast{top:calc(var(--sayBottom, 210px) + 8px)}
 #vwText{flex:1 1 auto}
 #vwOk{flex:0 0 auto}
 .fsIcon{width:28px;height:28px;display:block;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#tFull .fsIcon{width:26px;height:26px;stroke:#3b6fb6;stroke-width:2.4}          /* (the main menu: the same blue as its other icons) */
 .fsBtn .fsOut{display:none}
 body.fs .fsBtn .fsIn{display:none}
 body.fs .fsBtn .fsOut{display:inline}
@@ -731,15 +759,15 @@ body.fs .fsBtn .fsOut{display:inline}
 <div id="questCard" class="card hidden" role="button" aria-label="Quest">
   <canvas id="qcPortrait" width="112" height="112"></canvas>
   <div id="qcText"></div>
-  <div id="qcSpeak" aria-hidden="true">🔊</div>
+  <div id="qcSpeak" aria-hidden="true"><svg class="hic hw" viewBox="0 0 24 24" aria-hidden="true"><path class="fl" d="M3.5 9.2h3.4l5.2-4.4v14.4l-5.2-4.4H3.5z"/><path d="M15.6 9a4.2 4.2 0 0 1 0 6M18.4 6.2a8.2 8.2 0 0 1 0 11.6"/></svg></div>
 </div>
 <div id="topRight" class="hidden">
   <div id="bananaBox" class="card hidden">🍌 <span id="bananaCount">0</span>/8</div>
   <button id="partsBox" class="card hidden" aria-label="Ship parts">⚙️ <span id="partsCount">0</span>/8</button>
-  <button id="camBtn" class="card hidden" aria-label="Camera">📷</button>
+  <button id="camBtn" class="card hidden" aria-label="Camera"><svg class="hic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.2 8.4c0-1.2.9-2 2-2h2.4l1.6-2.2h5.6l1.6 2.2h2.4c1.1 0 2 .8 2 2v9.4c0 1.1-.9 2-2 2H5.2c-1.1 0-2-.9-2-2z"/><circle cx="12" cy="12.8" r="3.9"/><circle class="fl" cx="17.6" cy="9.4" r=".9"/></svg></button>
   <button id="coinBox" class="card hidden" aria-label="Sunny Coins"><span class="sc"></span><span id="coinCount">0</span></button>
-  <div id="starBox" class="card">⭐ <span id="starCount">0</span>/<span id="starTotal">8</span></div>
-  <button id="menuBtn" class="btn round white" aria-label="Menu">⚙️</button>
+  <div id="starBox" class="card"><svg class="hic star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.8 6.4.9-4.6 4.5 1.1 6.3L12 17.1l-5.7 3 1.1-6.3-4.6-4.5 6.4-.9z"/></svg><span id="starCount">0</span>/<span id="starTotal">8</span></div>
+  <button id="menuBtn" class="btn round white" aria-label="Menu"><svg class="hic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.3 2.8h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9-2.6-.5v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z"/><circle cx="12" cy="12" r="3.3"/></svg></button>
 </div>
 
 <div id="bossBar" class="hidden" aria-hidden="true"><div class="bbName" id="bbName">🦍 <span>BONGO</span></div><div id="bbSlots"></div></div>
@@ -755,7 +783,7 @@ body.fs .fsBtn .fsOut{display:inline}
   <div id="dlgWho"><canvas id="dlgPortrait" width="176" height="176"></canvas></div>
   <div id="dlgMain"><div id="dlgName"></div><div id="dlgText"></div></div>
   <div id="dlgBtns">
-    <button id="dlgSpeak" class="btn round blue" aria-label="Listen again">🔊</button>
+    <button id="dlgSpeak" class="btn round blue" aria-label="Listen again"><svg class="hic hw" viewBox="0 0 24 24" aria-hidden="true"><path class="fl" d="M3.5 9.2h3.4l5.2-4.4v14.4l-5.2-4.4H3.5z"/><path d="M15.6 9a4.2 4.2 0 0 1 0 6M18.4 6.2a8.2 8.2 0 0 1 0 11.6"/></svg></button>
     <button id="dlgNext" class="btn green">Next ▶</button>
   </div>
 </div>
@@ -916,14 +944,14 @@ body.fs .fsBtn .fsOut{display:inline}
 <div id="title" class="overlay">
   <div id="titleBox">
     <div class="titleL">
-      <div class="logo"><div class="logoSun"><div class="sunRays"></div><div class="sunFace">☀️</div></div><h1 id="titleText">Sunny Hill</h1></div>
+      <div class="logo"><div class="logoSun" id="logoSun"></div><h1 id="titleText">Sunny Hill</h1></div>
       <div class="ribbon" id="titleUnit"></div>
     </div>
     <div class="titleR">
       <button id="tContinue" class="gbtn contBtn hidden"><canvas id="tMe" width="144" height="144"></canvas>
-        <span class="contText"><span id="tContLbl" class="contLbl"></span><span id="tContInfo" class="contInfo"></span></span><span class="gi">▶</span></button>
-      <button id="tNew" class="gbtn"><span class="gi">✨</span><span id="tNewLbl"></span></button>
-      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tMusic" class="pill musicBtn">🎵</button><button id="tView" class="pill"></button><button id="tFull" class="pill fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button><button id="tInfo" class="pill"></button></div>
+        <span class="contText"><span id="tContLbl" class="contLbl"></span><span id="tContInfo" class="contInfo"></span></span><svg class="gic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,.28)"/><path fill="#fff" d="M9.6 7.3v9.4c0 .6.6.9 1.1.6l7.2-4.7a.7.7 0 0 0 0-1.2l-7.2-4.7c-.5-.3-1.1 0-1.1.6z"/></svg></button>
+      <button id="tNew" class="gbtn"><svg class="gic" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff8c4" stroke="#fff" stroke-width=".8" stroke-linejoin="round" d="M11 2.5l2.3 6 6 2.3-6 2.3-2.3 6-2.3-6-6-2.3 6-2.3z"/><path fill="#fff" d="M18.6 14.6l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9z"/></svg><span id="tNewLbl"></span></button>
+      <div class="tSmall"><button id="tSound" class="pill"></button><button id="tMusic" class="pill musicBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle class="fl" cx="6.8" cy="17.6" r="2.9"/><circle class="fl" cx="17.2" cy="15.6" r="2.9"/><path d="M9.6 17.6V6.2l10.4-2.2v11.6M9.6 9.6l10.4-2.2"/></svg></button><button id="tView" class="pill"></button><button id="tFull" class="pill fsBtn hidden"><svg class="fsIcon" viewBox="0 0 24 24" aria-hidden="true"><path class="fsIn" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/><path class="fsOut" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg></button><button id="tInfo" class="pill"></button></div>
       <div id="titleCredit"></div>
     </div>
   </div>
@@ -980,7 +1008,7 @@ const GAME_CONTENT = {
     restart: 'Restart game', close: 'Close',
     // ana menü ve oyun içi menü
     newGame: 'New Game', continue: 'Continue', fullScreen: 'Full screen', music: 'Music', mainMenu: 'Main menu', resume: 'Resume', speed: 'Speed', paused: 'Menu',
-    unit: 'Unit 1 · What is a family?',
+    unit: 'Unit 1 · What is a family?', tagline: 'An English Adventure',
     newGameAsk: 'Start a new game? Your stars will be lost. / Yeni oyun başlasın mı? Yıldızlar silinir.',
     restartAsk: 'Start again? / Baştan başlansın mı?', yes: 'Yes', no: 'No',
     hi: 'Hi, {name}!',
@@ -3562,7 +3590,7 @@ function rgb3(h) { const n = parseInt(String(h).slice(1), 16); return [(n >> 16)
 /* ---- mesh builder: collects flat-shaded triangles (position, normal, colour, animation) ---- */
 class MB {
   // smooth: faces meeting at less than this many degrees share a normal and look rounded (0 = flat facets)
-  constructor(seed) { this.a = []; this.xf = null; this.col = [1, 1, 1, 1]; this.jit = 0; this.R = rng(seed || 7); this.anim = 0; this.swayK = 0; this.swayBase = 0; this.smooth = 50; }
+  constructor(seed) { this.a = []; this.xf = null; this.col = [1, 1, 1, 1]; this.jit = 0; this.R = rng(seed || 7); this.anim = 0; this.swayK = 0; this.swayBase = 0; this.smooth = 50; this.bend = null; }
   color(c, alpha) { const v = typeof c === 'string' ? rgb3(c) : c; this.col = [v[0], v[1], v[2], alpha == null ? 1 : alpha]; return this; }
   at(m) { this.xf = m || null; return this; }
   P(p) {
@@ -3580,10 +3608,11 @@ class MB {
     let k = col || this.col;
     if (this.jit) { const f = 1 + (this.R() - 0.5) * this.jit; k = [k[0] * f, k[1] * f, k[2] * f, k[3]]; }
     const A = this.a;
-    const an = (lp) => (this.swayK ? Math.max(0, lp[1] - this.swayBase) * this.swayK : this.anim);
-    A.push(a[0], a[1], a[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(p));
-    A.push(b[0], b[1], b[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(q));
-    A.push(c[0], c[1], c[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(r));
+    // (bend: a function of the built position giving how much that point swings, 0..1: a hem, a hat, hanging hair)
+    const an = (lp, wp) => (this.bend ? 100 + clamp(this.bend(wp), 0, 1) : this.swayK ? Math.max(0, lp[1] - this.swayBase) * this.swayK : this.anim);
+    A.push(a[0], a[1], a[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(p, a));
+    A.push(b[0], b[1], b[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(q, b));
+    A.push(c[0], c[1], c[2], nx, ny, nz, k[0], k[1], k[2], k[3], an(r, c));
     return this;
   }
   // a triangle with its own colour at each corner (the ground blends between them)
@@ -3792,46 +3821,106 @@ function pack(mb) {
 }
 
 /* ---- the WebGL renderer (one for the village, one off-screen for portraits and pictures) ---- */
-const VS3 = `precision highp float;
-attribute vec3 aPos; attribute vec3 aNor; attribute vec4 aCol; attribute float aAnim;
-uniform mat4 uP, uV, uM; uniform float uTime, uZBias;
-uniform vec3 uCam; uniform vec2 uFog;
-varying vec4 vCol; varying float vFog; varying vec3 vNor; varying vec3 vView;
-void main() {
-  vec4 wp = uM * vec4(aPos, 1.0);
-  if (aAnim > 0.0) {
+// grass and leaves sway (anim > 0), water swells (anim < 0): the same in the picture and in the sun's shadow picture.
+// anim 100..101: a hem, a hat or hanging hair that swings behind a moving person, by uBend times (anim - 100)
+const ANIM3 = `
+  if (aAnim > 99.5) {
+    wp.xyz += uBend * (aAnim - 100.0);
+  } else if (aAnim > 0.0) {
     wp.x += sin(uTime * 1.4 + wp.x * 0.021 + wp.z * 0.017) * aAnim;
     wp.z += sin(uTime * 1.1 + wp.x * 0.013) * aAnim * 0.5;
   } else if (aAnim < 0.0) {
     wp.y += (sin(uTime * 1.7 + wp.x * 0.045 + wp.z * 0.03) + 0.6 * sin(uTime * 2.3 - wp.z * 0.06 + wp.x * 0.02)) * -aAnim;
-  }
+  }`;
+const PREC3 = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+`;
+// the picture's finish (uLook: the sun's edge, colour, contrast): a little richer colour and a gentle S curve
+const GRADE3 = `uniform vec4 uLook;
+vec3 grade(vec3 c) {
+  float l = dot(c, vec3(0.299, 0.587, 0.114));
+  c = max(mix(vec3(l), c, uLook.y), 0.0);
+  return mix(c, c * c * (3.0 - 2.0 * c), uLook.z);
+}`;
+const VS3 = `precision highp float;
+attribute vec3 aPos; attribute vec3 aNor; attribute vec4 aCol; attribute float aAnim;
+uniform mat4 uP, uV, uM, uLVP; uniform float uTime, uZBias;
+uniform vec3 uCam, uBend; uniform vec2 uFog;
+varying vec4 vCol; varying float vFog; varying vec3 vNor; varying vec3 vView; varying vec4 vLP; varying vec3 vW;
+void main() {
+  vec4 wp = uM * vec4(aPos, 1.0);${ANIM3}
+  vW = wp.xyz;
   vNor = (uM * vec4(aNor, 0.0)).xyz;
   vView = normalize(uCam - wp.xyz);
   vec3 c = aCol.rgb;
   if (aAnim < 0.0) c *= 1.0 + 0.08 * sin(uTime * 2.0 + wp.x * 0.07 + wp.z * 0.05);
   vCol = vec4(c, aCol.a);
   vFog = clamp((distance(wp.xyz, uCam) - uFog.x) / (uFog.y - uFog.x), 0.0, 1.0);
+  vLP = uLVP * vec4(wp.xyz + vNor * (1.6 / max(length(vNor), 0.001)), 1.0);          // (where it is in the sun's picture, a hair off the surface: no speckles)
   vec4 vp = uV * wp; vp.z += uZBias;
   gl_Position = uP * vp;
 }`;
-const FS3 = `precision mediump float;
-varying vec4 vCol; varying float vFog; varying vec3 vNor; varying vec3 vView;
-uniform vec3 uSun, uSunCol, uSky, uGnd, uFogCol; uniform vec4 uTint; uniform float uUnlit, uSpec, uRim;
-uniform sampler2D uTex; uniform float uTexOn; uniform vec4 uUV;
+const FS3 = `${PREC3}
+varying vec4 vCol; varying float vFog; varying vec3 vNor; varying vec3 vView; varying vec4 vLP; varying vec3 vW;
+uniform vec3 uSun, uSunCol, uSky, uGnd, uFogCol; uniform vec4 uTint; uniform float uUnlit, uSpec, uRim, uWater, uWaterT;
+uniform sampler2D uTex; uniform float uTexOn; uniform vec4 uUV, uIris;
+uniform sampler2D uShadow; uniform vec4 uShP;          // the sun's shadows: (one texel, how dark, on, bias)
+${GRADE3}
+float shadow(float ndl) {          // 1 in the sun, less in a shadow; four looks around the spot soften its edge
+  if (uShP.z < 0.5) return 1.0;
+  vec3 p = vLP.xyz / vLP.w * 0.5 + 0.5;
+  vec2 e = min(p.xy, 1.0 - p.xy);
+  float edge = clamp(min(e.x, e.y) * 14.0, 0.0, 1.0);
+  if (edge <= 0.0 || p.z >= 1.0) return 1.0;
+  float z = p.z - uShP.w * (1.0 + 2.0 * (1.0 - clamp(ndl, 0.0, 1.0))), t = uShP.x;
+  float s = step(z, texture2D(uShadow, p.xy + vec2(-0.7, -1.5) * t).r) + step(z, texture2D(uShadow, p.xy + vec2(1.5, -0.7) * t).r)
+    + step(z, texture2D(uShadow, p.xy + vec2(0.7, 1.5) * t).r) + step(z, texture2D(uShadow, p.xy + vec2(-1.5, 0.7) * t).r);
+  return 1.0 - (1.0 - s * 0.25) * uShP.y * edge;
+}
 void main() {
   vec3 n = normalize(vNor), v = normalize(vView);
-  float d = clamp((dot(n, uSun) + 0.2) / 1.2, 0.0, 1.0);          // wrapped light: soft, no hard dark side
+  if (uWater > 0.5) {          // water: little moving waves catch the sun and the sky
+    vec2 q = vW.xz; float t = uWaterT;
+    n = normalize(vec3(0.09 * sin(q.x * 0.043 + t * 1.3) + 0.06 * sin((q.x + q.y) * 0.071 - t * 1.7) + 0.04 * sin(q.y * 0.13 + t * 2.2),
+      1.0, 0.09 * cos(q.y * 0.051 + t * 1.1) + 0.06 * cos((q.x - q.y) * 0.067 + t * 1.6) + 0.04 * cos(q.x * 0.12 - t * 2.4)));
+  }
+  float ndl = dot(n, uSun);
+  float d = mix(clamp((ndl + 0.2) / 1.2, 0.0, 1.0), smoothstep(-0.06, 0.42, ndl), uLook.x);          // the sun: wrapped soft light, or a crisper edge like a picture book
+  d *= shadow(ndl);
   vec3 lit = mix(uGnd, uSky, n.y * 0.5 + 0.5) + uSunCol * d;
   lit += uRim * pow(1.0 - max(dot(n, v), 0.0), 3.0);
-  if (uTexOn > 0.5) {             // a painted face: the colour channels carry the picture's coordinates
+  if (uTexOn > 0.5) {             // a painted face: the colour channels carry the picture's coordinates (premultiplied)
     vec4 p = texture2D(uTex, uUV.xy + vCol.rg * uUV.zw);
-    gl_FragColor = vec4(mix(p.rgb * lit, uFogCol * p.a, vFog), p.a);
+    if (uIris.x >= 0.0) {          // eyes that look about: the iris picture (uIris.xy), moved by uIris.zw, shows only on the eye's white (not on the lids)
+      vec4 ir = texture2D(uTex, uIris.xy + vCol.rg * uUV.zw - uIris.zw);
+      vec3 bc = p.a > 0.004 ? p.rgb / p.a : vec3(0.0);
+      float m = p.a * smoothstep(0.35, 0.6, min(bc.r, min(bc.g, bc.b)));
+      p = p * (1.0 - ir.a * m) + ir * m;
+    }
+    vec3 pc = p.a > 0.004 ? p.rgb / p.a : vec3(0.0);
+    gl_FragColor = vec4(grade(mix(pc * lit, uFogCol, vFog)) * p.a, p.a);
     return;
   }
   vec3 c = vCol.rgb * mix(lit, vec3(1.0), uUnlit);
-  if (uSpec > 0.0) c += uSpec * pow(max(dot(n, normalize(v + uSun)), 0.0), 48.0) * vec3(1.0, 0.98, 0.9);
-  gl_FragColor = vec4(mix(c * uTint.rgb, uFogCol, vFog), vCol.a * uTint.a);
+  if (uWater > 0.5) {
+    float fr = pow(1.0 - max(dot(n, v), 0.0), 4.0);
+    c = mix(c, uFogCol * 1.08, fr * 0.55);
+    float sp = max(dot(reflect(-uSun, n), v), 0.0);
+    c += (pow(sp, 90.0) * 0.9 + pow(sp, 14.0) * 0.12) * shadow(1.0) * vec3(1.0, 0.97, 0.88);
+  } else if (uSpec > 0.0) c += uSpec * pow(max(dot(n, normalize(v + uSun)), 0.0), 48.0) * vec3(1.0, 0.98, 0.9);
+  gl_FragColor = vec4(grade(mix(c * uTint.rgb, uFogCol, vFog)), vCol.a * uTint.a);
 }`;
+// the sun's shadow picture: only how far each thing is from the sun
+const SVS3 = `precision highp float;
+attribute vec3 aPos; attribute vec3 aNor; attribute vec4 aCol; attribute float aAnim;
+uniform mat4 uLVP, uM; uniform float uTime; uniform vec3 uBend;
+void main() { vec4 wp = uM * vec4(aPos, 1.0);${ANIM3}
+  gl_Position = uLVP * wp; }`;
+const SFS3 = `precision mediump float;
+void main() { gl_FragColor = vec4(1.0); }`;
 const TVS3 = `precision mediump float;
 attribute vec3 aPos; attribute vec2 aUV; uniform mat4 uP, uV; uniform vec3 uCam; uniform vec2 uFog;
 varying vec2 vUV; varying float vFog;
@@ -3839,9 +3928,19 @@ void main() { vUV = aUV; vFog = clamp((distance(aPos, uCam) - uFog.x) / (uFog.y 
 const TFS3 = `precision mediump float;
 varying vec2 vUV; varying float vFog; uniform sampler2D uTex; uniform vec3 uFogCol; uniform float uLight;
 uniform float uAlpha;
-void main() { vec4 c = texture2D(uTex, vUV); gl_FragColor = vec4(mix(c.rgb * uLight, uFogCol, vFog), c.a * uAlpha); }`;
-const ENV_DAY = { sky: [0.68, 0.71, 0.77], gnd: [0.47, 0.43, 0.36], sun: [0.5, 0.46, 0.38], dir: [-0.32, 0.74, 0.6], fog: [0.74, 0.88, 0.98] };
+${GRADE3}
+void main() { vec4 c = texture2D(uTex, vUV); gl_FragColor = vec4(grade(mix(c.rgb * uLight, uFogCol, vFog)), c.a * uAlpha); }`;
+// the light: sky from above, warm bounce from the ground, the sun (and where it shines from), the haze far away
+const ENV_DAY = { sky: [0.56, 0.62, 0.74], gnd: [0.4, 0.38, 0.3], sun: [0.66, 0.58, 0.44], dir: [-0.45, 0.72, 0.52], fog: [0.74, 0.88, 0.98] };
 const ENV_EVE = { sky: [0.44, 0.37, 0.62], gnd: [0.24, 0.18, 0.3], sun: [0.62, 0.33, 0.22], dir: [-0.6, 0.4, 0.5], fog: [0.42, 0.33, 0.54] };
+// how the pictures are finished; the sun's shadows (G3.shadows: off on slow devices). Tunable in a running game.
+const LOOK3 = { edge: 0.5, sat: 1.1, contrast: 0.25, shadow: 0.8, bias: 0.0006, reach: 0.72, rim: 0.12, water: 1, vig: 1 };
+function m4ortho(l, r, b, t, n, f) {
+  const m = new Float32Array(16);
+  m[0] = 2 / (r - l); m[5] = 2 / (t - b); m[10] = -2 / (f - n);
+  m[12] = -(r + l) / (r - l); m[13] = -(t + b) / (t - b); m[14] = -(f + n) / (f - n); m[15] = 1;
+  return m;
+}
 class GLR {
   constructor(cv, opts) {
     const o = Object.assign({ antialias: true, alpha: false, depth: true, premultipliedAlpha: true, preserveDrawingBuffer: false }, opts || {});
@@ -3850,12 +3949,79 @@ class GLR {
     this.gl = gl; this.cv = cv; this.id = (GLR.count = (GLR.count || 0) + 1);
     (GLR.all = GLR.all || {})[this.id] = this;
     this.p = this.program(VS3, FS3, ['aPos', 'aNor', 'aCol', 'aAnim'],
-      ['uP', 'uV', 'uM', 'uTime', 'uZBias', 'uUnlit', 'uSun', 'uSunCol', 'uSky', 'uGnd', 'uCam', 'uTint', 'uFog', 'uFogCol', 'uSpec', 'uRim', 'uTex', 'uTexOn', 'uUV']);
+      ['uP', 'uV', 'uM', 'uLVP', 'uTime', 'uZBias', 'uUnlit', 'uSun', 'uSunCol', 'uSky', 'uGnd', 'uCam', 'uTint', 'uFog', 'uFogCol', 'uSpec', 'uRim', 'uTex', 'uTexOn', 'uUV', 'uShadow', 'uShP', 'uLook', 'uWater', 'uWaterT', 'uIris', 'uBend']);
     this.faces = new Map();
-    this.tp = this.program(TVS3, TFS3, ['aPos', 'aUV'], ['uP', 'uV', 'uCam', 'uFog', 'uTex', 'uFogCol', 'uLight', 'uAlpha']);
+    this.tp = this.program(TVS3, TFS3, ['aPos', 'aUV'], ['uP', 'uV', 'uCam', 'uFog', 'uTex', 'uFogCol', 'uLight', 'uAlpha', 'uLook']);
+    this.sp = this.program(SVS3, SFS3, ['aPos', 'aNor', 'aCol', 'aAnim'], ['uLVP', 'uM', 'uTime']);
     gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    this.tint = [1, 1, 1, 1];
+    this.tint = [1, 1, 1, 1]; this.tintA = 1; this.unlit = 0; this.sh = null; this.inDecal = false;
+  }
+  // the sun's shadows: a depth picture of everything seen from the sun (size × size), made at the start of each frame
+  // from the solid things drawn in the frame before. Off (null) when the device can't (or is too slow).
+  shadows(size) {
+    const gl = this.gl, old = this.sh;
+    if (old && old.size === size) return true;
+    if (old) { gl.deleteFramebuffer(old.fb); gl.deleteTexture(old.tex); gl.deleteRenderbuffer(old.col); this.sh = null; }
+    if (!size) return false;
+    if (!gl.getExtension('WEBGL_depth_texture') && !gl.getExtension('WEBKIT_WEBGL_depth_texture')) return false;
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, size, size, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
+    for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.NEAREST], [gl.TEXTURE_MAG_FILTER, gl.NEAREST], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+    const col = gl.createRenderbuffer();          // (some browsers want a colour picture too)
+    gl.bindRenderbuffer(gl.RENDERBUFFER, col); gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, size, size);
+    const fb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, col);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, tex, 0);
+    const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    if (!ok || gl.getError()) { gl.deleteFramebuffer(fb); gl.deleteTexture(tex); gl.deleteRenderbuffer(col); return false; }
+    this.sh = { fb, tex, col, size, mesh: [], mat: new Float32Array(16 * 512), one: new Float32Array(16), n: 0 };
+    return true;
+  }
+  // the box the sun's picture covers: around what the camera sees (more of the far side), lined up on its texels so
+  // shadow edges don't shimmer while the camera glides
+  sunBox(E, cam) {
+    const s = this.sh, L = this.sun, c = cam.at, e = cam.eye;
+    const gx = c[0] - e[0], gz = c[2] - e[2], gd = Math.hypot(gx, gz) || 1, dist = Math.hypot(gx, c[1] - e[1], gz);
+    const R = clamp(dist * LOOK3.reach, 300, 1700), cx = c[0] + gx / gd * R * 0.25, cz = c[2] + gz / gd * R * 0.25, far = 1400;
+    const V = m4look(cx + L[0] * far, c[1] + L[1] * far, cz + L[2] * far, cx, c[1], cz);
+    let M = m4mul(m4ortho(-R, R, -R, R, 60, far + 1100), V);
+    const o = m4apply(M, 0, 0, 0), k = s.size / 2;
+    M = m4mul(T3(Math.round(o[0] * k) / k - o[0], Math.round(o[1] * k) / k - o[1], 0), M);
+    return M;
+  }
+  shadowPass(t) {
+    const gl = this.gl, s = this.sh, u = this.sp.u;
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, null); gl.activeTexture(gl.TEXTURE0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, s.fb); gl.viewport(0, 0, s.size, s.size);
+    gl.colorMask(false, false, false, false); gl.depthMask(true); gl.disable(gl.BLEND); gl.depthFunc(gl.LESS);
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+    gl.disable(gl.CULL_FACE);          // (thin things, leaves and boards, cast from both sides)
+    gl.useProgram(this.sp.p);
+    gl.uniformMatrix4fv(u.uLVP, false, this.LVP); gl.uniform1f(u.uTime, t);
+    let last = null;
+    for (let i = 0; i < s.n; i++) {
+      const mesh = s.mesh[i];
+      if (mesh !== last) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buf(mesh));
+        gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+        gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.BYTE, true, 24, 12);
+        gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 4, gl.UNSIGNED_BYTE, true, 24, 16);
+        gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 24, 20);
+        last = mesh;
+      }
+      const M = s.one, o = i * 16;
+      for (let k = 0; k < 16; k++) M[k] = s.mat[o + k];
+      gl.uniformMatrix4fv(u.uM, false, M);
+      gl.drawArrays(gl.TRIANGLES, 0, mesh.n);
+    }
+    gl.enable(gl.CULL_FACE); gl.colorMask(true, true, true, true);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    for (let i = 0; i < s.n; i++) s.mesh[i] = null;
+    s.n = 0;
   }
   program(vs, fs, attrs, unis) {
     const gl = this.gl;
@@ -3881,10 +4047,13 @@ class GLR {
   // camera: { eye:[x,y,z], at:[x,y,z], fov, near, far }, env: day/evening mix
   begin(w, h, cam, ev, t, clear) {
     const gl = this.gl;
-    gl.viewport(0, 0, w, h);
     const E = {};
     for (const k in ENV_DAY) E[k] = ENV_DAY[k].map((v, i) => v + (ENV_EVE[k][i] - v) * ev);
     const dl = Math.hypot(E.dir[0], E.dir[1], E.dir[2]);
+    this.sun = [E.dir[0] / dl, E.dir[1] / dl, E.dir[2] / dl];
+    const sh = this.sh;
+    if (sh) { this.LVP = this.sunBox(E, cam); if (sh.n) this.shadowPass(t); }
+    gl.viewport(0, 0, w, h);
     const fog = clear === 'transparent' ? null : E.fog;
     if (fog) gl.clearColor(fog[0], fog[1], fog[2], 1); else gl.clearColor(0, 0, 0, 0);
     gl.depthMask(true);
@@ -3901,8 +4070,16 @@ class GLR {
     gl.uniform3fv(u.uCam, cam.eye);
     const fogNear = cam.fogNear || 1e5, fogFar = cam.fogFar || 2e5;
     gl.uniform2f(u.uFog, fogNear, fogFar); gl.uniform3fv(u.uFogCol, E.fog);
-    gl.uniform4f(u.uTint, 1, 1, 1, 1); this.tint = [1, 1, 1, 1]; this.unlit = 0;
-    gl.uniform1f(u.uSpec, 0); gl.uniform1f(u.uRim, 0); gl.uniform1f(u.uTexOn, 0); gl.uniform1i(u.uTex, 0);
+    gl.uniform4f(u.uTint, 1, 1, 1, 1); this.tint = [1, 1, 1, 1]; this.tintA = 1; this.unlit = 0;
+    gl.uniform1f(u.uSpec, 0); gl.uniform1f(u.uRim, 0); gl.uniform1f(u.uTexOn, 0); gl.uniform1i(u.uTex, 0); gl.uniform1f(u.uWater, 0); gl.uniform1f(u.uWaterT, t % 1000);
+    gl.uniform4f(u.uIris, -1, 0, 0, 0); gl.uniform3f(u.uBend, 0, 0, 0);
+    gl.uniform4f(u.uLook, LOOK3.edge, LOOK3.sat, LOOK3.contrast, 0);
+    gl.uniform1i(u.uShadow, 1);
+    if (sh) {
+      gl.uniformMatrix4fv(u.uLVP, false, this.LVP);
+      gl.uniform4f(u.uShP, 1 / sh.size, LOOK3.shadow * (1 - 0.5 * ev) * (cam.shadowK == null ? 1 : cam.shadowK), 1, LOOK3.bias);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, sh.tex); gl.activeTexture(gl.TEXTURE0);
+    } else { gl.uniformMatrix4fv(u.uLVP, false, IDENT3); gl.uniform4f(u.uShP, 0, 0, 0, 0); }
     this.E = E; this.fogNear = fogNear; this.fogFar = fogFar;
     this.mode('opaque');
   }
@@ -3913,14 +4090,19 @@ class GLR {
     else if (m === 'blend') { gl.enable(gl.BLEND); gl.depthMask(false); gl.depthFunc(gl.LESS); }
     else if (m === 'xray') { gl.enable(gl.BLEND); gl.depthMask(false); gl.depthFunc(gl.GREATER); }
   }
-  setLook(spec, rim) { const gl = this.gl, u = this.p.u; gl.uniform1f(u.uSpec, spec || 0); gl.uniform1f(u.uRim, rim || 0); }
+  setLook(spec, rim, water) { const gl = this.gl, u = this.p.u; gl.uniform1f(u.uSpec, spec || 0); gl.uniform1f(u.uRim, rim || 0); gl.uniform1f(u.uWater, water && LOOK3.water ? 1 : 0); }
   setTint(r, g, b, a, unlit) {
     const gl = this.gl, u = this.p.u;
     gl.uniform4f(u.uTint, r, g, b, a); gl.uniform1f(u.uUnlit, unlit || 0);
+    this.tintA = a; this.unlit = unlit || 0;
   }
   draw(mesh, m) {
     if (!mesh || !mesh.n) return;
-    const gl = this.gl;
+    const gl = this.gl, s = this.sh;
+    if (s && this.curMode === 'opaque' && this.tintA > 0.99 && this.unlit < 0.3 && !this.inDecal) {          // (solid things cast shadows next frame)
+      if ((s.n + 1) * 16 > s.mat.length) { const g = new Float32Array(s.mat.length * 2); g.set(s.mat); s.mat = g; }
+      s.mat.set(m || IDENT3, s.n * 16); s.mesh[s.n++] = mesh;
+    }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buf(mesh));
     gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
     gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.BYTE, true, 24, 12);
@@ -3993,23 +4175,28 @@ class GLR {
     return tx;
   }
   // a patch lying just above a head, showing one frame of its face picture (uv = [x, y, w, h] in the picture)
-  decal(mesh, tex, uv, m) {
+  // iris: [x, y] of the iris frame and how far it moves [dx, dy] (open eyes that look about), or nothing
+  decal(mesh, tex, uv, m, iris) {
     if (this.curMode === 'xray') return;
     const gl = this.gl, u = this.p.u, prev = this.curMode;
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.uniform1f(u.uTexOn, 1); gl.uniform4f(u.uUV, uv[0], uv[1], uv[2], uv[3]);
+    if (iris) gl.uniform4f(u.uIris, iris[0], iris[1], iris[2], iris[3]);
     gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
-    this.draw(mesh, m);
+    this.inDecal = true; this.draw(mesh, m); this.inDecal = false;
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.uniform1f(u.uTexOn, 0);
+    if (iris) gl.uniform4f(u.uIris, -1, 0, 0, 0);
     this.mode(prev);
   }
+  // how far the swinging parts (anim 100..101) of the next draws lean, in the world (0, 0, 0: hanging straight)
+  bend(x, y, z) { this.gl.uniform3f(this.p.u.uBend, x || 0, y || 0, z || 0); }
   // textured quads (sign boards): [{tex, buf}] drawn with their own little program
   drawTexQuads(list, light) {
     const gl = this.gl, u = this.tp.u;
     gl.useProgram(this.tp.p);
     gl.uniformMatrix4fv(u.uP, false, this.P); gl.uniformMatrix4fv(u.uV, false, this.V);
     gl.uniform3fv(u.uCam, this.cam.eye); gl.uniform2f(u.uFog, this.fogNear, this.fogFar); gl.uniform3fv(u.uFogCol, this.E.fog);
-    gl.uniform1f(u.uLight, light); gl.uniform1i(u.uTex, 0);
+    gl.uniform1f(u.uLight, light); gl.uniform1i(u.uTex, 0); gl.uniform4f(u.uLook, LOOK3.edge, LOOK3.sat, LOOK3.contrast, 0);
     gl.disableVertexAttribArray(2); gl.disableVertexAttribArray(3);
     gl.vertexAttrib4f(2, 1, 1, 1, 1); gl.vertexAttrib1f(3, 0);
     for (const q of list) {
@@ -4594,8 +4781,9 @@ function build3DWorld() {
     if (inKeep(x, z, 6) || blockedAt(x, z) || shoreC(x, z) < 62) continue;
     const mb = chunk(x, z);
     if (R2() < 0.55) {
-      mb.color(R2() < 0.5 ? '#74c250' : '#86d15c');
+      mb.color(R2() < 0.5 ? '#74c250' : '#86d15c'); mb.swayK = 0.12; mb.swayBase = 0;          // (the blades' tips sway in the wind)
       for (const a of [0, 2.1, 4.2]) { const dx = Math.cos(a) * 3, dz = Math.sin(a) * 3; mb.tri([x - dx, 0, z - dz], [x + dx, 0, z + dz], [x + dx * 0.3, 9, z + dz * 0.3]); mb.tri([x + dx, 0, z + dz], [x - dx, 0, z - dz], [x + dx * 0.3, 9, z + dz * 0.3]); }
+      mb.swayK = 0;
     } else {
       const col = FL[(R2() * FL.length) | 0];
       mb.color('#5cb84a').cyl(x, 0, z, 0.8, 0.8, 6, 3, { top: false });
@@ -4609,12 +4797,13 @@ function build3DWorld() {
     const x = R3() * W, z = R3() * H;
     if (!freeAt(x, z, 4)) continue;
     const mb = chunk(x, z), gy = groundH3(x, z), n = 4 + ((R3() * 4) | 0), tall = 6 + R3() * 6;
-    mb.color(GRASS[(R3() * GRASS.length) | 0]);
+    mb.color(GRASS[(R3() * GRASS.length) | 0]); mb.swayK = 0.12; mb.swayBase = gy;
     for (let k = 0; k < n; k++) {
       const a = R3() * TAU, r = R3() * 2.6, bx = x + Math.cos(a) * r, bz = z + Math.sin(a) * r, hgt = tall * (0.6 + R3() * 0.6), lean = (R3() - 0.3) * 3;
       const la = R3() * TAU, dx = Math.cos(la) * 1.1, dz = Math.sin(la) * 1.1, tip = [bx + lean * Math.cos(a), gy + hgt, bz + lean * Math.sin(a)];
       mb.tri([bx - dx, gy, bz - dz], [bx + dx, gy, bz + dz], tip); mb.tri([bx + dx, gy, bz + dz], [bx - dx, gy, bz - dz], tip);
     }
+    mb.swayK = 0;
   }
   for (let i = 0; i < 420; i++) {                  // clover: little three-leaf patches, some with a white flower
     const x = R3() * W, z = R3() * H;
@@ -4808,14 +4997,28 @@ function headMesh3(mb, d, col) {
   for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) mb.quad(G[j][i], G[j][i + 1], G[j + 1][i + 1], G[j + 1][i]);
 }
 
-/* ---- painted faces ---- */
-const FACE_W = 512, FACE_H = 256;
+/* ---- painted faces ----
+   One picture per face, in frames: the eyes (both eyes with the blush and the brows) and the mouth. The open and half-open eyes are
+   painted without their irises: the iris has a frame of its own, which the shader lays over the eye's white, moved a little toward
+   where the eyes look (gaze3), so the eyes can glance about. */
+const FACE_W = 512, FACE_H = 512;
 const EYE_U3 = [-0.98, 0.98], EYE_V3 = [-0.42, 0.44], MOUTH_U3 = [-0.5, 0.5], MOUTH_V3 = [-0.84, -0.3];
-const EYE_FR3 = { open: [2, 2], half: [258, 2], closed: [2, 106], happy: [258, 106] };            // 252 x 100 each
-const MOUTH_FR3 = { smile: [2, 210], open: [130, 210], wide: [258, 210], o: [386, 210] };          // 124 x 44 each
+const EYE_FR3 = { open: [2, 2], iris: [258, 2], half: [2, 106], closed: [258, 106], happy: [2, 210], laugh: [258, 210], surprised: [2, 314], wink: [258, 314] };          // 252 x 100 each
+const MOUTH_FR3 = { smile: [2, 418], open: [130, 418], wide: [258, 418], o: [386, 418], hmm: [2, 464], laugh: [130, 464] };          // 124 x 44 each
 const FACE_UV3 = { eyes: {}, mouth: {} };
 for (const k in EYE_FR3) FACE_UV3.eyes[k] = [EYE_FR3[k][0] / FACE_W, EYE_FR3[k][1] / FACE_H, 252 / FACE_W, 100 / FACE_H];
 for (const k in MOUTH_FR3) FACE_UV3.mouth[k] = [MOUTH_FR3[k][0] / FACE_W, MOUTH_FR3[k][1] / FACE_H, 124 / FACE_W, 44 / FACE_H];
+const GAZE3 = { def: [0.075, 0.065], small: [0.05, 0.045], batu: [0.045, 0.04] };          // how far an iris can move (head angles: sideways, up and down)
+const BROW_UP3 = { happy: 0.035, laugh: 0.03, surprised: 0.085, wink: 0.02 };          // how far the brows go up with each look
+// where the iris frame is and how far it moves for eyes looking at (gx, gy) (-1..1 each way; + is toward the model's +X, and up)
+const IRIS_UV3 = [0, 0, 0, 0];
+function irisUV3(F, gx, gy) {
+  const A = F.batu ? GAZE3.batu : F.small ? GAZE3.small : GAZE3.def, u = FACE_UV3.eyes.iris;
+  IRIS_UV3[0] = u[0]; IRIS_UV3[1] = u[1];
+  IRIS_UV3[2] = clamp(gx, -1, 1) * A[0] / (EYE_U3[1] - EYE_U3[0]) * u[2];
+  IRIS_UV3[3] = -clamp(gy, -1, 1) * A[1] / (EYE_V3[1] - EYE_V3[0]) * u[3];
+  return IRIS_UV3;
+}
 const FACE_CV = new Map();
 // F: { skin, lashes, freckles, brows, iris }. Drawn in head angles (radians), so round things stay round on the head.
 function paintFace3(F) {
@@ -4833,33 +5036,37 @@ function paintFace3(F) {
   };
   const line = (w, col) => { g.lineWidth = w; g.strokeStyle = col; g.stroke(); };
   const LID = '#4a2412', RIM = '#6b3a22', EX = 0.37, RX = 0.215, RY = 0.25;
-  const cheeks = (happy) => {
+  const cheeks = (up) => {          // the blush, freckles and brows (up: how far the brows lift)
     for (const s of [-1, 1]) {
       const gr = g.createRadialGradient(s * 0.63, -0.25, 0, s * 0.63, -0.25, 0.15);
       gr.addColorStop(0, 'rgba(255,105,125,0.42)'); gr.addColorStop(1, 'rgba(255,105,125,0)');
       if (!F.noBlush) { g.fillStyle = gr; g.beginPath(); g.ellipse(s * 0.63, -0.25, 0.16, 0.1, 0, 0, TAU); g.fill(); }
       if (F.batu) { const gb = g.createRadialGradient(s * 0.74, -0.36, 0, s * 0.74, -0.36, 0.14); gb.addColorStop(0, 'rgba(255,120,120,0.26)'); gb.addColorStop(1, 'rgba(255,120,120,0)'); g.fillStyle = gb; g.beginPath(); g.ellipse(s * 0.74, -0.36, 0.15, 0.08, 0, 0, TAU); g.fill(); }
-      if (F.batu) { const b = happy ? 0.03 : 0; g.beginPath(); g.moveTo(s * 0.25, 0.11 + b); g.quadraticCurveTo(s * 0.47, 0.2 + b, s * 0.7, 0.13 + b); line(0.08, F.brows); continue; }          // (Batuhan Teacher's brows, low)
-      if (F.thick) { const b = happy ? 0.03 : 0, x0 = s * 0.31, x1 = s * 0.66; g.beginPath(); g.moveTo(x0, 0.27 + b); g.quadraticCurveTo(s * 0.48, 0.34 + b, x1, 0.29 + b); line(0.075, '#1e1a1c'); continue; }          // (thick dark brows)
+      if (F.batu) { const b = up * 0.86; g.beginPath(); g.moveTo(s * 0.25, 0.11 + b); g.quadraticCurveTo(s * 0.47, 0.2 + b, s * 0.7, 0.13 + b); line(0.08, F.brows); continue; }          // (Batuhan Teacher's brows, low)
+      if (F.thick) { const b = up * 0.86, x0 = s * 0.31, x1 = s * 0.66; g.beginPath(); g.moveTo(x0, 0.27 + b); g.quadraticCurveTo(s * 0.48, 0.34 + b, x1, 0.29 + b); line(0.075, '#1e1a1c'); continue; }          // (thick dark brows)
       if (F.freckles) { g.fillStyle = 'rgba(150,85,45,0.6)'; for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(s * (0.5 + k * 0.085), -0.15 - (k % 2) * 0.045, 0.02, 0, TAU); g.fill(); } }
-      if (F.brows) { const b = happy ? 0.035 : 0; g.beginPath(); g.moveTo(s * 0.22, 0.31 + b); g.quadraticCurveTo(s * 0.37, 0.37 + b, s * 0.52, 0.31 + b); line(0.05, F.brows); }
+      if (F.brows) { const b = up; g.beginPath(); g.moveTo(s * 0.22, 0.31 + b); g.quadraticCurveTo(s * 0.37, 0.37 + b, s * 0.52, 0.31 + b); line(0.05, F.brows); }
     }
   };
-  const lashes = (s, cx, cy) => {
+  const lashes = (s, cx, cy, rx = RX, ry = RY) => {
     if (!F.lashes) return;
     for (const [a, dx, dy] of [[0.2, 0.075, 0.05], [0.33, 0.045, 0.08]]) {
-      const ang = s > 0 ? a * Math.PI : (1 - a) * Math.PI, px = cx + RX * Math.cos(ang), py = cy + RY * Math.sin(ang);
+      const ang = s > 0 ? a * Math.PI : (1 - a) * Math.PI, px = cx + rx * Math.cos(ang), py = cy + ry * Math.sin(ang);
       g.beginPath(); g.moveTo(px, py); g.lineTo(px + s * dx, py + dy); line(0.035, LID);
     }
   };
+  // one eye (s: -1 the picture's left, 1 its right) in a look: open and half (no iris: see the iris frame), iris (only the iris),
+  // closed, happy (^), laugh (> <), surprised (big and round), wink (the right one shut in a happy curve); full: open with its iris
   const eye = (s, mode) => {
     if (F.small || F.batu) return eyeS(s, mode);
     const cx = s * EX, cy = 0;
     if (F.patch && s > 0) {          // an eye patch, and its strap going up round the head
+      if (mode === 'iris') return;
       g.beginPath(); g.moveTo(cx - 0.55, 0.44); g.lineTo(cx - 0.12, cy + 0.12); g.moveTo(cx + 0.12, cy + 0.14); g.lineTo(cx + 0.6, 0.44); line(0.05, '#1d1c22');
       g.beginPath(); g.ellipse(cx, cy, RX * 1.2, RY * 1.1, 0, 0, TAU); g.fillStyle = '#1d1c22'; g.fill();
       return;
     }
+    if (mode === 'wink') mode = s > 0 ? 'happy' : 'full';
     if (mode === 'closed' || mode === 'happy') {
       g.beginPath();
       if (mode === 'closed') { g.moveTo(cx - 0.19, cy - 0.02); g.quadraticCurveTo(cx, cy - 0.12, cx + 0.19, cy - 0.02); }
@@ -4868,14 +5075,23 @@ function paintFace3(F) {
       if (F.lashes) { const ex = cx + s * 0.19, ey = mode === 'closed' ? cy - 0.02 : cy - 0.07; g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex + s * 0.06, ey + 0.05); line(0.035, LID); }
       return;
     }
+    if (mode === 'laugh') {          // squeezed shut with laughing: > <, the points toward the nose
+      g.beginPath(); g.moveTo(cx + s * 0.15, cy + 0.13); g.lineTo(cx - s * 0.11, cy + 0.01); g.lineTo(cx + s * 0.15, cy - 0.11); line(0.055, LID);
+      return;
+    }
+    const big = mode === 'surprised', rx = big ? RX * 1.12 : RX, ry = big ? RY * 1.15 : RY, k = big ? 0.74 : 1;
+    const iris = () => {          // the iris, a soft shine and two sparkles
+      g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.04 * k, 0.152 * k, 0.19 * k, 0, 0, TAU); g.fillStyle = F.iris; g.fill();
+      g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.12 * k, 0.1 * k, 0.08 * k, 0, 0, TAU); g.fillStyle = 'rgba(255,255,255,0.14)'; g.fill();
+      g.fillStyle = '#ffffff';
+      g.beginPath(); g.arc(cx + 0.06 * k, cy + 0.075 * k, 0.058 * k, 0, TAU); g.fill();
+      g.beginPath(); g.arc(cx - 0.055 * k, cy - 0.1 * k, 0.024 * k, 0, TAU); g.fill();
+    };
+    if (mode === 'iris') { iris(); return; }
     g.save();
-    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, TAU); g.fillStyle = '#ffffff'; g.fill(); g.clip();
-    g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.04, 0.152, 0.19, 0, 0, TAU); g.fillStyle = F.iris; g.fill();
-    g.beginPath(); g.ellipse(cx + s * 0.008, cy - 0.12, 0.1, 0.08, 0, 0, TAU); g.fillStyle = 'rgba(255,255,255,0.14)'; g.fill();
-    g.fillStyle = '#ffffff';
-    g.beginPath(); g.arc(cx + 0.06, cy + 0.075, 0.058, 0, TAU); g.fill();
-    g.beginPath(); g.arc(cx - 0.055, cy - 0.1, 0.024, 0, TAU); g.fill();
-    if (mode === 'half') { g.fillStyle = F.skin; g.fillRect(cx - 0.3, cy + 0.03, 0.6, 0.4); }
+    g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, TAU);
+    if (mode === 'half') { g.clip(); g.beginPath(); g.rect(cx - 0.3, cy - 0.4, 0.6, 0.43); g.fillStyle = '#ffffff'; g.fill(); }          // (the lid down to the middle: the white only below it)
+    else { g.fillStyle = '#ffffff'; g.fill(); if (mode === 'full' || big) { g.clip(); iris(); } }
     g.restore();
     if (mode === 'half') {
       g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, Math.PI * 1.05, Math.PI * 1.95); line(0.026, RIM);
@@ -4883,44 +5099,55 @@ function paintFace3(F) {
       lashes(s, cx, cy - 0.12);
       return;
     }
-    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, TAU); line(0.026, RIM);
-    g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, Math.PI * 0.14, Math.PI * 0.86); line(0.05, LID);
-    lashes(s, cx, cy);
+    g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, TAU); line(0.026, RIM);
+    g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, Math.PI * 0.14, Math.PI * 0.86); line(0.05, LID);
+    lashes(s, cx, cy, rx, ry);
   };
   const eyeS = (s, mode) => {          // small almond eyes (Batuhan Teacher's): a white almond, a round brown iris, a thin dark lid
-    const cx = s * (F.batu ? 0.47 : 0.48), cy = F.batu ? -0.17 : 0.04, rx = F.batu ? 0.215 : 0.17, ry = F.batu ? 0.205 : 0.17;
+    const big = mode === 'surprised', k = big ? 0.78 : 1;
+    const cx = s * (F.batu ? 0.47 : 0.48), cy = F.batu ? -0.17 : 0.04, rx = (F.batu ? 0.215 : 0.17) * (big ? 1.1 : 1), ry = (F.batu ? 0.205 : 0.17) * (big ? 1.22 : 1);
+    if (mode === 'wink') mode = s > 0 ? 'happy' : 'full';
     if (mode === 'closed' || mode === 'happy') {
       g.beginPath();
       if (mode === 'closed') { g.moveTo(cx - 0.15, cy - 0.01); g.quadraticCurveTo(cx, cy - 0.08, cx + 0.15, cy - 0.01); }
       else { g.moveTo(cx - 0.15, cy - 0.05); g.quadraticCurveTo(cx, cy + 0.12, cx + 0.15, cy - 0.05); }
       line(0.045, LID); return;
     }
+    if (mode === 'laugh') { g.beginPath(); g.moveTo(cx + s * 0.13, cy + 0.1); g.lineTo(cx - s * 0.09, cy + 0.01); g.lineTo(cx + s * 0.13, cy - 0.08); line(0.05, LID); return; }          // (> <)
     const almond = () => { g.beginPath(); g.moveTo(cx - rx, cy); g.bezierCurveTo(cx - rx * 0.6, cy + ry * 1.25, cx + rx * 0.6, cy + ry * 1.25, cx + rx, cy); g.bezierCurveTo(cx + rx * 0.6, cy - ry * 1.15, cx - rx * 0.6, cy - ry * 1.15, cx - rx, cy); g.closePath(); };
-    if (F.batu && mode !== 'half') {          // (Batuhan Teacher's: an iris with depth, two sparkles, a fuller lid with a flick)
-      g.save(); almond(); g.fillStyle = '#ffffff'; g.fill(); g.clip();
-      const sh = g.createLinearGradient(0, cy + ry, 0, cy + ry * 0.2); sh.addColorStop(0, 'rgba(120,80,60,0.28)'); sh.addColorStop(1, 'rgba(120,80,60,0)'); g.fillStyle = sh; g.fillRect(cx - rx, cy - ry, rx * 2, ry * 2.4);
-      const ix = cx - s * 0.012, iy = cy - 0.005, ir = 0.17, gi = g.createRadialGradient(ix, iy - 0.05, 0.02, ix, iy, ir);
-      gi.addColorStop(0, '#b07a4c'); gi.addColorStop(0.55, F.iris); gi.addColorStop(1, '#2e1a0e');
-      g.beginPath(); g.arc(ix, iy, ir, 0, TAU); g.fillStyle = gi; g.fill();
-      g.beginPath(); g.arc(ix, iy, 0.078, 0, TAU); g.fillStyle = '#1c100a'; g.fill();
-      g.fillStyle = '#ffffff'; g.beginPath(); g.arc(ix + 0.055, iy + 0.06, 0.05, 0, TAU); g.fill();
-      g.beginPath(); g.arc(ix - 0.06, iy - 0.065, 0.024, 0, TAU); g.fill();
-      g.restore();
+    const iris = () => {
+      if (F.batu) {          // (Batuhan Teacher's: an iris with depth and two sparkles)
+        const ix = cx - s * 0.012, iy = cy - 0.005, ir = 0.17 * k, gi = g.createRadialGradient(ix, iy - 0.05 * k, 0.02 * k, ix, iy, ir);
+        gi.addColorStop(0, '#b07a4c'); gi.addColorStop(0.55, F.iris); gi.addColorStop(1, '#2e1a0e');
+        g.beginPath(); g.arc(ix, iy, ir, 0, TAU); g.fillStyle = gi; g.fill();
+        g.beginPath(); g.arc(ix, iy, 0.078 * k, 0, TAU); g.fillStyle = '#1c100a'; g.fill();
+        g.fillStyle = '#ffffff'; g.beginPath(); g.arc(ix + 0.055 * k, iy + 0.06 * k, 0.05 * k, 0, TAU); g.fill();
+        g.beginPath(); g.arc(ix - 0.06 * k, iy - 0.065 * k, 0.024 * k, 0, TAU); g.fill();
+        return;
+      }
+      g.beginPath(); g.arc(cx - s * 0.015, cy + 0.01, 0.125 * k, 0, TAU); g.fillStyle = F.iris; g.fill();
+      g.beginPath(); g.arc(cx - s * 0.015, cy + 0.01, 0.06 * k, 0, TAU); g.fillStyle = 'rgba(40,24,16,0.55)'; g.fill();
+      g.fillStyle = '#ffffff'; g.beginPath(); g.arc(cx + 0.035 * k, cy + 0.06 * k, 0.03 * k, 0, TAU); g.fill();
+    };
+    if (mode === 'iris') { iris(); return; }
+    g.save(); almond();
+    if (mode === 'half') { g.clip(); g.beginPath(); g.rect(cx - 0.3, cy - 0.4, 0.6, 0.42); g.fillStyle = '#ffffff'; g.fill(); }          // (the lid down to the middle: the white only below it)
+    else {
+      g.fillStyle = '#ffffff'; g.fill(); g.clip();
+      if (F.batu) { const sh = g.createLinearGradient(0, cy + ry, 0, cy + ry * 0.2); sh.addColorStop(0, 'rgba(120,80,60,0.28)'); sh.addColorStop(1, 'rgba(120,80,60,0)'); g.fillStyle = sh; g.fillRect(cx - rx, cy - ry, rx * 2, ry * 2.4); }
+      if (mode === 'full' || big) iris();
+    }
+    g.restore();
+    if (F.batu && mode !== 'half') {          // (Batuhan Teacher's fuller lid, with a flick)
       g.beginPath(); g.moveTo(cx - rx, cy + 0.005); g.bezierCurveTo(cx - rx * 0.6, cy + ry * 1.25, cx + rx * 0.6, cy + ry * 1.25, cx + rx, cy + 0.005); line(0.05, '#2a1810');
       g.beginPath(); g.moveTo(cx + s * rx * 0.95, cy + 0.02); g.lineTo(cx + s * (rx + 0.05), cy + 0.07); line(0.04, '#2a1810');
       return;
     }
-    g.save(); almond(); g.fillStyle = '#ffffff'; g.fill(); g.clip();
-    g.beginPath(); g.arc(cx - s * 0.015, cy + 0.01, F.batu ? 0.165 : 0.125, 0, TAU); g.fillStyle = F.iris; g.fill();
-    g.beginPath(); g.arc(cx - s * 0.015, cy + 0.01, 0.06, 0, TAU); g.fillStyle = 'rgba(40,24,16,0.55)'; g.fill();
-    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(cx + 0.035, cy + 0.06, 0.03, 0, TAU); g.fill();
-    if (mode === 'half') { g.fillStyle = F.skin; g.fillRect(cx - 0.3, cy + 0.02, 0.6, 0.4); }
-    g.restore();
     g.beginPath(); g.moveTo(cx - rx, cy + 0.005); g.bezierCurveTo(cx - rx * 0.6, cy + (mode === 'half' ? 0.04 : ry * 1.25), cx + rx * 0.6, cy + (mode === 'half' ? 0.04 : ry * 1.25), cx + rx, cy + 0.005); line(0.034, '#3a2216');
   };
   for (const k in EYE_FR3) {
     const [x, y] = EYE_FR3[k];
-    frame(x, y, 252, 100, EYE_U3, EYE_V3, () => { cheeks(k === 'happy'); eye(-1, k); eye(1, k); });
+    frame(x, y, 252, 100, EYE_U3, EYE_V3, () => { if (k !== 'iris') cheeks(BROW_UP3[k] || 0); eye(-1, k); eye(1, k); });
   }
   const MC = '#6b2a1a', MI = '#8a2436', TG = '#ff8e9c';
   const openMouth = (w, top, bot) => {
@@ -4944,6 +5171,11 @@ function paintFace3(F) {
   frame(MOUTH_FR3.o[0], MOUTH_FR3.o[1], 124, 44, MOUTH_U3, MOUTH_V3, () => {
     g.beginPath(); g.ellipse(0, -0.56 + mo, 0.075, 0.095, 0, 0, TAU); g.fillStyle = MI; g.fill(); line(0.026, MC);
   });
+  frame(MOUTH_FR3.hmm[0], MOUTH_FR3.hmm[1], 124, 44, MOUTH_U3, MOUTH_V3, () => {          // a crooked little "hmm", off to one side (thinking, or "oops!")
+    const y = F.batu ? -0.6 : -0.52, x = 0.04;
+    g.beginPath(); g.moveTo(x - 0.13, y - 0.012); g.bezierCurveTo(x - 0.05, y + 0.05, x + 0.03, y - 0.06, x + 0.13, y + 0.02); line(0.038, F.batu ? '#4a2418' : MC);
+  });
+  frame(MOUTH_FR3.laugh[0], MOUTH_FR3.laugh[1], 124, 44, MOUTH_U3, MOUTH_V3, () => F.batu ? openMouth(0.17, -0.56, -0.82) : openMouth(0.21, -0.42, -0.81));          // a big laugh
   FACE_CV.set(key, cv);
   return cv;
 }
@@ -5029,6 +5261,7 @@ function hair3(mb, d, L, P) {
     for (let k = 0; k <= ROWS; k++) { const v = e + (top - e) * k / ROWS; vs.push(v); ps.push(pt(u, v, fAt(v) + (k === 0 ? tooth * (S.tips || 0) : 0))); }
     cols.push({ u, e, vs, ps, inner: headPt(d, u, e, 0.985) });
   }
+  if (S.hang != null) { const y0 = headPt(d, 0, S.hang, 1)[1]; mb.bend = (p) => 0.6 * clamp((y0 - p[1]) / (d.hyr * 0.9), 0, 1); }          // (long hair hanging below the ears swings, see sway3)
   for (let c = 0; c < cols.length - 1; c++) {
     const A = cols[c], B = cols[c + 1];
     if (!A || !B) continue;
@@ -5047,6 +5280,7 @@ function hair3(mb, d, L, P) {
     mb.quad(iA, iB, B.ps[0], A.ps[0], tone(-0.18));
     if (S.bald) mb.quad(A.ps[ROWS], B.ps[ROWS], headPt(d, B.u, B.vs[ROWS], 0.985), headPt(d, A.u, A.vs[ROWS], 0.985), tone(-0.1));
   }
+  mb.bend = null;
   if (S.curls) {        // a head of curls: bumps over the shell and small ones along the fringe
     mb.color(base);
     const R = rng(7 + Math.round(base[0] * 90));
@@ -5102,7 +5336,7 @@ function hair3(mb, d, L, P) {
 
 const PERSON3 = new Map();
 function freePerson3(P) {
-  for (const m of [P.legA, P.legB, P.torso, P.armA, P.armB, P.head].concat(P.tails.map((t) => t.mesh), P.extra || []))
+  for (const m of [P.legA, P.legB, P.torso, P.armA, P.armB, P.head, P.hat].concat(P.tails.map((t) => t.mesh), P.extra || []))
     if (m) for (const id in m.gpu) { const R = GLR.all && GLR.all[id]; if (R) R.gl.deleteBuffer(m.gpu[id]); }
 }
 // ---- Batuhan Teacher: a model of his own, from his model sheet (the shared parts, so the poses work the same)
@@ -5219,16 +5453,22 @@ function personModel3(L) {
     mb.color(legCol).lathe(x, 3, 0, [[r * 0.95, 0], [r, (d.hip - 3) * 0.5], [r * 1.08, d.hip - 3]], 10, { cap: false });
     if (L.socks) mb.color(L.socks).lathe(x, 2.6, 0, [[r * 1.14, 0], [r * 1.12, 2.6], [r * 1.03, 3.3]], 10, { cap: false });
     if (L.shorts) mb.color(L.pants).lathe(x, d.hip - 7.5, 0, [[r + 1.6, 0], [r + 1.55, 1], [r + 1, 4.5]], 10, { cap: false });
+    if (L.socks) mb.color(shade3(L.socks, -0.13)).lathe(x, 5.1, 0, [[r * 1.15, 0], [r * 1.1, 0.8]], 10, { cap: false });          // (a ribbed band at the sock's top)
     mb.push(m4s(T3(x, 0, 0), sc, sc, sc));
     mb.color(shoe).sphere(0, 2.3, 1.2, 3.4, 2.7, 5.1, 12, 8, { l1: 0.56, cap: true });
-    mb.color('#f4efe6').sphere(0, 1.1, 1.2, 3.65, 1.15, 5.35, 12, 6);
-    mb.sphere(0, 4.4, 3, 0.8, 0.5, 1.5, 6, 4);
-    if (L.laces) mb.color(L.laces).sphere(0, 4.3, 2.4, 1.7, 0.75, 2.4, 8, 4);          // (white laces over the top)
+    mb.color('#f4efe6').sphere(0, 1.1, 1.2, 3.65, 1.15, 5.35, 12, 6);          // the white sole
+    mb.color('#c4b9ab').sphere(0, 0.45, 1.2, 3.45, 0.5, 5.15, 12, 4);          // its tread, darker underneath
+    mb.color(shade3(shoe, -0.2)).box(-1.2, 2.2, -4.25, 1.2, 4.9, -3.45);          // a heel tab
+    const sk = rgb3(shoe), lc = L.laces || (sk[0] * 0.3 + sk[1] * 0.59 + sk[2] * 0.11 > 0.75 ? '#7a6a5e' : '#ffffff');
+    for (const [z, y] of [[3.0, 4.95], [3.85, 4.72], [4.6, 4.38]]) mb.color(lc).sphere(0, y, z, 1.45, 0.32, 0.42, 6, 3);          // laces: three crossings over the top
     mb.pop();
     P[s < 0 ? 'legA' : 'legB'] = pack(mb);
   }
   // body: turned like a vase; the shirt flares out over the shorts like a little bell
   const tb = new MB(5), b = d.bw, H = d.hip, S = d.sh, bzk = d.bz / d.bw;
+  // what swings (see sway3): a dress's, a coat's or a skirt's hem, a shirt's flared hem a little; never the trousers or the overalls
+  const hem = L.dress ? [H + 4, 10.6, 1] : L.coat ? [H + 2, 12, 0.85] : L.skirt ? [H + 3.6, 9, 1] : L.overalls ? null : [H + 5.5, 8, 0.3];
+  const hemBend = hem ? (p) => (p[1] < hem[0] ? hem[2] * sstep((hem[0] - p[1]) / hem[1]) : 0) : null;
   const low = L.overalls || L.pants || '#4a5a8a', top = L.dress || L.coat || L.shirt || '#ffffff';
   const neck = [[b - 1.1, S - 2.8], [b * 0.62, S + 1.2], [0.01, S + 2.4]];
   let prof;
@@ -5239,8 +5479,11 @@ function personModel3(L) {
   } else {
     tb.lathe(0, 0, 0, [[b * 0.8, H - 6.8], [b * 0.97, H - 5], [b + 0.15, H - 0.5], [b * 0.9, H + 1.5]], 16, { sz: bzk, cols: [C(low)] });
     if (L.skirt) {
+      tb.bend = hemBend;
       tb.color(L.skirt).lathe(0, 0, 0, [[b + 6, H - 5.4], [b + 5.7, H - 4.2], [b + 1.4, H + 3.6]], 16, { sz: bzk, cap: false });
       tb.color(shade3(L.skirt, -0.2)).lathe(0, 0, 0, [[b * 0.7, H - 5.4], [b + 6, H - 5.4]], 16, { sz: bzk, cap: false });
+      tb.color(mixHex3(L.skirt, '#ffffff', 0.62)).lathe(0, 0, 0, [[b + 6.1, H - 4.75], [b + 5.92, H - 4.0]], 16, { sz: bzk, cap: false });          // (a pale stripe near the hem)
+      tb.bend = null;
       prof = [[b + 0.9, H + 2.4], [b + 1.1, H + 5.5], [b + 0.4, S - 7.5]].concat(neck);
     } else if (L.overalls) prof = [[b + 0.7, H - 1.5], [b + 0.7, H + 3], [b + 0.4, S - 7.5]].concat(neck);
     else {
@@ -5265,8 +5508,18 @@ function personModel3(L) {
     if (L.hoodie && j === 0) c = shade3(top, -0.12);
     cols.push(typeof c === 'string' ? C(c) : c.concat(1));
   }
+  if (!L.skirt) tb.bend = hemBend;
   tb.lathe(0, 0, 0, rows, 18, { sz: bzk, cols });
   tb.color(shade3(top, -0.2)).lathe(0, 0, 0, [[b * 0.7, prof[0][1]], [prof[0][0], prof[0][1]]], 18, { sz: bzk, cap: false });   // under the hem
+  if (L.dress) {          // a pale trim round the hem, a ribbon at the waist (when no belt, apron or shawl), polka dots on some
+    tb.color(mixHex3(L.dress, '#ffffff', 0.55)).lathe(0, 0, 0, [[prof[0][0] + 0.12, prof[0][1] - 0.02], [prof[1][0] + 0.14, prof[1][1] + 0.3]], 18, { sz: bzk, cap: false });
+    if (!L.belt && !L.apron && !L.shawl) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(shade3(L.dress, -0.2)).torus(0, H + 4.6, 0, rAt(H + 4.6) + 0.3, 0.85, 18, 5, 'y'); tb.pop(); }
+    if (L.dots) for (const [y, n, o] of [[H - 3.2, 9, 0], [H + 0.6, 8, 0.5]]) for (let i = 0; i < n; i++) {
+      const a = (i + o) / n * TAU, r = rAt(y) + 0.35;
+      tb.push(RY3(T3(Math.sin(a) * r, y, Math.cos(a) * r * bzk), a)); tb.color(L.dots).sphere(0, 0, 0, 1.05, 1.05, 0.3, 6, 4); tb.pop();
+    }
+  }
+  // (from here on, whatever sits low on the clothes, pockets, an apron, the coat's opening, swings with the hem)
   if (L.belt) { tb.push(m4s(m4(), 1, 1, bzk)); tb.color(L.belt).torus(0, H + 4, 0, rAt(H + 4) + 0.5, 1.4, 18, 6, 'y'); tb.pop(); }
   if (L.overalls) {
     const zf = front(H + 3);
@@ -5282,6 +5535,13 @@ function personModel3(L) {
     tb.color(L.shirt || '#8fd3ff').box(-2.6, S - 12, front(S - 9) - 0.5, 2.6, S - 2.5, front(S - 6) + 0.4);   // the shirt in the coat's V
     tb.color(shade3(L.coat, -0.12)).box(-0.5, H - 10, front(H - 2) - 0.2, 0.5, S - 12, front(H) + 0.6);     // the coat's opening
     for (const s of [-1, 1]) tb.color(shade3(L.coat, -0.08)).box(s * 4.2 - 2.4, H - 4, front(H - 2) - 0.3, s * 4.2 + 2.4, H + 0.5, front(H) + 0.5); // pockets
+    for (const s of [-1, 1]) { tb.push(RZ3(T3(s * 3.5, S - 8.5, front(S - 8.5) + 0.3), -s * 0.3)); tb.color(shade3(L.coat, -0.1)).box(-1.1, -4.3, -0.3, 1.1, 4.3, 0.32); tb.pop(); }          // lapels either side of the V
+  }
+  if (d.A && !L.dress && !L.coat && !L.overalls && !L.hoodie && !L.apron && !L.buttons && !L.polo && !L.shawl && !L.cape) {          // a chest pocket on a grown-up's shirt (the wearer's left)
+    const y = S - 13, r = rAt(y), x = b * 0.42, z = Math.sqrt(Math.max(0.1, r * r - x * x)) * bzk;
+    tb.push(RY3(T3(x, y, z), Math.asin(Math.min(0.9, x / r)) * 0.8));
+    tb.color(shade3(top, -0.1)).box(-2.4, -2.8, -0.3, 2.4, 2.2, 0.36); tb.color(shade3(top, -0.24)).box(-2.45, 1.7, -0.25, 2.45, 2.3, 0.46);          // (and its hem)
+    tb.pop();
   }
   if (L.collar) for (const s of [-1, 1]) {          // a shirt's collar: two points either side of the neck
     tb.push(RZ3(T3(s * 2.5, S - 1.9, front(S - 2.2) + 0.5), s * 0.62)); tb.color(L.collar).sphere(0, 0, 0, 2.7, 1.35, 0.75, 8, 5); tb.color(shade3(L.collar, -0.12)).sphere(0, -0.3, -0.25, 2.5, 1.1, 0.6, 8, 4); tb.pop();
@@ -5334,11 +5594,13 @@ function personModel3(L) {
   }
   if (L.shawl) tb.color(L.shawl).lathe(0, 0, 0, [[b + 3.8, S - 10], [b + 2.2, S - 4], [b * 0.66, S + 2.2], [0.01, S + 3.3]], 16, { sz: bzk * 1.08 });
   if (L.cape) {
+    tb.bend = (p) => clamp((S - p[1]) / (S - H + 9), 0, 1);          // (a cape swings from the shoulders down)
     const zt = -d.bz - 1.5, zb = -(b + 8) * bzk - 3, TL = [-b - 1, S, zt], TR = [b + 1, S, zt], BR = [b + 8, H - 9, zb], BL = [-b - 8, H - 9, zb];
     tb.color(L.cape).quad(TL, TR, BR, BL);
     tb.color(shade3(L.cape, -0.25)).quad(TL, BL, BR, TR);
     tb.color(shade3(L.cape, -0.1)).torus(0, S + 0.5, 0, b * 0.62, 1.4, 14, 5, 'y');
   }
+  tb.bend = null;
   P.torso = pack(tb);
   // arms hang from round shoulders: a sleeve, a thin arm and a mitten hand with a thumb
   const long = !!L.hoodie || !!L.coat || !!L.longSleeves;
@@ -5350,6 +5612,7 @@ function personModel3(L) {
       mb.color(shade3(top, -0.14)).lathe(x, y0 - a + 1.4, 0, [[2.6, 0], [2.9, 1.8]], 10, { cap: false });
     } else {
       mb.lathe(x, y0 - 7.2, 0, [[sr + 0.5, 0], [sr + 0.45, 1.1], [sr - 0.1, 7.2]], 12, { cap: false });
+      mb.color(shade3(top, -0.13)).lathe(x, y0 - 7.25, 0, [[sr + 0.6, 0], [sr + 0.56, 0.9]], 12, { cap: false });          // a hem band round the sleeve
       mb.color(skin).lathe(x, y0 - a + 1.5, 0, [[1.95, 0], [2.15, a - 8], [2.35, a - 5.5]], 10, { cap: false });
     }
     mb.color(skin).sphere(x, y0 - a, 0.2, 3.0, 3.3, 2.7, 10, 8);
@@ -5370,58 +5633,59 @@ function personModel3(L) {
   else hb.color(mixHex3(skin, '#ff8a5c', 0.4)).sphere(0, 0, 0, 2.3, 1.5, 2.1, 3, 4, { rot: Math.PI / 2 });
   hb.pop(); hb.pop();
   hair3(hb, d, L, P);
-  const h = L.hat;
-  const visor = (y, z, w, depth, col) => { hb.color(col).sphere(0, y, z, w, 1.3, depth, 16, 6, { l1: 0.5, cap: true }); };
+  const h = L.hat, ht = new MB(9);          // (a hat is a mesh of its own, so it can tip a little as its wearer moves)
+  const visor = (y, z, w, depth, col) => { ht.color(col).sphere(0, y, z, w, 1.3, depth, 16, 6, { l1: 0.5, cap: true }); };
   if (h === 'cap') {          // a shell over the head from the forehead up, a button on top, the visor above the eyes
     const c = L.hatColor || '#ff4d4d', { yb, vb, ecb } = capBand3(d, CAP_K3), NU = 28, NV = 7, F = 1.09;
     const rows = [];
     for (let j = 0; j <= NV; j++) { const v = vb + (Math.PI / 2 - vb) * j / NV, r = []; for (let i = 0; i <= NU; i++) r.push(headPt(d, -Math.PI + TAU * i / NU, v, F)); rows.push(r); }
     const col = C(c), rim = shade3(c, -0.1).concat(1);          // (shade3 gives [r, g, b])
-    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) hb.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], j === 0 ? rim : col);
-    hb.color(c).sphere(0, d.hy + d.hyr * F + 0.6, 0, 2.4, 2, 2.4, 8, 5);
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) ht.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], j === 0 ? rim : col);
+    ht.color(c).sphere(0, d.hy + d.hyr * F + 0.6, 0, 2.4, 2, 2.4, 8, 5);
     visor(yb + 1.6, d.hz * ecb * 1.02, d.hx * ecb * 0.8, hr * 0.42, shade3(c, -0.22));          // a short visor: the face stays in sight from the game's camera
   } else if (h === 'captain') {          // sized to this head (the hair inside it is left out, see hair3)
     const { yb, ecb } = capBand3(d), NU = 32, ax = d.hx * ecb, az = d.hz * ecb;
     const ring = (y, F) => { const r = []; for (let i = 0; i <= NU; i++) { const u = -Math.PI + TAU * i / NU; r.push([ax * F * spow3(Math.sin(u), 0.84), y, az * F * spow3(Math.cos(u), 0.84)]); } return r; };
     const RG = [[0, 1.1], [0.3, 1.12], [0.36, 1.34], [0.48, 1.42], [0.6, 1.3], [0.7, 0.95], [0.75, 0.01]].map(([y, F]) => ring(yb + hr * y, F));
     const COLS = [C('#1f2f5e'), C('#e4e9f0'), C('#ffffff'), C('#ffffff'), C('#ffffff'), C('#ffffff')];
-    for (let j = 0; j < RG.length - 1; j++) for (let i = 0; i < NU; i++) hb.quad(RG[j][i], RG[j][i + 1], RG[j + 1][i + 1], RG[j + 1][i], COLS[j]);
+    for (let j = 0; j < RG.length - 1; j++) for (let i = 0; i < NU; i++) ht.quad(RG[j][i], RG[j][i + 1], RG[j + 1][i + 1], RG[j + 1][i], COLS[j]);
     visor(yb + 0.6, az * 1.04, ax * 0.8, hr * 0.56, '#222222');
-    hb.color('#ffd23c').sphere(0, yb + hr * 0.15, az * 1.12 + 0.3, 2.8, 2.6, 1.3, 10, 6);
+    ht.color('#ffd23c').sphere(0, yb + hr * 0.15, az * 1.12 + 0.3, 2.8, 2.6, 1.3, 10, 6);
   } else if (h === 'tricorn') {          // a pirate's three-cornered hat: a crown over the head, the brim turned up in three walls, a gold edge
     const { yb, vb, ecb } = capBand3(d, CAP_K3), NU = 24, NV = 5, F = 1.1, R0 = Math.max(d.hx, d.hz) * ecb * 2.15, dark = C('#2b2530'), gold = C('#d9b25a');
     const rows = [];
     for (let j = 0; j <= NV; j++) { const v = vb + (Math.PI / 2 - vb) * j / NV, r = []; for (let i = 0; i <= NU; i++) r.push(headPt(d, -Math.PI + TAU * i / NU, v, F)); rows.push(r); }
-    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) hb.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], dark);
+    for (let j = 0; j < NV; j++) for (let i = 0; i < NU; i++) ht.quad(rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i], dark);
     const cor = [0, 1, 2].map((k) => [Math.sin(k * TAU / 3) * R0, Math.cos(k * TAU / 3) * R0]), N = 8;
     for (let k = 0; k < 3; k++) {
       const A = cor[k], B = cor[(k + 1) % 3], at = (s) => [A[0] + (B[0] - A[0]) * s, A[1] + (B[1] - A[1]) * s, Math.sin(Math.PI * s)];
       const lo = (q) => [q[0], yb - 0.5, q[1]], hi = (q) => [q[0] * 1.06, yb + 7 + q[2] * 3.5, q[1] * 1.06], up = (p) => [p[0], p[1] + 1.3, p[2]];
       for (let i = 0; i < N; i++) {
         const a = at(i / N), b = at((i + 1) / N);
-        hb.quad(lo(a), lo(b), hi(b), hi(a), dark); hb.quad(lo(b), lo(a), hi(a), hi(b), dark);
-        hb.quad(hi(a), hi(b), up(hi(b)), up(hi(a)), gold); hb.quad(hi(b), hi(a), up(hi(a)), up(hi(b)), gold);
-        hb.tri([0, yb - 0.6, 0], lo(b), lo(a), dark); hb.tri([0, yb - 0.6, 0], lo(a), lo(b), dark);
+        ht.quad(lo(a), lo(b), hi(b), hi(a), dark); ht.quad(lo(b), lo(a), hi(a), hi(b), dark);
+        ht.quad(hi(a), hi(b), up(hi(b)), up(hi(a)), gold); ht.quad(hi(b), hi(a), up(hi(a)), up(hi(b)), gold);
+        ht.tri([0, yb - 0.6, 0], lo(b), lo(a), dark); ht.tri([0, yb - 0.6, 0], lo(a), lo(b), dark);
       }
     }
-    hb.color('#f4f1e8').sphere(0, yb + hr * 0.3, d.hz * ecb * F + 0.6, 2.6, 2.6, 1.2, 8, 5);          // a little skull badge in front
+    ht.color('#f4f1e8').sphere(0, yb + hr * 0.3, d.hz * ecb * F + 0.6, 2.6, 2.6, 1.2, 8, 5);          // a little skull badge in front
   } else if (h === 'straw') {
     const y0 = hy + hr * 0.5;
-    hb.color('#f2cf6b').lathe(0, y0, 0, [[hr * 1.8, -0.8], [hr * 1.74, 0.8], [hr * 0.98, 2.2], [0.01, 2.4]], 22);
-    hb.color('#f6d77e').lathe(0, y0 + 2, 0, [[hr * 0.95, 0], [hr * 0.88, hr * 0.5], [hr * 0.6, hr * 0.62], [0.01, hr * 0.64]], 18);
-    hb.color('#e8503a').lathe(0, y0 + 2, 0, [[hr * 0.965, 0], [hr * 0.94, 4]], 18, { cap: false });
+    ht.color('#f2cf6b').lathe(0, y0, 0, [[hr * 1.8, -0.8], [hr * 1.74, 0.8], [hr * 0.98, 2.2], [0.01, 2.4]], 22);
+    ht.color('#f6d77e').lathe(0, y0 + 2, 0, [[hr * 0.95, 0], [hr * 0.88, hr * 0.5], [hr * 0.6, hr * 0.62], [0.01, hr * 0.64]], 18);
+    ht.color('#e8503a').lathe(0, y0 + 2, 0, [[hr * 0.965, 0], [hr * 0.94, 4]], 18, { cap: false });
   } else if (h === 'bucket') {
     const y0 = hy + hr * 0.42;
-    hb.color('#3d8fe0').lathe(0, y0, 0, [[hr * 1.5, -2.5], [hr * 1.44, -1], [hr * 1.02, 1.2], [0.01, 1.4]], 20);
-    hb.color('#4aa3ff').sphere(0, y0, 0, hr * 1.06, hr * 0.92, hr * 1.06, 18, 12, { l1: 0.5 });
-    hb.push(surfH(d, 0, 0.62, 3.2)); hb.color('#ffd23c').sphere(0, 0, 0, 3.4, 3.4, 1.4, 8, 5); hb.pop();
+    ht.color('#3d8fe0').lathe(0, y0, 0, [[hr * 1.5, -2.5], [hr * 1.44, -1], [hr * 1.02, 1.2], [0.01, 1.4]], 20);
+    ht.color('#4aa3ff').sphere(0, y0, 0, hr * 1.06, hr * 0.92, hr * 1.06, 18, 12, { l1: 0.5 });
+    ht.push(surfH(d, 0, 0.62, 3.2)); ht.color('#ffd23c').sphere(0, 0, 0, 3.4, 3.4, 1.4, 8, 5); ht.pop();
   } else if (h === 'crown') {
     const y0 = hy + hr * 0.84;
-    hb.color('#ffd23c').lathe(0, y0, 0, [[hr * 0.66, 0], [hr * 0.7, 7]], 16, { cap: false });
-    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU + Math.PI / 2; hb.cone(Math.cos(a) * hr * 0.65, y0 + 7, Math.sin(a) * hr * 0.65, 2.8, 8, 8); hb.sphere(Math.cos(a) * hr * 0.65, y0 + 15.3, Math.sin(a) * hr * 0.65, 1.3, 1.3, 1.3, 6, 4); }
+    ht.color('#ffd23c').lathe(0, y0, 0, [[hr * 0.66, 0], [hr * 0.7, 7]], 16, { cap: false });
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU + Math.PI / 2; ht.cone(Math.cos(a) * hr * 0.65, y0 + 7, Math.sin(a) * hr * 0.65, 2.8, 8, 8); ht.sphere(Math.cos(a) * hr * 0.65, y0 + 15.3, Math.sin(a) * hr * 0.65, 1.3, 1.3, 1.3, 6, 4); }
     const J = ['#ff5a8a', '#4aa3ff', '#4cc36a'];
-    for (let k = 0; k < 3; k++) { const a = Math.PI / 2 + (k - 1) * 0.7; hb.color(J[k]).sphere(Math.cos(a) * hr * 0.71, y0 + 3.5, Math.sin(a) * hr * 0.71, 1.8, 1.8, 1.8, 8, 5); }
+    for (let k = 0; k < 3; k++) { const a = Math.PI / 2 + (k - 1) * 0.7; ht.color(J[k]).sphere(Math.cos(a) * hr * 0.71, y0 + 3.5, Math.sin(a) * hr * 0.71, 1.8, 1.8, 1.8, 8, 5); }
   }
+  if (ht.a.length) { P.hat = pack(ht); P.hatY = h === 'straw' ? hy + hr * 0.5 : h === 'bucket' ? hy + hr * 0.42 : h === 'crown' ? hy + hr * 0.84 : capBand3(d, h === 'captain' ? 0 : CAP_K3).yb; }          // (it tips about its band)
   if (L.flower) { hb.push(surfH(d, 0.95, 0.55, 1.6)); for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; hb.color(L.flower).sphere(Math.cos(a) * 3.4, Math.sin(a) * 3.4, 0, 2.6, 2.6, 1.4, 8, 5); } hb.color('#ff8c42').sphere(0, 0, 0.8, 1.8, 1.8, 1.2, 8, 5); hb.pop(); }
   if (L.glasses) {
     const gc = L.glassesColor || '#7a4ab0';
@@ -5452,13 +5716,113 @@ function personModel3(L) {
 }
 function mixHex3(a, b, k) { const x = rgb3(a), y = rgb3(b); return [x[0] + (y[0] - x[0]) * k, x[1] + (y[1] - x[1]) * k, x[2] + (y[2] - x[2]) * k]; }
 
-/* ---- how a person stands, walks and talks at time t (the same t always gives the same pose) ----
-   st: { t, seed, mv (0 standing .. 1 walking) or moving, phase, talk, wave, closed, still } */
+/* ---- faces that go with the words: what a line sounds like, for the speaker's face while they say it ---- */
+const nowS = () => performance.now() / 1000;
+const MOOD3 = { mood: null, t0: 0 };          // the line being said now (set by Speech.speak)
+function moodOf3(text) {
+  const s = String(text || '');
+  if (/\b(ha ?ha|he ?he|hee hee|ho ho)\b/i.test(s)) return 'laugh';
+  if (/^\W*(oh|ooh|wow|whoa|what|really|oops|uh-oh|huh)\b/i.test(s)) return 'surprised';
+  if (/^\W*(yes|yay|great|hooray|well done|good job|super|excellent|brilliant|perfect|amazing|fantastic|correct|awesome|wonderful|thank)/i.test(s)) return 'happy';
+  if (/\?/.test(s)) return 'think';
+  return null;
+}
+/* ---- reactions: a short burst of feeling over whatever a person is doing (joy: jump and clap, think: a hand under the chin,
+   oops: scratch the head with a sheepish grin; never a sad face) ---- */
+const REACT3 = new Map();          // a look -> { kind, t0 (seconds, nowS) }
+const REACT_LEN3 = { joy: 1.7, think: 2.4, oops: 1.6 };
+function react3(who, kind) {
+  const L = who === 'player' ? PLAYER_LOOK : typeof who === 'string' ? LOOKS[who] : who;
+  if (L && REACT_LEN3[kind]) REACT3.set(L, { kind, t0: nowS() });
+}
+function reactPose3(q, kind, a, len, kid, seated) {
+  const e = sstep(a / 0.16) * sstep((len - a) / 0.3), mix = (v, w) => v + (w - v) * e;
+  if (kind === 'joy') {          // a jump or two, and clapping in front
+    const hop = a < len - 0.35 ? Math.abs(Math.sin(a * Math.PI * 2.4)) : 0, up = (kid ? 6.5 : 4) * hop * e;
+    if (seated) q.y += 0.6 * hop * e; else { q.y += up; q.liftA += up; q.liftB += up; }
+    const clap = 0.5 + 0.5 * Math.cos(a * 23);
+    q.armAx = mix(q.armAx, -1.45); q.armBx = mix(q.armBx, -1.45); q.armAz = mix(q.armAz, 0.04); q.armBz = mix(q.armBz, -0.04);
+    q.armAy += (0.28 + 0.24 * clap) * e; q.armBy -= (0.28 + 0.24 * clap) * e;
+    q.hPitch -= 0.1 * e; q.eyes = hop > 0.55 ? 'laugh' : 'happy'; q.mouth = hop > 0.3 ? 'laugh' : 'wide';
+    q.gT = [0, 0.4, e];
+  } else if (kind === 'think') {          // hmm... a hand up to the chin, the other arm across the tummy, the eyes up to one side
+    q.armBx = mix(q.armBx, (kid ? -1.8 : -1.82) + 0.05 * Math.sin(a * 9)); q.armBz = mix(q.armBz, 0.02); q.armBy -= (kid ? 0.48 : 0.62) * e;          // (the arm's reach to the chin, worked out for each body)
+    q.armAx = mix(q.armAx, -1.0); q.armAz = mix(q.armAz, 0.05); q.armAy += 0.45 * e;
+    q.hRoll -= 0.1 * e; q.hYaw += 0.1 * e; q.hPitch -= 0.05 * e;
+    q.mouth = 'hmm'; q.gT = [0.85, 0.9, e];
+  } else if (kind === 'oops') {          // a scratch at the side of the head and a wink: oops, never mind!
+    q.armBz = mix(q.armBz, (kid ? 2.25 : 2.66) + 0.07 * Math.sin(a * 26)); q.armBx = mix(q.armBx, kid ? -0.23 : -0.3); q.armBy *= 1 - e;          // (the hand just touching the side of the head, worked out for each body)
+    q.hRoll += 0.04 * e; q.hPitch += 0.04 * e;
+    if (e > 0.3) { q.eyes = 'wink'; q.mouth = 'hmm'; }
+  }
+}
+/* ---- where the eyes look: q.gx, q.gy (-1..1 of the way the iris can move; + is toward the model's +X, and up).
+   At st.look (someone to look at: { x, y } on the map, or a person with .look) when there is one, else ahead; little jumps every
+   second or so, like real glances; q.gLx / q.gLy: the eyes leading a turn of the head; q.gT: [x, y, weight] where they must go ---- */
+const EYE_H3 = (L) => (L.model ? 64 : L.age === 'adult' ? 59 : 45) * (L.size || 1);
+function gaze3(q, L, st) {
+  if (st.still && !q.gT) return;
+  const t = st.t || 0, sd = st.seed || 0, tg = st.look;
+  let bx = 0, by = (st.mv != null ? st.mv : st.moving ? 1 : 0) > 0.5 ? -0.12 : 0, aim = !!st.talk;
+  if (tg && st.x != null) {
+    const yw = st.yaw || 0, c = Math.cos(yw), s = Math.sin(yw), dx = tg.x - st.x, dz = (tg.z != null ? tg.z : tg.y) - st.z;
+    const lx = dx * c - dz * s, lz = dx * s + dz * c, a = Math.atan2(lx, lz) - q.hYaw - q.twist;
+    if (Math.abs(a) < 1.7) {
+      const TL = tg.look || (tg === player ? PLAYER_LOOK : null), dy = TL ? (EYE_H3(TL) - EYE_H3(L)) * (st.scale || 1) : 0;
+      bx = clamp(a / 0.75, -1, 1); by = clamp((Math.atan2(dy, Math.max(20, Math.hypot(lx, lz))) + q.hPitch) / 0.45, -1, 1); aim = true;
+    }
+  }
+  const k = t / 1.35 + 0.35 * Math.sin(t * 0.61 + sd * 2.9) + sd * 1.7, slot = Math.floor(k);
+  const pick = (n) => {
+    const h = hash1(n * 5.31 + sd * 9.7), h2 = hash1(n * 2.17 + sd * 3.3), h3 = hash1(n * 8.9 + sd * 0.7);
+    if (aim) return h3 < 0.16 ? [(h < 0.5 ? -1 : 1) * (0.5 + h2 * 0.4), (h2 - 0.6) * 0.5] : [bx + (h - 0.5) * 0.26, by + (h2 - 0.5) * 0.2];          // mostly at them, now and then away
+    if (h3 < 0.55) return [bx + (h - 0.5) * 0.3, by + (h2 - 0.55) * 0.3];          // ahead
+    return [(h < 0.5 ? -1 : 1) * (0.5 + h2 * 0.5), by + (h3 - 0.78) * 1.4];          // a glance to one side
+  };
+  const A = pick(slot - 1), B = pick(slot), w = sstep((k - slot) / 0.05);
+  let gx = A[0] + (B[0] - A[0]) * w, gy = A[1] + (B[1] - A[1]) * w;
+  if (q.gLx) gx = gx * (1 - Math.abs(q.gLx)) + q.gLx;
+  if (q.gLy) gy = gy * (1 - Math.abs(q.gLy)) + q.gLy;
+  if (q.gT) { gx += (q.gT[0] - gx) * q.gT[2]; gy += (q.gT[1] - gy) * q.gT[2]; }
+  q.gx = clamp(gx, -1, 1); q.gy = clamp(gy, -1, 1);
+}
+/* ---- clothes and hair that swing behind a moving person: a damped spring per person (ox, oz: the swing on the map, in world
+   units), pushed by the body's changes of speed, so a hem, a hat or a ponytail swings out, overshoots a little and settles ---- */
+const SWAY3 = new WeakMap();
+function sway3(L, st) {
+  if (st.still || st.x == null) return null;
+  let M = SWAY3.get(L); if (!M) SWAY3.set(L, M = new Map());
+  const key = st.seed || 0, t = st.t || 0, x = st.x, z = st.z;
+  let s = M.get(key);
+  if (!s || t < s.t || t - s.t > 0.25 || Math.abs(x - s.x) + Math.abs(z - s.z) > 80) {          // (new, or after a jump: hanging straight)
+    if (!s) M.set(key, s = {});
+    return Object.assign(s, { t, x, z, vx: 0, vz: 0, ox: 0, oz: 0, wx: 0, wz: 0 });
+  }
+  const dt = t - s.t;
+  if (dt <= 0) return s;          // (the same moment drawn again: the same swing)
+  const vx = (x - s.x) / dt, vz = (z - s.z) / dt;
+  s.wx -= (vx - s.vx) * 0.32; s.wz -= (vz - s.vz) * 0.32;          // a start throws it back, a stop forward
+  const n = Math.min(8, Math.ceil(dt / 0.017)), h = dt / n;
+  for (let i = 0; i < n; i++) {
+    s.wx += (-170 * s.ox - 9 * s.wx - 1.6 * vx) * h; s.wz += (-170 * s.oz - 9 * s.wz - 1.6 * vz) * h;          // (and walking, it trails a little behind)
+    s.ox += s.wx * h; s.oz += s.wz * h;
+  }
+  const r = Math.hypot(s.ox, s.oz); if (r > 4) { s.ox *= 4 / r; s.oz *= 4 / r; }
+  s.t = t; s.x = x; s.z = z; s.vx = vx; s.vz = vz;
+  return s;
+}
+// Batuhan Teacher's own little moves (for the idle slots 0..8): looks round, checks his watch, tilts his head, winks, yawns, looks down
+const IDLE_TEACHER3 = [0, 1, 9, 3, 10, 6, 9, 7, 2];
+
+/* ---- how a person stands, walks and talks at time t (the same t always gives the same pose; reactions and the face that goes
+   with a line run on their own clock) ----
+   st: { t, seed, mv (0 standing .. 1 walking) or moving, phase, talk, mood, wave, closed, still, look, react: { kind, age } } */
 function pose3(L, st) {
   const t = st.t || 0, sd = st.seed || 0, kid = L.age !== 'adult';
   const mv = st.mv != null ? st.mv : st.moving ? 1 : 0, ph = st.phase || 0, id = 1 - mv;
   const q = { y: 0, tx: 0, roll: 0, lean: 0, twist: 0, br: 0, legA: 0, legB: 0, liftA: 0, liftB: 0,
-    armAx: 0, armAz: kid ? -0.36 : -0.26, armBx: 0, armBz: kid ? 0.36 : 0.26, hYaw: 0, hPitch: 0, hRoll: 0, tailX: 0, tailZ: 0, eyes: 'open', mouth: 'smile' };
+    armAx: 0, armAy: 0, armAz: kid ? -0.36 : -0.26, armBx: 0, armBy: 0, armBz: kid ? 0.36 : 0.26, hYaw: 0, hPitch: 0, hRoll: 0, tailX: 0, tailZ: 0,
+    eyes: 'open', mouth: 'smile', gx: 0, gy: 0 };
   if (id > 0) {
     const br = Math.sin(t * 2.1 + sd), ws = Math.sin(t * 0.55 + sd * 1.7);
     q.br = br * id; q.roll = ws * 0.03 * id; q.tx = ws * 0.5 * id; q.hRoll = -ws * 0.035 * id; q.hPitch = br * 0.012 * id;
@@ -5470,14 +5834,26 @@ function pose3(L, st) {
       const k = (t + sd * 3.1) / 4.6, slot = Math.floor(k), f = k - slot;
       const h = hash1(slot * 7.13 + sd * 13.7), dir = hash1(slot * 3.7 + sd * 5.1) < 0.5 ? -1 : 1;
       const e = sstep(f / 0.14) * sstep((0.64 - f) / 0.14) * id;
-      switch (Math.floor(h * 9)) {
-        case 1: case 2: q.hYaw += dir * 0.55 * e; q.hPitch -= 0.05 * e; q.twist += dir * 0.08 * e; break;
+      let c = Math.floor(h * 9);
+      if (L.model) c = IDLE_TEACHER3[c];
+      else if (kid) { if (c === 4) c = 12; else if (c === 5) c = 13; }          // (children hop, and stand on tiptoe)
+      else if (c === 4) c = 14;          // (grown-ups stretch with their hands on their backs)
+      switch (c) {
+        case 1: case 2: q.hYaw += dir * 0.55 * e; q.hPitch -= 0.05 * e; q.twist += dir * 0.08 * e; q.gLx = dir * e; break;          // (the eyes go first)
         case 3: q.hRoll += dir * 0.22 * e; q.armAz -= 0.1 * e; q.armBz += 0.1 * e; if (e > 0.5) q.eyes = 'happy'; break;
         case 4: { const b = Math.abs(Math.sin(f * Math.PI * 7)) * e; q.y += (kid ? 2.2 : 1.2) * b; q.armAz -= 0.35 * e; q.armBz += 0.35 * e; q.tailX -= 0.3 * b; if (e > 0.5) q.eyes = 'happy'; break; }
         case 5: { const r = Math.sin(f * Math.PI * 5) * e; q.lean += 0.07 * r; q.armAx += 0.55 * e; q.armBx += 0.55 * e; q.armAz += 0.16 * e; q.armBz -= 0.16 * e; break; }
         case 6: { const u = sstep(f / 0.2) * sstep((0.6 - f) / 0.2) * id; q.armAz -= 2.3 * u; q.armBz += 2.3 * u; q.y += 0.8 * u; q.hPitch -= 0.18 * u; if (u > 0.7) { q.eyes = 'closed'; q.mouth = 'o'; } break; }
-        case 7: q.hPitch += 0.3 * e; q.hYaw += dir * 0.15 * e; break;
+        case 7: q.hPitch += 0.3 * e; q.hYaw += dir * 0.15 * e; q.gLy = -0.8 * e; break;
         case 8: { const w = Math.sin(f * Math.PI * 6) * e; q.hRoll += 0.12 * w; q.roll += 0.04 * w; q.tailZ += 0.2 * w; if (e > 0.4) q.eyes = 'happy'; break; }
+        case 9: { const u = sstep(f / 0.16) * sstep((0.6 - f) / 0.14) * id;          // checking his watch: the left wrist up in front, a look down at it, a nod
+          q.armAx -= 1.25 * u; q.armAy += 0.62 * u; q.armAz += 0.3 * u; q.hPitch += (0.24 + 0.04 * Math.sin(f * 30)) * u; q.hYaw -= 0.08 * u; q.gLy = -0.9 * u; break; }
+        case 10: q.hRoll += 0.08 * e; if (f > 0.16 && f < 0.42) { q.eyes = 'wink'; q.mouth = 'smile'; } break;          // a wink (one of his jokes)
+        case 12: { const b = Math.max(0, Math.sin(f * Math.PI * 8)) * e; q.y += 3.4 * b; q.liftA += 3.4 * b; q.liftB += 3.4 * b; q.armAz -= 0.4 * b; q.armBz += 0.4 * b; if (e > 0.5) q.eyes = 'happy'; break; }          // little hops on the spot
+        case 13: q.y += 1.6 * e; q.liftA += 1.6 * e; q.liftB += 1.6 * e; q.lean += 0.06 * e; q.armAx += 0.35 * e; q.armBx += 0.35 * e; q.hPitch -= 0.14 * e; q.gLy = 0.8 * e; q.gLx = dir * 0.5 * e; break;          // on tiptoe, peeking
+        case 14: { const u = sstep(f / 0.18) * sstep((0.62 - f) / 0.16) * id;          // a stretch, both hands on the back
+          q.lean -= 0.13 * u; q.armAx += 0.55 * u; q.armBx += 0.55 * u; q.armAy -= 0.5 * u; q.armBy += 0.5 * u; q.armAz += 0.12 * u; q.armBz -= 0.12 * u; q.hPitch -= 0.16 * u;
+          if (u > 0.6) { q.eyes = 'closed'; q.mouth = 'o'; } break; }
       }
     }
   }
@@ -5505,12 +5881,23 @@ function pose3(L, st) {
     q.hPitch += Math.sin(t * 5.3) * 0.04; q.hYaw += Math.sin(t * 1.9 + sd) * 0.07; q.hRoll += Math.sin(t * 1.3) * 0.04;
     const g = 0.5 + 0.5 * Math.sin(t * 1.1 + sd);          // hands help with the words
     q.armBx -= (0.3 + 0.25 * Math.sin(t * 3.1)) * g * id; q.armBz += 0.12 * g * id; q.armAx -= 0.18 * (1 - g) * id;
-    if (hash1(Math.floor(t / 2.2) + sd) > 0.72) q.eyes = 'happy';
+    // the face that goes with the line: "Wow!" surprised, "Ha ha!" laughing, a question thinking (eyes up to one side), "Great!" happy
+    const md = st.mood !== undefined ? st.mood : MOOD3.mood, ma = st.mood !== undefined ? 0.5 : nowS() - MOOD3.t0;
+    if (md === 'surprised' && ma < 1.5) { q.eyes = 'surprised'; q.hPitch -= 0.05; }
+    else if (md === 'laugh') { q.eyes = 'laugh'; if (q.mouth !== 'smile') q.mouth = 'laugh'; q.y += Math.abs(Math.sin(t * 9)) * 0.6; }
+    else if (md === 'think' && ma < 1.7) { q.gLx = sd % 2 < 1 ? 0.9 : -0.9; q.gLy = 0.85; q.hRoll += 0.06; }
+    else if (hash1(Math.floor(t / (md === 'happy' ? 1.2 : 2.2)) + sd) > (md === 'happy' ? 0.35 : 0.72)) q.eyes = 'happy';
   }
   if (L.model && !st.wave) { q.armAz -= 0.16; q.armBz += 0.16; }          // (Batuhan Teacher: his arms a little out from the body, as in the model)
   if (st.wave && L.model) { q.armAz = -2.48 + Math.sin(t * 9) * 0.2; q.armAx = -0.55; q.hRoll += 0.06; }          // (Batuhan Teacher: his big head; the hand waves beside it, a little in front)
   else if (st.wave) { q.armAz = -2.5 + Math.sin(t * 9) * 0.35; q.armAx = -0.2; }
   if (st.wave) { q.roll += Math.sin(t * 4.5) * 0.04; q.eyes = 'happy'; if (!st.talk) q.mouth = 'open'; }
+  const rc = st.react || (!st.still && REACT3.size ? REACT3.get(L) : null);
+  if (rc) {
+    const a = rc.age != null ? rc.age : nowS() - rc.t0, len = REACT_LEN3[rc.kind] || 1.5;
+    if (a < 0 || a > len) { if (!st.react) REACT3.delete(L); }
+    else reactPose3(q, rc.kind, a, len, kid, st.sit != null);
+  }
   if (st.dizzy) { q.eyes = 'closed'; q.mouth = 'o'; q.hRoll += Math.sin(t * 9) * 0.24; q.roll += Math.sin(t * 9) * 0.05; q.armAz -= 0.45; q.armBz += 0.45; }
   if (st.closed) { q.eyes = 'closed'; q.mouth = 'smile'; }
   else if (q.eyes === 'open' && !st.still) {       // blinks, sometimes twice
@@ -5519,6 +5906,7 @@ function pose3(L, st) {
     else if (bt < 0.12) q.eyes = 'closed';
     else if (bt > 0.3 && bt < 0.4 && hash1(Math.floor((t + sd * 1.7) / 4.1) + sd) > 0.65) q.eyes = 'closed';
   }
+  gaze3(q, L, st);
   return q;
 }
 // the movements of a job (level 3: everyone busy), only while standing still (k: 0 walking .. 1 standing)
@@ -5550,7 +5938,12 @@ function drawProp3(R, kind, mA, mB, d, st) {
   return hand;
 }
 function drawPerson3(R, L, st) {
+  if (!st.look && st.scale && Dialog.open && Dialog.focus) {          // in a talk out in the world, the two look at each other
+    if (L === PLAYER_LOOK) st.look = Dialog.focus;
+    else if (st.talk || Dialog.focus.look === L) st.look = player;
+  }
   const P = personModel3(L), d = P.d, s = (L.size || 1) * (st.scale || 1), q = pose3(L, st);
+  R.setLook(0, LOOK3.rim);          // (a soft light round the edge keeps people clear of the ground behind them)
   const root = T3(st.x, st.y || 0, st.z); m4ry(root, st.yaw || 0); if (s !== 1) m4s(root, s, s, s);
   const at = (base, px, py, pz, fn) => { const m = m4t(new Float32Array(base), px, py, pz); fn(m); return m4t(m, -px, -py, -pz); };
   // the legs stay on the ground; everything above the hips bobs, sways and leans
@@ -5558,27 +5951,39 @@ function drawPerson3(R, L, st) {
   const body = at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.y, 0); m4rz(m, q.roll); m4rx(m, q.lean); m4ry(m, q.twist); });
   R.draw(P.legA, at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.liftA, 0); m4rx(m, q.legA); }));
   R.draw(P.legB, at(hips, 0, d.hip, 0, (m) => { m4t(m, 0, q.liftB, 0); m4rx(m, q.legB); }));
+  const sw = sway3(L, st);          // hems, hanging hair, hats and tails swing behind the body's moves
+  if (sw) {
+    const yw = st.yaw || 0, c = Math.cos(yw), sn = Math.sin(yw), lx = sw.ox * c - sw.oz * sn, lz = sw.ox * sn + sw.oz * c;
+    q.swX = clamp(-lz * 0.15, -0.7, 0.7); q.swZ = clamp(lx * 0.15, -0.7, 0.7); q.hatX = clamp(lz * 0.03, -0.08, 0.08); q.hatZ = clamp(-lx * 0.03, -0.08, 0.08);
+    R.bend(sw.ox, Math.hypot(sw.ox, sw.oz) * 0.12, sw.oz);
+  }
   R.draw(P.torso, at(body, 0, d.hip, 0, (m) => m4s(m, 1 + q.br * 0.008, 1 + q.br * 0.014, 1 + q.br * 0.008)));
   const shY = d.sh - 2.4 - (d.armDrop || 0), lift = q.br * 0.25;          // (Batuhan Teacher's arms hang a little lower)
-  const mA = at(body, -d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armAz); m4rx(m, q.armAx); });
-  const mB = at(body, d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armBz); m4rx(m, q.armBx); });
+  const mA = at(body, -d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armAz); if (q.armAy) m4ry(m, q.armAy); m4rx(m, q.armAx); });          // (ay: turned in, for a clap or the hands on the back)
+  const mB = at(body, d.ax, shY, 0, (m) => { m4t(m, 0, lift, 0); m4rz(m, q.armBz); if (q.armBy) m4ry(m, q.armBy); m4rx(m, q.armBx); });
   R.draw(P.armA, mA); R.draw(P.armB, mB);
   const hm = at(body, 0, d.sh + 1, 0, (m) => { m4t(m, 0, q.br * 0.35, 0); m4ry(m, q.hYaw); m4rx(m, q.hPitch); m4rz(m, q.hRoll); });
   drawHeadParts3(R, P, hm, q);
+  if (sw) R.bend(0, 0, 0);
+  R.setLook(0, 0);
   if (st.prop && R.curMode !== 'xray') return drawProp3(R, st.prop, mA, mB, d, st);
   return null;
 }
 function drawHeadParts3(R, P, hm, q) {
   R.draw(P.head, hm);
+  if (P.hat) {          // the hat, tipping a little behind the moves (about its band)
+    if (q.hatX || q.hatZ) { const y = P.hatY, m = m4t(new Float32Array(hm), 0, y, 0); m4rx(m, q.hatX || 0); m4rz(m, q.hatZ || 0); R.draw(P.hat, m4t(m, 0, -y, 0)); }
+    else R.draw(P.hat, hm);
+  }
   if (P.extra) for (const x of P.extra) R.draw(x, hm);          // (Batuhan Teacher's hair)
   if (R.curMode !== 'xray') {
-    const tex = R.faceTex(P.faceKey, () => paintFace3(P.face));
-    R.decal(P.eyes, tex, FACE_UV3.eyes[q.eyes] || FACE_UV3.eyes.open, hm);
+    const tex = R.faceTex(P.faceKey, () => paintFace3(P.face)), E = q.eyes !== 'iris' && FACE_UV3.eyes[q.eyes] ? q.eyes : 'open';
+    R.decal(P.eyes, tex, FACE_UV3.eyes[E], hm, E === 'open' || E === 'half' ? irisUV3(P.face, q.gx || 0, q.gy || 0) : null);          // (open eyes look about)
     R.decal(P.mouth, tex, FACE_UV3.mouth[q.mouth] || FACE_UV3.mouth.smile, hm);
   }
   for (const tl of P.tails) {
     const m = m4t(new Float32Array(hm), tl.p[0], tl.p[1], tl.p[2]);
-    m4rz(m, tl.rz + q.tailZ * 0.6 + (tl.s !== 0 && P.tails.length > 1 ? q.tailX * 0.3 * tl.s : 0)); m4rx(m, tl.rx + q.tailX);
+    m4rz(m, tl.rz + q.tailZ * 0.6 + (tl.s !== 0 && P.tails.length > 1 ? q.tailX * 0.3 * tl.s : 0) + (q.swZ || 0)); m4rx(m, tl.rx + q.tailX + (q.swX || 0));
     R.draw(tl.mesh, m);
   }
 }
@@ -5830,7 +6235,14 @@ function animalModel3(kind) {
 let SPARKY_GEAR3 = null;
 function drawAnimal3(R, kind, st) {
   const A = animalModel3(kind), t = st.t || 0, G = GAIT3[kind], mv = !!st.moving;
-  const root = T3(st.x, st.y || 0, st.z); m4ry(root, st.yaw || 0); if (st.scale) m4s(root, st.scale, st.scale, st.scale);
+  // Sparky, standing about, now and then chases his tail (two turns on the spot) or sniffs the ground
+  let spin = 0, sniff = 0;
+  if (kind === 'dog' && !mv && !st.talk && !st.still) {
+    const k = (t + 2.3) / 5.2, slot = Math.floor(k), f = k - slot, h = hash1(slot * 4.13 + 0.7);
+    if (h < 0.3) spin = sstep(f / 0.42) * TAU * 2 * (hash1(slot * 1.9) < 0.5 ? -1 : 1);
+    else if (h < 0.62) sniff = sstep(f / 0.08) * sstep((0.5 - f) / 0.08);
+  }
+  const root = T3(st.x, st.y || 0, st.z); m4ry(root, (st.yaw || 0) + spin); if (st.scale) m4s(root, st.scale, st.scale, st.scale);
   const th = G ? (st.phase || 0) / 0.13 * G.rate : 0;      // where each foot is in its step
   const sw = mv ? Math.sin(st.phase) * 0.55 : 0;
   let bob = mv ? Math.abs(Math.cos(st.phase)) * 1.4 : Math.sin(t * 3) * 0.3;
@@ -5855,6 +6267,7 @@ function drawAnimal3(R, kind, st) {
     if (st.graze) dip = 0.55 + Math.sin(t * 2) * 0.05;
     if (st.peck) dip = 0.9;
     if (st.talk) dip = Math.sin(t * 12) * 0.08;
+    if (sniff) dip = sniff * (0.55 + Math.sin(t * 19) * 0.07);          // (sniff, sniff)
     if (mv && G && G.nod) dip += Math.sin(2 * th) * G.nod;        // horses nod their heads as they walk
     if (A.turn) m4ry(m, (Math.sin(t * 0.55) * 0.5 + Math.sin(t * 1.7) * 0.08) * (st.talk ? 0.35 : 1));
     m4rx(m, dip); m4t(m, -hp[0], -hp[1], -hp[2]);
@@ -5977,6 +6390,9 @@ function g3Init() {
     let cv = $('gl');
     if (!cv) { cv = document.createElement('canvas'); cv.id = 'gl'; document.body.insertBefore(cv, $('game')); }
     G3.R = new GLR(cv, { alpha: false });
+    if (!Device.done) Device.detect();
+    G3.shadows = G3.R.shadows(Device.touch ? 1024 : 2048);          // (the sun's shadows; a smaller picture on tablets and phones)
+    document.body.classList.toggle('vig', !!LOOK3.vig);
     cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); setView3(false, true); }, false);
     const t0 = performance.now();
     build3DWorld();
@@ -6033,7 +6449,7 @@ function g3CamObj(tour) {
   const D = CAM3.D, at = [CAM3.x, 18, CAM3.z];
   return { eye: [at[0], at[1] + Math.sin(CAM3.pitch) * D, at[2] + Math.cos(CAM3.pitch) * D], at, fov: CAM3.fov, near: 40, far: D * 3.5, fogNear: D * 1.05, fogFar: D * 2.3 };
 }
-const blob3 = (R, x, z, rx, rz, a, y) => { const m = T3(x, (y || 0) + 2.8, z); m4s(m, rx, 1, rz); R.setTint(1, 1, 1, a / 0.3, 0); R.draw(W3.dyn.blob, m); };
+const blob3 = (R, x, z, rx, rz, a, y) => { const m = T3(x, (y || 0) + 2.8, z); m4s(m, rx, 1, rz); R.setTint(1, 1, 1, a / 0.3 * (R.sh ? 0.7 : 1), 0); R.draw(W3.dyn.blob, m); };          // (lighter under the sun's own shadows)
 function drawVillageLife3(R, t, dt) {          // Sunny Hill's people and animals (and the lab): in the village, and seen from the sea
   for (const n of NPCS) {
     if (n.hidden || n.sleeping) continue;
@@ -6043,7 +6459,7 @@ function drawVillageLife3(R, t, dt) {          // Sunny Hill's people and animal
       continue;
     }
     const dp = Math.hypot(player.x - n.x, player.y - n.y), lk = (Dialog.partner === n || dp < 150) && !n.follow ? player : null;
-    const yaw = face3(n, dt, lk), hand = drawPerson3(R, n.look, { x: n.x, z: n.y, y: standY3(n.x, n.y), yaw, moving: n.moving, mv: mvOf3(n, dt), phase: n.phase, t, seed: n.seed, talk: Dialog.mouth === n.id, wave: n.waving, act: n.act, prop: n.prop, scale: CS3 });
+    const yaw = face3(n, dt, lk), hand = drawPerson3(R, n.look, { x: n.x, z: n.y, y: standY3(n.x, n.y), yaw, moving: n.moving, mv: mvOf3(n, dt), phase: n.phase, t, seed: n.seed, talk: Dialog.mouth === n.id, wave: n.waving, act: n.act, prop: n.prop, scale: CS3, look: lk || (dp < 260 && !n.follow ? player : null) });          // (their eyes follow you as you pass)
     if (n.act || n.prop) SHIP.drawExtra3(R, n, yaw, t, hand);
   }
   for (const a of ANIMALS) {
@@ -6135,14 +6551,14 @@ function g3Render(t, dt, tour) {
     for (const o of faded) { R.setTint(1, 1, 1, o.fade, 0); R.draw(o.mesh, o.m); }
     R.gl.depthMask(false); R.setTint(1, 1, 1, 1, 0);
   }
-  R.draw(W3.shadows);
+  R.setTint(1, 1, 1, R.sh ? 0.45 : 1, 0); R.draw(W3.shadows);
   blob3(R, player.x, player.y, 15, 10, 0.24, standY3(player.x, player.y));
   blob3(R, sparky.x, sparky.y, 14, 9, 0.22);
   for (const n of NPCS) if (!n.hidden && !n.sleeping && n.kind === 'person') blob3(R, n.x, n.y, 15, 10, 0.22, standY3(n.x, n.y));
   for (const a of HERD) blob3(R, a.x, a.y, a.kind === 'horse' ? 26 : 18, a.kind === 'horse' ? 16 : 11, 0.2);
   for (const a of ANIMALS) blob3(R, a.x, a.y, a.kind === 'cow' ? 28 : 9, a.kind === 'cow' ? 18 : 6, 0.2);
   R.setTint(1, 1, 1, 1, 0);
-  R.setLook(0.55, 0); R.draw(W3.water); if (W3.ocean) { R.draw(W3.oceanFar); for (const m of W3.ocean) if (R.visible(m.box)) R.draw(m); } R.setLook(0, 0);
+  R.setLook(0.55, 0, 1); R.draw(W3.water); if (W3.ocean) { R.draw(W3.oceanFar); for (const m of W3.ocean) if (R.visible(m.box)) R.draw(m); } R.setLook(0, 0);
   SHIP.draw3Blend(R, t);
   EGGS.draw3Blend(R, t);
   R.setTint(1, 1, 1, 1, 1);
@@ -7251,7 +7667,7 @@ function drawButterflies(c, t, cx, cy, vw, vh) {
 const LOOKS = {
   milo: { age: 'kid', skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'spiky', shirt: '#4aa3ff', pants: '#3b5a8c', shorts: true, socks: '#ffffff', shoes: '#ff5a5a' },
   leo:  { age: 'kid', size: 0.84, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'short', shirt: '#ffd23c', stripes: '#ff8c42', pants: '#4a7bd0', shorts: true, socks: '#ffffff', shoes: '#4cc36a', hat: 'cap', hatColor: '#ff4d4d' },
-  mom:  { age: 'adult', skin: '#f6c7a0', hair: '#9a5530', hairStyle: 'long', dress: '#ff7aa2', lashes: true, shoes: '#c2185b' },
+  mom:  { age: 'adult', skin: '#f6c7a0', hair: '#9a5530', hairStyle: 'long', dress: '#ff7aa2', dots: '#ffffff', lashes: true, shoes: '#c2185b' },
   dad:  { age: 'adult', skin: '#f6c7a0', hair: '#5a3620', hairStyle: 'short', shirt: '#4cc36a', pants: '#3b4f7a', mustache: true },
   rosa: { age: 'adult', skin: '#f3c6a5', hair: '#eceaf4', hairStyle: 'bun', dress: '#a77bd8', shawl: '#ffc4dc', glasses: true, lashes: true },
   nomi: { age: 'kid', skin: '#eab98c', hair: '#2d2330', hairStyle: 'braids', dress: '#ff5a5a', belt: '#ffd23c', lashes: true, socks: '#ffffff', shoes: '#8a3b2b' },
@@ -7279,10 +7695,10 @@ const LOOKS = {
   koa:  { age: 'adult', skin: '#a86b45', hair: '#2a1a12', hairStyle: 'short', shirt: '#2fbfa0', stripes: '#ffffff', pants: '#f0e0c0', shorts: true, mustache: true, shoes: '#6b4430' },
   malia: { age: 'adult', skin: '#b8794f', hair: '#2a1a12', hairStyle: 'long', dress: '#ff5a8a', flower: '#ffffff', lashes: true, shoes: '#c2185b' },
   kai:  { age: 'kid', skin: '#a86b45', hair: '#2a1a12', hairStyle: 'curly', shirt: '#ffd23c', pants: '#4aa3ff', shorts: true, shoes: '#ff8c42' },
-  lani: { age: 'kid', size: 0.9, skin: '#a86b45', hair: '#2a1a12', hairStyle: 'pigtails', ties: '#ff7aa2', dress: '#7fd36a', flower: '#ff7aa2', lashes: true, shoes: '#ff5a8a' },
+  lani: { age: 'kid', size: 0.9, skin: '#a86b45', hair: '#2a1a12', hairStyle: 'pigtails', ties: '#ff7aa2', dress: '#7fd36a', dots: '#fff4a8', flower: '#ff7aa2', lashes: true, shoes: '#ff5a8a' },
   pirate: { age: 'adult', skin: '#e8b48a', hair: '#2a1a12', hairStyle: 'long', beard: '#2a1a12', hat: 'tricorn', patch: true, shirt: '#ffffff', stripes: '#c8372d', coat: '#a32a2a', buttons: '#ffd23c', pants: '#3a2a20', shoes: '#2b1d16' },
   fizz: { age: 'adult', skin: '#f3c6a5', hair: '#f4f4f8', hairStyle: 'wild', coat: '#ffffff', shirt: '#8fd3ff', pants: '#4a4f6a', glasses: true, glassesColor: '#ff9f1a', bowtie: '#ff4d6d', shoes: '#3a2a20' },
-  mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', lashes: true, socks: '#ffffff', shoes: '#ff5a8a' },
+  mia:  { age: 'kid', size: 0.8, skin: '#f6c7a0', hair: '#7a4a2a', hairStyle: 'pigtails', ties: '#ffd23c', dress: '#ffb3c6', dots: '#ffffff', lashes: true, socks: '#ffffff', shoes: '#ff5a8a' },
 };
 const PHOTO_LOOKS = { grandfather: 'grandpa', grandmother: 'rosa', father: 'dad', mother: 'mom', brother: 'leo', sister: 'mia' };
 // pitch per speaker (see Speech.pitchFor)
@@ -12466,7 +12882,7 @@ const SEA = {
     }
     // see-through: the sea, foam, the wakes, splashes, smoke, warnings where the pirates' balls will fall
     R.mode('blend');
-    R.setLook(0.55, 0); R.draw(W3.oceanFar); for (const m of W3.ocean) if (R.visible(m.box)) R.draw(m);
+    R.setLook(0.55, 0, 1); R.draw(W3.oceanFar); for (const m of W3.ocean) if (R.visible(m.box)) R.draw(m);
     for (const m of this.tiles) if (R.visible(m.box)) R.draw(m);
     R.setLook(0, 0);
     ISLE5.drawAtSeaBlend(R, t); ISLE6.drawAtSeaBlend(R, t);
@@ -13854,7 +14270,7 @@ const ISLE5 = {
     for (const [x, y] of this.TORCH) shadow(x + 2, y + 3, 8, 5, 0.16, this.groundH(x, y));
     for (const c of this.CRABS || []) { const p = this.crabAt(c, t); shadow(p.x, p.y, 10, 7, 0.18, this.groundH(p.x, p.y)); }
     R.setTint(1, 1, 1, 1, 0);
-    R.setLook(0.55, 0); R.draw(this.oceanFar); for (const w of this.water) if (R.visible(w.box)) R.draw(w); R.setLook(0, 0);
+    R.setLook(0.55, 0, 1); R.draw(this.oceanFar); for (const w of this.water) if (R.visible(w.box)) R.draw(w); R.setLook(0, 0);
     R.draw(this.foam);
     for (const g of this.GLINTS || []) {          // the sun glinting on the water, here and there
       const k = Math.max(0, Math.sin(t * g.sp + g.ph)); if (k < 0.75) continue;
@@ -13947,7 +14363,7 @@ const ISLE5 = {
   drawAtSeaBlend(R, t) {
     if (!G3.on || !this.built) return;
     const o = this.seaOff(), mv = (b) => [b[0] + o.x, b[1], b[2] + o.y, b[3] + o.x, b[4], b[5] + o.y], m0 = T3(o.x, 0, o.y);
-    R.setLook(0.55, 0); for (const w of this.seaRing) if (R.visible(mv(w.box))) R.draw(w, m0); R.setLook(0, 0);
+    R.setLook(0.55, 0, 1); for (const w of this.seaRing) if (R.visible(mv(w.box))) R.draw(w, m0); R.setLook(0, 0);
     R.draw(this.foam, m0);
   },
   // ---- 2D (the flat view): the island as a picture, painted once; then everything on it, nearest last
@@ -15748,6 +16164,7 @@ const ISLE6 = {
       if (k.gone) continue;
       const talking = Dialog.open && Dialog.focus && Dialog.focus.id === k.id, idle = !k.moving && !k.on && k.mode !== 'hop';
       const st = { x: k.x, z: k.y, y: k.h, yaw: talking || (idle && k.near < 140 && !this.asm) ? Math.atan2(player.x - k.x, player.y - k.y) : k.yaw, moving: k.moving, mv: k.moving ? (k.run ? 1.4 : 1) : 0, phase: k.phase, t: t + k.hx * 0.01, seed: k.hx * 0.013, talk: Dialog.mouth === k.id, wave: (idle && !talking && !this.asm && k.near > 70 && k.near < 260 && !Dialog.open) || this.cheerT > 0, scale: CS3 };
+      if (k.near < 260) st.look = player;          // (their eyes on you)
       if (k.on) { const a = this.swingA(0); Object.assign(st, { y: 96 - 78 * Math.cos(a) - this.hipH(LOOKS[k.id]), yaw: 0, sit: -1.15 + 0.35 * Math.cos(k.st * 2.3), arms: 'chains', tilt: a, wave: false }); }          // (Zoe on her swing)
       drawPerson3(R, LOOKS[k.id], st);
     }
@@ -15782,6 +16199,7 @@ const ISLE6 = {
       const st = { x: T.x, z: T.y, y: T.sitting ? 15 - this.hipH(LOOKS.teacher) : this.standY(T.x, T.y), yaw: T._yaw, moving: T.moving, mv: T.moving ? 1 : 0, phase: T.phase, t, seed: 4.2, talk: Dialog.mouth === 'teacher' || this.bubbleOn(), wave, scale: CS3 };
       if (T.act) { st.act = T.act; if (T.act === 'water') st.prop = 'can'; }
       if (T.sitting) { st.sit = -0.95; st.arms = 'lap'; if (!talking) st.closed = true; }
+      if (d < 420) st.look = player;
       drawPerson3(R, LOOKS.teacher, st); }
     for (const b of this.BFLY || []) {          // butterflies
       const p = ISLE5.bflyAt(b, t), m = T3(p.x, p.h, p.y), cc = rgb3(b.c); m4ry(m, p.yaw); m4s(m, 1.6, 1.6, 1.6);
@@ -15829,7 +16247,7 @@ const ISLE6 = {
     for (const [x, y] of this.BENCHES) shadow(x + 3, y + 4, 30, 9, 0.14, 0.3);
     for (const c of this.CRABS || []) { const p = this.crabPos(c, t); shadow(p.x, p.y, 10, 7, 0.18, this.groundH(p.x, p.y)); }
     R.setTint(1, 1, 1, 1, 0);
-    R.setLook(0.55, 0); R.draw(this.oceanFar); for (const w of this.water) if (R.visible(w.box)) R.draw(w); R.setLook(0, 0);
+    R.setLook(0.55, 0, 1); R.draw(this.oceanFar); for (const w of this.water) if (R.visible(w.box)) R.draw(w); R.setLook(0, 0);
     R.draw(this.foam);
     for (const g of this.GLINTS || []) {
       const k = Math.max(0, Math.sin(t * g.sp + g.ph)); if (k < 0.75) continue;
@@ -15862,7 +16280,7 @@ const ISLE6 = {
     if (!G3.on || !this.built) return;
     const o = this.seaOff(), mv = (b) => [b[0] + o.x, b[1], b[2] + o.y, b[3] + o.x, b[4], b[5] + o.y], m0 = T3(o.x, 0, o.y);
     if (!R.visible(mv([this.C.x - this.RX * 1.3, -40, this.C.y - this.RY * 1.3, this.C.x + this.RX * 1.3, 40, this.C.y + this.RY * 1.3]))) return;
-    R.setLook(0.55, 0); for (const w of this.seaRing) if (R.visible(mv(w.box))) R.draw(w, m0); R.setLook(0, 0);
+    R.setLook(0.55, 0, 1); for (const w of this.seaRing) if (R.visible(mv(w.box))) R.draw(w, m0); R.setLook(0, 0);
     R.draw(this.foam, m0);
   },
 
@@ -18420,8 +18838,9 @@ const SCHOOLIN = {
   render3(R, t, dt) {
     if (!this.M) this.build();
     const M = this.M, D = CAM3.D * this.zoom3D(), at = [CAM3.x, 14, CAM3.z], LS = this.lesson;
-    R.begin(R.cv.width, R.cv.height, LS ? this.lessonCam(dt)          // (a lesson: from among the desks, in front of the board)
-      : { eye: [at[0], at[1] + Math.sin(CAM3.pitch) * D, at[2] + Math.cos(CAM3.pitch) * D], at, fov: CAM3.fov, near: 40, far: D * 3.5 }, 0, t);
+    const vc = LS ? this.lessonCam(dt)          // (a lesson: from among the desks, in front of the board)
+      : { eye: [at[0], at[1] + Math.sin(CAM3.pitch) * D, at[2] + Math.cos(CAM3.pitch) * D], at, fov: CAM3.fov, near: 40, far: D * 3.5 };
+    R.begin(R.cv.width, R.cv.height, Object.assign({}, vc, { shadowK: 0.55 }), 0, t);          // (softer sun shadows indoors)
     const gl = R.gl; gl.clearColor(0.74, 0.88, 0.98, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     R.draw(M.floor); R.draw(M.walls); R.draw(M.props);
     for (const T of this.tall) if (T.k > 0.99) R.draw(T.mesh);
@@ -18454,6 +18873,7 @@ const SCHOOLIN = {
     for (const p of ppl) {          // (the teacher and the classmates, the school's people: they look at you while you talk to them)
       const L = LOOKS[p.id], talking = Dialog.open && Dialog.focus && Dialog.focus.id === p.id && !LS, st = { x: p.x, z: p.y, y: p.sit ? (p.seat || 17.5) - ISLE6.hipH(L) : 1, yaw: talking && !p.sit ? squareYaw(Math.atan2(player.x - p.x, player.y - p.y)) : p.yaw, moving: !!p.mv, mv: p.mv ? 1 : 0, phase: p.phase || 0, t: t + p.x * 0.01, seed: p.x * 0.013, talk: Dialog.mouth === p.id || (this.lesson && this.lesson.bub && this.lesson.bub.id === p.id), wave: !!p.wave, act: p.act, scale: CS3 };
       if (p.sit) { st.sit = -1; st.arms = 'lap'; }
+      if (p.id === 'teacher') st.look = player;          // (the teacher looks at you; the class looks ahead, at the board)
       drawPerson3(R, L, st);
       if (p.tray) this.trayDraw(R, p.tray, p.x, p.y, p.yaw, p.sit);
     }
@@ -18945,6 +19365,7 @@ const Dialog = {
   render() {
     const [who, raw] = this.lines[this.i], text = fillName(raw);
     this.who = who; this.text = text; this.shownAt = performance.now();
+    if (who && who !== 'player' && /\?\s*$/.test(text) && nowS() - (this.thinkT || 0) > 6) { this.thinkT = nowS(); react3('player', 'think'); }          // (asked something, the player has a little think)
     const dl = $('dialog'); this.shout = who === 'bongo' && /[A-Z]{2}/.test(text) && text === text.toUpperCase();
     dl.classList.remove('shout'); if (this.shout) { void dl.offsetWidth; dl.classList.add('shout'); }
     $('dlgName').textContent = who ? charName(who) : '';
@@ -19322,8 +19743,9 @@ const UI = {
     tap('capOk', () => CaptainCert.close());
     tap('capSave', () => { Sfx.play('tap'); CaptainCert.save(); });
     tap('pStart', () => Parent.start());
+    $('logoSun').innerHTML = titleSun();
     { const T = $('titleText'), s = T.textContent; T.textContent = '';
-      [...s].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.12) + 's'; T.appendChild(sp); }); }
+      [...s].forEach((ch, i) => { const sp = document.createElement('span'); sp.textContent = sp.dataset.ch = ch === ' ' ? '\u00a0' : ch; sp.style.animationDelay = (i * 0.12) + 's'; sp.style.setProperty('--i', i); T.appendChild(sp); }); }
     tap('pVoiceTest', () => Parent.test());
     tap('vwOk', () => VoiceWarn.hide());
     tap('tFull', () => { Sfx.unlock(); Sfx.play('tap'); FS.toggle(); });
@@ -20171,6 +20593,7 @@ const Speech = {
   },
   describe() { return this.english.slice(0, 6).map((v) => v.name.replace(/^Microsoft |^Google | Online \(Natural\).*| - English.*/g, '')).join(', '); },
   speak(text, o = {}) {
+    MOOD3.mood = moodOf3(text); MOOD3.t0 = nowS();          // (the speaker's face goes with the line, sound or not)
     if (!this.ok || !state.settings.sound || !text) return false;
     if (this.status !== 'ok' || Object.keys(this.bad).length) this.build();
     if (this.status === 'none') { VoiceWarn.show(); return false; }
@@ -20718,6 +21141,8 @@ const Sfx = {
   },
   note(f) { try { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.tone(f, 0.4, 'triangle', 0.16); this.tone(f * 2, 0.25, 'sine', 0.05, 0.02); } catch (e) { /* audio is optional */ } },
   play(n) {
+    if (n === 'ok' || n === 'star') react3('player', 'joy');          // a right answer, a star: the player jumps and claps
+    else if (n === 'no') react3('player', 'oops');          // a miss: a scratch of the head, a wink (never a sad face)
     try {
       if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();   // every call comes from a tap or key
       if (n === 'tap') this.tone(700, 0.06, 'triangle', 0.06);
@@ -20943,6 +21368,7 @@ const Perf = {
     if (this.acc < 3) return;
     const avg = this.acc / this.n;
     this.acc = this.n = 0;
+    if (G3.R.sh && avg > 0.03) { G3.R.shadows(0); G3.shadows = false; return; }          // (under about 33 frames a second the sun's shadows go first)
     if (avg < 0.042) return;            // about 24 frames a second or better: fine
     this.step++;
     if (this.step <= 2) { G3.low = this.step; g3Resize(); g3Camera(0, true); }
@@ -20999,6 +21425,48 @@ function startGame() {            // Enter on the main menu
   if (game.mode !== 'title') return;
   if (state.created) Title.resume(); else Title.newGame();
 }
+// the main menu's sun: a soft glow, two rings of rays turning opposite ways, a round face with the logo's dark edge and
+// a warm shade inside its lower edge (it blinks), and little twinkles round it
+function titleSun() {
+  const C = 80, ray = (r0, r1, w, k) => `M${C - w} ${C - r0} C${C - w * 0.75} ${C - (r0 + r1) / 2} ${C - k * 1.3} ${C - r1 + 7} ${C - k} ${C - r1 + k * 0.7} A${k} ${k} 0 0 1 ${C + k} ${C - r1 + k * 0.7} C${C + k * 1.3} ${C - r1 + 7} ${C + w * 0.75} ${C - (r0 + r1) / 2} ${C + w} ${C - r0} Z`;          // (a ray with a rounded tip, k its radius)
+  const twinkle = (x, y, r, d) => `<path class="sunTw" style="animation-delay:${d}s" d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r} Z"/>`;
+  let back = '', front = '';
+  for (let i = 0; i < 12; i++) {
+    back += `<path d="${ray(30, 79, 12, 1.6)}" transform="rotate(${i * 30 + 15} ${C} ${C})"/>`;
+    front += `<path d="${ray(34, i % 2 ? 61 : 70, 9.5, 2.8)}" transform="rotate(${i * 30} ${C} ${C})"/>`;
+  }
+  return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs>
+    <radialGradient id="sgGlow"><stop offset="0" stop-color="#fff3a8" stop-opacity=".95"/><stop offset=".55" stop-color="#ffd25a" stop-opacity=".38"/><stop offset="1" stop-color="#ffc040" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sgBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffcf55"/><stop offset="1" stop-color="#ff9420"/></linearGradient>
+    <linearGradient id="sgRay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff48e"/><stop offset="1" stop-color="#ffc232"/></linearGradient>
+    <radialGradient id="sgDisc" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#fffdf0"/><stop offset=".3" stop-color="#fff07a"/><stop offset=".68" stop-color="#ffcb3a"/><stop offset="1" stop-color="#ffa224"/></radialGradient>
+    <radialGradient id="sgCheek"><stop offset="0" stop-color="#ff6a88" stop-opacity=".8"/><stop offset="1" stop-color="#ff6a88" stop-opacity="0"/></radialGradient>
+    <clipPath id="sgMouth"><path d="M67.5 93 Q80 111 92.5 93 Z"/></clipPath>
+  </defs>
+  <circle class="sunGlow" cx="80" cy="80" r="80" fill="url(#sgGlow)"/>
+  <g class="sunBack" fill="url(#sgBack)" opacity=".92">${back}</g>
+  <g class="sunFront" fill="url(#sgRay)" stroke="#5a2f14" stroke-width="3" stroke-linejoin="round">${front}</g>
+  <circle cx="80" cy="80" r="38" fill="url(#sgDisc)"/>
+  <path d="M111 92 A33 33 0 0 1 68 111" fill="none" stroke="#f08c1c" stroke-width="6" stroke-linecap="round" opacity=".45"/>
+  <circle cx="80" cy="80" r="38" fill="none" stroke="#5a2f14" stroke-width="4.5"/>
+  <path d="M54 71 A28 28 0 0 1 75 50" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <circle cx="57.5" cy="78.5" r="2.4" fill="#fff" opacity=".85"/>
+  <ellipse cx="58" cy="93" rx="9.5" ry="6.2" fill="url(#sgCheek)"/><ellipse cx="102" cy="93" rx="9.5" ry="6.2" fill="url(#sgCheek)"/>
+  <g class="sunEyes"><ellipse cx="68" cy="80" rx="6.3" ry="8.6" fill="#3a1f0e"/><ellipse cx="92" cy="80" rx="6.3" ry="8.6" fill="#3a1f0e"/>
+    <circle cx="70.3" cy="76.4" r="2.8" fill="#fff"/><circle cx="94.3" cy="76.4" r="2.8" fill="#fff"/><circle cx="66.2" cy="84.2" r="1.25" fill="#fff" opacity=".85"/><circle cx="90.2" cy="84.2" r="1.25" fill="#fff" opacity=".85"/></g>
+  <path d="M67.5 93 Q80 111 92.5 93 Z" fill="#8a2a1c" stroke="#5a2f14" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="80" cy="104.5" rx="7.4" ry="5" fill="#ff7f8f" clip-path="url(#sgMouth)"/>
+  <g fill="#fff">${twinkle(16, 22, 7.5, 0)}${twinkle(150, 36, 5.5, 1.1)}${twinkle(24, 140, 6, 2.2)}</g>
+  </svg>`;
+}
+// the main menu's small icons, drawn (the same on every device)
+const ICON = {
+  sound: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="fl" d="M3.5 9.2h3.4l5.2-4.4v14.4l-5.2-4.4H3.5z"/><path d="M15.6 9a4.2 4.2 0 0 1 0 6M18.4 6.2a8.2 8.2 0 0 1 0 11.6"/></svg>',
+  mute: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="fl" d="M3.5 9.2h3.4l5.2-4.4v14.4l-5.2-4.4H3.5z"/><path d="M15.6 9.4l5.2 5.2M20.8 9.4l-5.2 5.2"/></svg>',
+  cube: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l8.2 4.6v9.2L12 21.2l-8.2-4.6V7.4z"/><path d="M3.8 7.4l8.2 4.6 8.2-4.6M12 12v9.2"/></svg>',
+  picture: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="4.6" width="17.6" height="14.8" rx="2.4"/><circle class="fl" cx="8.8" cy="9.6" r="1.8"/><path d="M3.8 17.2l5-5 4 4 3-3 4.4 4.4"/></svg>',
+  info: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 10.8v6.2"/><circle class="fl" cx="12" cy="7.4" r="1.5"/></svg>',
+};
 const Title = {
   open() {
     const U = GAME_CONTENT.ui, has = !!state.created;
@@ -21013,18 +21481,18 @@ const Title = {
         const s = document.createElement('span'); if (cls) s.className = cls; s.textContent = txt; info.appendChild(s);
       }
     }
-    $('titleUnit').textContent = U.unit;
+    $('titleUnit').innerHTML = '<span class="rStar">★</span>' + U.tagline + '<span class="rStar">★</span>';
     $('titleCredit').textContent = GAME_CONTENT.parent.credit;
     this.small();
     $('title').classList.remove('hidden'); setMode('title');
   },
   small() {
     const U = GAME_CONTENT.ui;
-    $('tSound').textContent = state.settings.sound ? '🔊' : '🔇'; $('tSound').setAttribute('aria-label', U.sound);
+    $('tSound').innerHTML = state.settings.sound ? ICON.sound : ICON.mute; $('tSound').setAttribute('aria-label', U.sound);
     Music.button($('tMusic'));
-    $('tView').textContent = (G3.on ? '🧊' : '🖼️') + ' ' + (G3.on ? '3D' : '2D');
+    $('tView').innerHTML = (G3.on ? ICON.cube + '3D' : ICON.picture + '2D');
     $('tView').classList.toggle('hidden', !!G3.tried && !G3.ok);
-    $('tInfo').textContent = 'ℹ️ ' + U.info;
+    $('tInfo').innerHTML = ICON.info + U.info;
   },
   resume() {
     FS.auto();
@@ -21180,7 +21648,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys, LAB, SHIP, Parts, shoreC,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, SCHOOLIN, SchoolQuiz, SeaPick, Where, Update, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, SCHOOLIN, SchoolQuiz, SeaPick, Where, Update, LOOK3, ENV_DAY, ENV_EVE, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
