@@ -36,6 +36,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog, viewport }) 
   await step(1); await shot('l7-back-dock' + T);
   for (let i = 0; i < 120 && await S('SH.SEA.active'); i++) await step(0.25);
   log('tied up:', await S('JSON.stringify({ sea: SH.SEA.active, school: SH.ISLE6.here() })'), '| you', await where(), '|', await trip());
+  log('   the camera from you:', await S('JSON.stringify(G3.on ? [Math.round(CAM3.x - SH.player.x), Math.round(CAM3.z - SH.player.y)] : [Math.round(cam.x + view.w / 2 - SH.player.x), Math.round(cam.y + view.h / 2 - SH.player.y)])')); await shot('l7-back-tied' + T);
   for (let i = 0; i < 100 && !(await S('SH.Dialog.open')); i++) await step(0.2);
   log('welcome back:', await lines(), '| you', await where(), '| card', await card(), '| arrow', await S('JSON.stringify(SH.Quests.target())'), '| doors', await S('SH.ISLE6.doorK'));
   for (let i = 0; i < 160 && await S('!!SH.TRIP.walk'); i++) await step(0.25);
