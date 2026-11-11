@@ -84,6 +84,15 @@ const buttons = FULL ? `
     <button data-p="schK">Okulun içi: dersler bitti, Kim ile tanışma (müdür odası)</button>
     <button data-p="schH">Okulun içi: Kim tamam, ev zamanı ve karne</button>
     <button data-p="schS">Okulun içi: Sunny Shop önünde, 600 coin ile</button>
+    <div class="tmHead">7. bölüm: okul gezisi (Unit 3)</div>
+    <button data-p="trp0">Okul adası: öğretmen sınıfı topluyor, gezi duyurusu</button>
+    <button data-p="trpG">Spor salonunda: quiz show</button>
+    <button data-p="trpS">Doğu iskelesi: okul gemisine biniş, kaptan sorusu</button>
+    <button data-p="trpI">Yeşil Adalar: çayır (büyüteç, çöpler)</button>
+    <button data-p="trpP">Yeşil Adalar: gölet (tabela, ağ, nilüferler)</button>
+    <button data-p="trpF">Yeşil Adalar: orman (tabela, dürbün)</button>
+    <button data-p="trpB">Yeşil Adalar: hepsi bitti, iskeleye dönüş</button>
+    <button data-p="trpO">Okulda: sınıfta poster (Our Living Things)</button>
     <button data-p="funH">Serbest oyun: köyde, okul bugün bitti (balık, elma, uçurtma, iksir, 📷, hazine, saklambaç)</button>
     <button data-p="funR">Serbest oyun: okul bahçesinde, yarış çizgisinde</button>
     <button data-p="newDay">🔁 Yeni gün: tören yeniden (adada)</button>
@@ -123,6 +132,15 @@ const buttons = FULL ? `
     <button data-p="schK">Okulun içi: dersler bitti, Kim ile tanışma (müdür odası)</button>
     <button data-p="schH">Okulun içi: Kim tamam, ev zamanı ve karne</button>
     <button data-p="schS">Okulun içi: Sunny Shop önünde, 600 coin ile</button>
+    <div class="tmHead">7. bölüm: okul gezisi (Unit 3)</div>
+    <button data-p="trp0">Okul adası: öğretmen sınıfı topluyor, gezi duyurusu</button>
+    <button data-p="trpG">Spor salonunda: quiz show</button>
+    <button data-p="trpS">Doğu iskelesi: okul gemisine biniş, kaptan sorusu</button>
+    <button data-p="trpI">Yeşil Adalar: çayır (büyüteç, çöpler)</button>
+    <button data-p="trpP">Yeşil Adalar: gölet (tabela, ağ, nilüferler)</button>
+    <button data-p="trpF">Yeşil Adalar: orman (tabela, dürbün)</button>
+    <button data-p="trpB">Yeşil Adalar: hepsi bitti, iskeleye dönüş</button>
+    <button data-p="trpO">Okulda: sınıfta poster (Our Living Things)</button>
     <button data-p="funH">Serbest oyun: köyde, okul bugün bitti (balık, elma, uçurtma, iksir, 📷, hazine, saklambaç)</button>
     <button data-p="funR">Serbest oyun: okul bahçesinde, yarış çizgisinde</button>
     <button data-p="newDay">🔁 Yeni gün: tören yeniden (adada)</button>
@@ -202,8 +220,21 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
   const freePlay = () => { const t = new Date().toLocaleDateString('tr-TR'), les = {}; for (const k of ['english', 'math', 'music', 'pe', 'art', 'lunch', 'lost', 'reading', 'writing']) les[k] = { plays: 1, best: 8 };
     return pupil({ inside: 1, days: 1, les, art: { del: ['classroom', 'library', 'computer'] }, news: { a: 'zoe', b: 'sam' }, kim: { st: 'tour', i: 4, done: 1 }, coins: 200, coinTold: 1, home: t, day: { d: t, in: 1, n: 9, home: 1 } }); };
   Object.assign(P, { funH: freePlay, funR: freePlay });
+  // level 7: the school trip (after the school day's first home time); trip: its state (state.school.trip)
+  const tripPupil = (trip) => { const g = freePlay(); g.school.les.show = trip.st ? { plays: 1, best: 8 } : undefined; g.school.trip = trip; if (!trip.st) g.school.day = { d: '01.01.2026', n: 9, home: 1 }; else g.school.day = { d: new Date().toLocaleDateString('tr-TR'), in: 1, n: 9, home: 1, trip: 1 }; return g; };
+  const today = () => new Date().toLocaleDateString('tr-TR'), M6 = { flower: 1, grass: 1, ant: 1, earthworm: 1, bee: 1, butterfly: 1 }, BIN = { bottle: 1, can: 1, cup: 1 }, P12 = Object.assign({ tadpole: 1, fish: 1, lily: 1, dragonfly: 1, mosquito: 1, frog: 1 }, M6), SAW = { deer: 1, rabbit: 1, squirrel: 1, bird: 1 };
+  Object.assign(P, {
+    trp0: () => tripPupil({ st: '' }),
+    trpG: () => tripPupil({ st: 'show', d: today() }),
+    trpS: () => tripPupil({ st: 'ship', d: today(), seen: 1 }),
+    trpI: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'meadow' }),
+    trpP: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'pondSign', got: Object.assign({}, M6), bin: Object.assign({}, BIN) }),
+    trpF: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'forestSign', got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3 }),
+    trpB: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'back', got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
+    trpO: () => tripPupil({ st: 'poster', d: today(), seen: 1, landed: 1, seen3: 'back', in: 1, got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
+  });
   for (let i = 0; i < 8; i++) P['q' + i] = () => atQuest(i);
-  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm', isle0: 'helm', isle1: 'isle', isle3: 'hill', isleW: 'isle', sch0: 'helm', sch1: 'school', schP: 'school', schL: 'school', schI: 'classroom', schM: 'musicroom', schG: 'gym', schA: 'artroom', schR: 'libroom', schW: 'pcroom', schLu: 'cafe', schLf: 'lobbybox', schK: 'office', schH: 'office', schS: 'shopfront', funH: [1200, 1110], funR: 'race' };
+  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm', isle0: 'helm', isle1: 'isle', isle3: 'hill', isleW: 'isle', sch0: 'helm', sch1: 'school', schP: 'school', schL: 'school', schI: 'classroom', schM: 'musicroom', schG: 'gym', schA: 'artroom', schR: 'libroom', schW: 'pcroom', schLu: 'cafe', schLf: 'lobbybox', schK: 'office', schH: 'office', schS: 'shopfront', funH: [1200, 1110], funR: 'race', trp0: 'school', trpG: 'gym', trpS: 'eastpier', trpI: 'green', trpP: 'greenPond', trpF: 'greenForest', trpB: 'greenPier', trpO: 'classroom' };
   const menu = document.getElementById('testMenu');
   const refresh = () => { try { Hud.cardKey = ''; Hud.refresh(); } catch (e) { /* older game */ } };          // the quest card, after a jump
   // what has been reached so far (read from the game itself)
@@ -230,6 +261,7 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
       ok(!!(s.school || {}).news) + 'Okul gazetesi panoda',
       ok(!!((s.school || {}).kim && s.school.kim.done)) + 'Yeni öğrenci Kim: okul turu',
       ok(!!(s.school || {}).home) + 'Ev zamanı ve karne (gemi açıldı)',
+      (() => { const T = (s.school || {}).trip || {}, n = Object.keys(T.got || {}).length + Object.keys(T.saw || {}).length; return ok(T.st === 'done') + '7. bölüm, okul gezisi: ' + ({ '': 'başlamadı', show: 'quiz show', ship: 'gemiye', sea: 'denizde', green: 'Yeşil Adalar', sea2: 'dönüş yolunda', poster: 'sınıfta poster', done: 'bitti' }[T.st || ''] || T.st) + ' · defterde ' + n + ' / 16 canlı'; })(),
       (() => { const f = s.fun || {}, ph = Object.keys(f.photo || {}).length; return ok(ph >= 16) + 'Serbest oyun: 📷 albüm ' + ph + ' / 16 · 🗺️ hazine ' + (f.hunted | 0) + ' kez · 🙈 saklambaç ' + (f.hides | 0) + ' kez · 🎣 ' + Object.keys(f.fish || {}).length + ' renk balık · 🍎 ' + (f.apples | 0) + ' elma · 🎈 ' + (f.balloons | 0) + ' balon · ⚗️ ' + (f.potions | 0) + ' iksir'; })(),
       'ℹ️ Sunny Coin: ' + ((window.SH && SH.Coins) ? SH.Coins.get() : 0) + ' · dükkândan: ' + (((s.school || {}).shop || {}).own || []).join(', '),
       'ℹ️ Bugün: ' + (window.SH && SH.SCHOOLIN && SH.SCHOOLIN.day() ? (SH.SCHOOLIN.onBreak() ? 'teneffüs' : SH.SCHOOLIN.nextLesson() ? 'sıradaki ders ' + SH.SCHOOLIN.lessonName() : 'dersler bitti') : 'kapılar açılmadı'),
@@ -265,7 +297,7 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
   });
   // after the reload: the first time you are in the game (Continue), jump to the right place
   let tp = null; try { tp = localStorage.getItem(TP); } catch (e) { /* no storage */ }
-  if (tp) { const iv = setInterval(() => { if (window.SH && SH.game && SH.game.mode === 'play') { clearInterval(iv); try { localStorage.removeItem(TP); } catch (e) { /* */ } let p = JSON.parse(tp); if (p === 'school' && SH.ISLE6) { SH.ISLE6.land(); refresh(); return; } if (p === 'race' && SH.ISLE6) { SH.ISLE6.land(); SH.tp(2590, 5428); refresh(); return; } if (p === 'classroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1490, 2150); refresh(); return; } if (p === 'musicroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(746, 2165); refresh(); return; } if (p === 'gym' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(470, 2125); refresh(); return; } if (p === 'artroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1452, 2525); refresh(); return; } if (p === 'libroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1810, 2125); refresh(); return; } if (p === 'pcroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1797, 2560); refresh(); return; } const inside = { cafe: [374, 2560], lobbybox: [990, 2560], office: [800, 2400], shopfront: [960, 2240] }; if (inside[p] && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(inside[p][0], inside[p][1]); refresh(); return; } if (p === 'isle' || p === 'hill') { SH.ISLE5.land(); if (p === 'hill') { const H = SH.ISLE5.HILL; SH.tp(H.x - H.rx * H.top - 50, SH.ISLE5.RAMP.y); } refresh(); return; } if (p === 'helm') { const q = SH.SHIP.helmSpot(); p = [q.x, q.y]; } SH.tp(p[0], p[1]); refresh(); } }, 300); }
+  if (tp) { const iv = setInterval(() => { if (window.SH && SH.game && SH.game.mode === 'play') { clearInterval(iv); try { localStorage.removeItem(TP); } catch (e) { /* */ } let p = JSON.parse(tp); if (p === 'school' && SH.ISLE6) { SH.ISLE6.land(); refresh(); return; } if (p === 'race' && SH.ISLE6) { SH.ISLE6.land(); SH.tp(2590, 5428); refresh(); return; } if (p === 'eastpier' && SH.ISLE6) { SH.ISLE6.land(); SH.tp(3330, 5500); refresh(); return; } const g7 = { green: null, greenPond: [1960, 7910], greenForest: [2965, 8160], greenPier: [3300, 8170] }; if (p in g7 && SH.ISLE7) { SH.ISLE7.land(); if (g7[p]) SH.tp(g7[p][0], g7[p][1]); refresh(); return; } if (p === 'classroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1490, 2150); refresh(); return; } if (p === 'musicroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(746, 2165); refresh(); return; } if (p === 'gym' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(470, 2125); refresh(); return; } if (p === 'artroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1452, 2525); refresh(); return; } if (p === 'libroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1810, 2125); refresh(); return; } if (p === 'pcroom' && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(1797, 2560); refresh(); return; } const inside = { cafe: [374, 2560], lobbybox: [990, 2560], office: [800, 2400], shopfront: [960, 2240] }; if (inside[p] && SH.SCHOOLIN) { SH.SCHOOLIN.enter(true); SH.tp(inside[p][0], inside[p][1]); refresh(); return; } if (p === 'isle' || p === 'hill') { SH.ISLE5.land(); if (p === 'hill') { const H = SH.ISLE5.HILL; SH.tp(H.x - H.rx * H.top - 50, SH.ISLE5.RAMP.y); } refresh(); return; } if (p === 'helm') { const q = SH.SHIP.helmSpot(); p = [q.x, q.y]; } SH.tp(p[0], p[1]); refresh(); } }, 300); }
   void FULL;
 })();
 </script>

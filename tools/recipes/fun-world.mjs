@@ -20,7 +20,7 @@ export default async function ({ evaluate, sleep, shot, consoleLog, viewport }) 
   await S(`Object.assign(SH.state, { stars: 8, quest: 8, finished: true, done: ['brother','family','chores','animals','where','bedtime','truefalse','final'] });
     SH.state.lab = { stage: 'done', bananas: 8, told: 1, roared: 1 }; SH.state.ship = { stage: 'ready', got: ['max','dad','mom','nomi','lily','bob','owl','rosa'], capt: 1, sailed: 1 };
     SH.state.sea = { stage: 'won', hits: 5, told: 1, dmg: 0, map: 1 }; SH.state.isle = { stage: 'won', f: 5, n: 0, fixed: 1 }; SH.state.eggs = { treasure: 1 };
-    SH.state.school = { stage: 'pass', met: 1, yard: 1, uniform: 1, listed: 1, ttSeen: 1, inside: 1, days: 1, coins: 100, coinTold: 1, kim: { done: 1 }, home: SH.ISLE6.today(), day: { d: SH.ISLE6.today(), n: 9, ph: 'lesson', home: 1 } };
+    SH.state.school = { stage: 'pass', trip: { st: 'done' }, met: 1, yard: 1, uniform: 1, listed: 1, ttSeen: 1, inside: 1, days: 1, coins: 100, coinTold: 1, kim: { done: 1 }, home: SH.ISLE6.today(), day: { d: SH.ISLE6.today(), n: 9, ph: 'lesson', home: 1 } };
     SH.state.unlocked = ['uniform']; SH.state.wear = { uniform: true }; SH.state.bname = 'Ayşe'; SH.state.cls = 'B'; SH.refreshPlayerLook(); SH.Save.save(); SH.Hud.cardKey = ''; SH.Hud.refresh();`);
   await S('SH.game.paused = true'); await step(0.2);
   log('the card at home after school:', await card());
