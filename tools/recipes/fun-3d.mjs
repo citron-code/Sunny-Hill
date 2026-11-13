@@ -21,6 +21,9 @@ export default async function ({ evaluate, sleep, shot, consoleLog }) {
     await S(`SH.state.fun.hunt = { stops: ['tent', 'boat', 'barn'], i: 0 }; SH.FUN.start('dig')`); await sleep(300); await pic('dig-x');
     for (let k = 0; k < 3; k++) { await S('SH.FUN.digTap(200, 222)'); await sleep(150); } await sleep(1300); await pic('dig-found');
     await S(`(() => { const G = SH.FUN.G; G.ph = 'far'; G.t = 0; })()`); await sleep(400); await pic('dig-far'); await close();
+    await S(`SH.state.fun.hunt = { stops: ['tent', 'scarecrow', 'barn'], i: 0 }; SH.FUN.start('dig')`); await sleep(300); for (let k = 0; k < 3; k++) { await S('SH.FUN.digTap(200, 222)'); await sleep(150); } await sleep(1300);
+    await S(`(() => { const G = SH.FUN.G; G.ph = 'far'; G.t = 0; })()`); await sleep(400); await pic('dig-far-scarecrow'); await close();          // (the scarecrow: once missing from the 3D pictures)
+    await S(`(SH.state.fun.hunt = { stops: ['scarecrow', 'windmill', 'barn'], i: 0 }, SH.FUN.start('map'))`); await sleep(900); await pic('map-scarecrow'); await close();
     await S(`SH.state.fun.hunt = { stops: ['tent', 'windmill', 'barn'], i: 2 }; SH.FUN.start('dig')`); await sleep(200); for (let k = 0; k < 3; k++) { await S('SH.FUN.digTap(200, 222)'); await sleep(150); } await sleep(1000); await S(`SH.FUN.G.ph = 'open'`); await sleep(800); await pic('dig-chest'); await close();
     await S('SH.state.fun.hunt = null');
   }
