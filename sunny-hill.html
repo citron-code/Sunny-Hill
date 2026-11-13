@@ -236,8 +236,8 @@ body.ttOn #joyZone{display:none!important}
 #lsBtns.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:min(680px,96vw)} #lsBtns .tile{width:60px;height:62px;font-size:34px;padding:0;background:#8f6bd1;border-radius:14px} #lsBtns .tile.ok{background:#3fae5c;opacity:.55;box-shadow:none}
 #lsBtns .tile.shake{animation:tshake .35s} @keyframes tshake{0%,100%{transform:none}25%{transform:translateX(-7px) rotate(-4deg)}75%{transform:translateX(7px) rotate(4deg)}}
 #pnl7{position:fixed;left:50%;top:clamp(66px,12vh,120px);transform:translateX(-50%);z-index:40;pointer-events:none;filter:drop-shadow(0 8px 16px rgba(0,0,0,.3));text-align:center}
-#pnl7 canvas{display:block;margin:0 auto} #pnl7.lens canvas{width:min(230px,50vw,34vh);height:min(230px,50vw,34vh);border-radius:50%;border:12px solid #8a5a34;box-shadow:inset 0 0 0 5px #c98f55;background:#fff}
-#pnl7.lens::after{content:'';position:absolute;left:78%;top:80%;width:20px;height:64px;border-radius:10px;background:#6b4430;transform:rotate(-42deg);transform-origin:top center}
+#pnl7 canvas{display:block;margin:0 auto} #pnl7.lens{transform:translateX(-39%)} #pnl7.lens canvas{width:min(340px,72vw,44vh);height:auto;aspect-ratio:1;transform-origin:84% 84%;animation:lensIn .5s cubic-bezier(.2,1.35,.45,1) both,lensBob 3.4s ease-in-out .5s infinite}
+@keyframes lensIn{from{transform:translate(40px,60px) rotate(24deg) scale(.5);opacity:0}to{transform:none;opacity:1}} @keyframes lensBob{0%,100%{transform:none}50%{transform:rotate(-2deg) translateY(-4px)}}
 #pnl7.bino canvas{width:min(480px,88vw,66vh);height:auto;aspect-ratio:16/9;animation:binoIn .8s ease-out} @keyframes binoIn{from{filter:blur(8px);transform:scale(1.08)}to{filter:none;transform:none}} #pnl7.page canvas{width:min(520px,92vw,52vh);height:auto;aspect-ratio:4/3;border-radius:12px}
 #pnl7.note{pointer-events:auto;top:50%;transform:translate(-50%,-50%)} #pnl7.note canvas{width:min(620px,94vw,105vh);height:auto;aspect-ratio:3/2;border-radius:16px;border:6px solid #3a7bd5;background:#fffdf6}
 #pnl7.poster{pointer-events:auto;top:50%;transform:translate(-50%,-50%)} #pnl7.poster canvas{width:min(640px,94vw,125vh);height:auto;aspect-ratio:900/640;border-radius:14px;border:6px solid #8a5a34} #pnl7.poster.full .ok7{display:inline-block}
@@ -2778,7 +2778,7 @@ function drawPerson(c, L, o) {
     armP(c, -bw - 0.5, shY + 4, act[1] != null ? act[1] : 0.14 + sw * 0.2, armLen, sleeve, L.skin, long);
     const wave = o.wave && !back ? -2.55 + Math.sin(t * 9) * 0.35 : act[0] != null ? act[0] : -(0.14 - sw * 0.2);
     armP(c, bw + 0.5, shY + 4, wave, armLen, sleeve, L.skin, long);
-    if (o.prop && !back) { c.save(); c.translate(bw + 0.5, shY + 4); c.rotate(wave); c.translate(0, armLen); drawProp2D(c, o.prop, t); c.restore(); }
+    if (o.prop && (!back || o.prop === 'lens')) { c.save(); c.translate(bw + 0.5, shY + 4); c.rotate(wave); c.translate(0, armLen); drawProp2D(c, o.prop, t); c.restore(); }          // (a magnifier held out to the side shows from behind too)
   }
   if (L.cape && back) capeP(c, L.cape, bw, shY, hipY, false, true);
   if (back) {
@@ -4857,6 +4857,7 @@ function groundH3(x, z) {
   return h;
 }
 const WATER_Y3 = -7;
+function wave3(x, z, t) { return (Math.sin(t * 1.7 + x * 0.045 + z * 0.03) + 0.6 * Math.sin(t * 2.3 - z * 0.06 + x * 0.02)) * 1.4; }          // (the water's swell at (x, z), as ANIM3 moves it for anim -1.4: things floating on it go up and down with it)
 function standY3(x, z) {       // where feet rest: the dock is a little higher than the ground
   const D = MAP.dock;
   if (x > D.x0 && x < D.x1 && z > D.y0 - 10 && z < D.y1) return 5;
@@ -5024,10 +5025,12 @@ function build3DWorld() {
   }
   // lily pads and reeds
   const wm = chunk(...AT('lake'));
+  wm.anim = -1.4;          // (they float: up and down with the water's swell, never under it)
   for (const p of MAP.lilies) {
     wm.color('#5cc86a').cyl(p[0], WATER_Y3 + 0.6, p[1], 11, 11, 1.2, 10, { rot: 0.4 });
     if (p[0] % 3 === 0) wm.color('#ff9fc0').sphere(p[0] + 3, WATER_Y3 + 3, p[1] - 3, 4, 3, 4, 6, 3);
   }
+  wm.anim = 0;
   for (const p of MAP.reeds) {
     for (let k = -1; k <= 1; k++) { wm.color('#4c9a3c').cyl(p[0] + k * 4, -4, p[1] + k, 1.2, 0.8, 28 - k * 3, 4); wm.color('#8a5530').sphere(p[0] + k * 4, 22 - k * 3, p[1] + k, 2.4, 5, 2.4, 5, 3); }
   }
@@ -6082,17 +6085,20 @@ function actPose3(q, act, t, sd, k) {
     case 'hold': q.armAx += -1.05 * k; q.armBx += -1.05 * k; q.armAz += 0.42 * k; q.armBz -= 0.42 * k; q.hPitch += 0.08 * k; break;          // (a ball in both hands, in front)
     case 'point': q.armBx += -2.1 * k; q.armBz -= 0.2 * k; q.hPitch -= 0.1 * k; break;          // (the right arm out and up: over there!)
     case 'shoot': q.armAx += -2.6 * k; q.armBx += -2.6 * k; q.armAz += 0.25 * k; q.armBz -= 0.25 * k; q.eyes = 'happy'; break;          // (both arms up: a throw)
+    case 'lens': q.armBx += -0.9 * k; q.armBz += 0.45 * k; q.armAx += -0.3 * k; q.armAz += 0.12 * k; q.lean += 0.14 * k; q.hPitch += 0.34 * k; break;          // (a magnifier held out low in front: a close look)
+    case 'dip': { const u = KIT.dipK; q.armAx += (-1.5 + 0.45 * u) * k; q.armBx += (-1.5 + 0.45 * u) * k; q.armAz += 0.3 * k; q.armBz -= 0.3 * k; q.lean += 0.12 * u * k; q.hPitch += (0.08 + 0.32 * u) * k; q.twist += Math.sin(t * 7) * 0.07 * u * k; break; }          // (the pond net: held up in front; down into the water, a swish)
   }
 }
 // a thing in the right hand (a painter has a palette in the left, a basket hangs from the left); returns the right hand
 function drawProp3(R, kind, mA, mB, d, st) {
-  const P = SHIP.M && SHIP.M.props;
+  const P = kind === 'lens' || kind === 'dipnet' ? KIT.hand3() : SHIP.M && SHIP.M.props;          // (the Green Islands' magnifier and pond net are the kit's)
   if (!P) return null;
   const hy = d.sh - 2.4 - (d.armDrop || 0) - d.arm, hand = m4s(m4t(new Float32Array(mB), d.ax, hy, 0.6), 1.3, 1.3, 1.3);
   if (kind === 'basket') { R.draw(P.basket, m4s(m4t(new Float32Array(mA), -d.ax, hy, 0.6), 1.3, 1.3, 1.3)); return hand; }
   if (P[kind]) R.draw(P[kind], hand);
   if (kind === 'brush') R.draw(P.palette, m4s(m4t(new Float32Array(mA), -d.ax, hy, 1), 1.3, 1.3, 1.3));
   if (kind === 'can' && st.act === 'water') for (let k = 0; k < 3; k++) { const f = ((st.t || 0) * 50 + k * 7) % 21, tip = m4apply(hand, 0, -3, 18.5); R.draw(W3.dyn.drop, T3(tip[0], tip[1] - f, tip[2])); }
+  if (kind === 'dipnet') KIT.dipFx(R, hand, st);
   return hand;
 }
 function drawPerson3(R, L, st) {
@@ -6397,8 +6403,9 @@ function drawAnimal3(R, kind, st) {
   let spin = 0, sniff = 0;
   if (kind === 'dog' && !mv && !st.talk && !st.still) {
     const k = (t + 2.3) / 5.2, slot = Math.floor(k), f = k - slot, h = hash1(slot * 4.13 + 0.7);
-    if (h < 0.3) spin = sstep(f / 0.42) * TAU * 2 * (hash1(slot * 1.9) < 0.5 ? -1 : 1);
-    else if (h < 0.62) sniff = sstep(f / 0.08) * sstep((0.5 - f) / 0.08);
+    if (st.idle != null && h < 0.12 && f < 0.05 && st.idle - f * 5.2 > 12) sparky.twirl = slot;          // (after a long quiet while, now and then: once round after his tail; decided as the moment starts, so it never stops half way)
+    if (st.idle != null && sparky.twirl === slot) spin = sstep(f / 0.5) * TAU * (hash1(slot * 1.9) < 0.5 ? -1 : 1);
+    else if (h >= 0.12 && h < 0.62) sniff = sstep(f / 0.08) * sstep((0.5 - f) / 0.08);
   }
   const root = T3(st.x, st.y || 0, st.z); m4ry(root, (st.yaw || 0) + spin); if (st.scale) m4s(root, st.scale, st.scale, st.scale);
   const th = G ? (st.phase || 0) / 0.13 * G.rate : 0;      // where each foot is in its step
@@ -6698,7 +6705,7 @@ function g3Render(t, dt, tour) {
   const look = Dialog.focus && Dialog.open ? Dialog.focus : null;
   const pst = { x: player.x, z: player.y, y: standY3(player.x, player.y), yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', dizzy: player.stun > 0, scale: CS3 };
   drawPerson3(R, PLAYER_LOOK, pst);
-  drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+  drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
   drawVillageLife3(R, t, dt);
   SHIP.draw3(R, t);
   // carried thing, Sparky's arrow
@@ -7132,7 +7139,8 @@ const player = {
   path: null, pathI: 0, goal: null, stuck: 0, regoal: 0, trail: [],
   b: [-28, -88, 28, 10], occ: false,
   draw(c, t) {
-    drawPerson(c, PLAYER_LOOK, { x: this.x, y: this.y, dir: this.dir, moving: this.moving, phase: this.phase, t, seed: this.seed, talk: Dialog.mouth === 'player', sleep: this.stun > 0 });
+    const h = KIT.held();          // (the Green Islands: the magnifier or the pond net in your hands)
+    drawPerson(c, PLAYER_LOOK, { x: this.x, y: this.y, dir: this.dir, moving: this.moving, phase: this.phase, t, seed: this.seed, talk: Dialog.mouth === 'player', sleep: this.stun > 0, act: h && h.act, prop: h && h.prop });
   },
 };
 const sparky = {
@@ -10045,7 +10053,7 @@ const EGGS = {
       drawAnimal3(R, k ? 'duckling' : 'duck', { x: d.x, z: d.z, y: WATER_Y3 - 1.5 + Math.sin(t * 2 + k) * 0.6, yaw: d.yaw, t: t + k, talk: !k && Dialog.mouth === 'duck', scale: CS3 });
     }
     const fp = this.frogPos();
-    drawAnimal3(R, 'frog', { x: fp.x, z: fp.z, y: WATER_Y3 + 1.3 + fp.h, yaw: Math.atan2(player.x - fp.x, player.y - fp.z) * 0.5, t, talk: Dialog.mouth === 'frog', scale: CS3 });
+    drawAnimal3(R, 'frog', { x: fp.x, z: fp.z, y: WATER_Y3 + 1.3 + fp.h + wave3(fp.x, fp.z, t), yaw: Math.atan2(player.x - fp.x, player.y - fp.z) * 0.5, t, talk: Dialog.mouth === 'frog', scale: CS3 });
     const S = this.scarecrow, sm = T3(S.x, 0, S.y);
     m4rz(sm, S.wave > 0 ? Math.sin(t * 10) * 0.09 : Math.sin(t * 1.2) * 0.02); R.draw(W3.dyn.scarecrow, sm);
     const Rb = this.rabbit;
@@ -10872,7 +10880,7 @@ const LAB = {
     const pst = { x: player.x, z: player.y, y: 1, yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', dizzy: player.stun > 0, scale: CS3 };
     const blink = player.inv > 0 && !(player.stun > 0) && Math.floor(t * 14) % 2;
     if (!blink) drawPerson3(R, PLAYER_LOOK, pst);
-    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, y: 1, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, y: 1, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
     this.drawApe3(R, t);
     for (let k = 0; k < (this.hearts > 0 ? 4 : 0); k++) {
       const p = (t * 0.6 + k / 4) % 1, m = T3(P.x + Math.sin(p * 6 + k) * 22, 180 + p * 60, P.y + 8);
@@ -12160,6 +12168,7 @@ function drawProp2D(c, kind, t) {
   else if (kind === 'brush') { seg(c, 0, 0, 0, 10, '#c98f55', 2); circ(c, 0, 11, 1.8, '#ff5a8a', 0); }
   else if (kind === 'basket') { rrect(c, -7, 4, 14, 9, 3, '#d9a066', 2); c.beginPath(); c.arc(0, 5, 6, Math.PI, 0); c.lineWidth = 1.6; c.strokeStyle = '#b98a55'; c.stroke(); circ(c, -2, 4, 2, '#ff7aa2', 0); circ(c, 2.5, 4, 2, '#ffd23c', 0); }
   else if (kind === 'yarn') { circ(c, 0, 4, 4, '#ff7aa2', 1.6); seg(c, -5, 0, 5, 8, '#c9c1b2', 1.2); seg(c, 5, 0, -5, 8, '#c9c1b2', 1.2); }
+  else if (kind === 'lens') { rrect(c, -1.6, -2, 3.2, 10.5, 1.5, '#8a4f24', 1.2); rrect(c, -2.3, 7.5, 4.6, 3, 1.2, '#f2c14e', 1); c.beginPath(); c.arc(0, 17, 6.6, 0, TAU); c.fillStyle = 'rgba(214,241,255,.8)'; c.fill(); c.lineWidth = 2.8; c.strokeStyle = '#e0a032'; c.stroke(); c.beginPath(); c.arc(0, 17, 8, 0, TAU); c.lineWidth = 1; c.strokeStyle = INK; c.stroke(); seg(c, -3.2, 14, -1.2, 12.2, 'rgba(255,255,255,.95)', 1.5); }          // (the magnifier)
   void t;
 }
 // how the arms move for each job in the flat view: [right arm, left arm] (angles; null = as usual)
@@ -12173,6 +12182,8 @@ function actArms2D(act, t) {
     case 'knit': return [0.6 + 0.05 * Math.sin(t * 9), -0.6 + 0.05 * Math.sin(t * 9 + 1)];
     case 'pick': return [-0.3 - 0.4 * Math.max(0, Math.sin(t * 2.2)), null];
     case 'feed': return [-0.4 - 1.0 * Math.max(0, Math.sin(t * 3)), null];
+    case 'lens': return [-0.95, null];
+    case 'dip': return [0.42, -0.42];
   }
   return [null, null];
 }
@@ -14427,7 +14438,7 @@ const ISLE5 = {
     const look = Dialog.open && Dialog.focus ? Dialog.focus : null, py = this.standY(player.x, player.y);
     const blink = player.inv > 0 && !(player.stun > 0) && Math.floor(t * 14) % 2;
     if (!blink) drawPerson3(R, PLAYER_LOOK, { x: player.x, z: player.y, y: py, yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', dizzy: player.stun > 0, scale: CS3 });
-    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, y: this.standY(sparky.x, sparky.y), yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, y: this.standY(sparky.x, sparky.y), yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
     if (player.stun > 0) {
       const top = py - personTop(PLAYER_LOOK) * CS3 + 8;
       R.setTint(1, 1, 1, 1, 0.5);
@@ -16419,7 +16430,7 @@ const ISLE6 = {
     // you and Sparky
     const look = Dialog.open && Dialog.focus ? Dialog.focus : this.tt && this.tt.on && this.tt.near != null ? (this.tt.near ? this.TT.near : this.TT.far) : null, rp = this.ride && this.ride.p, py = rp ? (rp.seat != null ? rp.seat - this.hipH() : rp.h) : this.standY(player.x, player.y);          // (on a ride: sitting on the seat, or up the ladder)
     drawPerson3(R, PLAYER_LOOK, { x: player.x, z: player.y, y: py, yaw: rp ? rp.yaw : face3(player, dt, look, true), moving: player.moving, mv: rp ? (player.moving ? 1 : 0) : mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3, sit: rp && rp.seat != null ? rp.legs : null, arms: rp && rp.arms, tilt: rp && rp.tilt });
-    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, y: rp && rp.dog ? rp.dog.h : this.standY(sparky.x, sparky.y), yaw: rp && rp.dog ? -Math.PI / 2 : face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, y: rp && rp.dog ? rp.dog.h : this.standY(sparky.x, sparky.y), yaw: rp && rp.dog ? -Math.PI / 2 : face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
     const tg = game.mode === 'play' ? Quests.target() : null;
     if (tg && Math.hypot(tg.x - player.x, tg.y - player.y) > 130) {          // Sparky's arrow
       const side = sparky.x >= player.x ? 1 : -1, ax = sparky.x + side * 24, az = sparky.y + 6;
@@ -19101,7 +19112,7 @@ const SCHOOLIN = {
       if (Shop.has('pencils')) R.draw(M.dPencils, T3(D.x - 6, 29.6, D.desk + 6));
       if (Shop.has('plant')) R.draw(M.dPlant, T3(D.x - 15, 29.6, D.desk - 4));
       if (Shop.has('trophy')) R.draw(M.dTrophy, T3(D.x + 15, 29.6, D.desk - 4)); }
-    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, y: 1, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, y: 1, yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
     const ppl = this.people().concat(this.staff());
     for (const p of ppl) {          // (the teacher and the classmates, the school's people: they look at you while you talk to them)
       const L = LOOKS[p.id], talking = Dialog.open && Dialog.focus && Dialog.focus.id === p.id && !LS, st = { x: p.x, z: p.y, y: p.sit ? (p.seat || 17.5) - ISLE6.hipH(L) : 1, yaw: talking && !p.sit ? squareYaw(Math.atan2(player.x - p.x, player.y - p.y)) : p.yaw, moving: !!p.mv, mv: p.mv ? 1 : 0, phase: p.phase || 0, t: t + p.x * 0.01, seed: p.x * 0.013, talk: Dialog.mouth === p.id || (this.lesson && this.lesson.bub && this.lesson.bub.id === p.id), wave: !!p.wave, act: p.act, scale: CS3 };
@@ -19938,7 +19949,7 @@ const ISLE7 = {
     if (Math.abs(l) < 92 && Math.abs(x - S.x) < HULL.half(l) * K) { const dk = HULL.deck(l) * K - 0.5; return Math.abs(y - P.y) < P.hw + 3 && x > P.x0 - 14 ? dk + (P.h0 - dk) * clamp((x - P.x0 + 14) / 14, 0, 1) : dk; }          // the school ship's deck
     const b = this.onBridge(x, y); if (b) return Math.max(this.groundH(x, y), 3 + 11 * Math.sin(Math.PI * b.u));          // a bridge: a gentle arch
     if (this.inJetty(x, y)) return 0.6 + 4 * clamp((this.JETTY.y1 - y) / 36, 0, 1);          // the little pier on the pond (its land end a ramp down to the grass)
-    for (const q of this.PADS.concat([this.FROG_PAD])) if (Math.hypot(x - q[0], y - q[1]) < 20) return WATER_Y3 + 1.4;          // the water lilies (hopping)
+    for (const q of this.PADS.concat([this.FROG_PAD])) if (Math.hypot(x - q[0], y - q[1]) < 20) return WATER_Y3 + 1.4 + wave3(x, y, game.t);          // the water lilies (hopping; they ride the swell)
     { const h = GREEN7.standY(x, y); if (h != null) return h; }          // the treehouse lookout: up its stairs, its floor
     return this.inDock(x, y) ? 5 : Math.max(0, this.groundH(x, y));
   },
@@ -20071,6 +20082,7 @@ const ISLE7 = {
     if (this.off) { if (game.mode === 'play' && !Dialog.open) this.offTick(dt); }
     if (TRIP.walk && game.mode === 'play' && !Dialog.open) TRIP.walkTick(dt);
     if (TRIP.hop) TRIP.hopTick(dt);          // (hopping on the water lilies)
+    if (TRIP.dipping) TRIP.dipTick(dt);          // (dipping the pond net)
     if (!TRIP.crew) this.crewLand();
     if (!this.off) { TRIP.stageTick(); TRIP.backTick(); GREEN7.update(dt); }          // (a new part of the trip: what happens as it starts; at the end, all aboard; Sparky's hints, the islands' sounds)
   },
@@ -20121,7 +20133,8 @@ const ISLE7 = {
     const rd = new MB(704);          // reeds round the pond, water lilies on it
     { const P = this.POND, R = rng(31);
       for (let k = 0; k < 46; k++) { const a = R() * TAU, f = 1.02 + R() * 0.12, x = P.x + Math.cos(a) * P.rx * f, y = P.y + Math.sin(a) * P.ry * f; if (Math.abs(a - Math.PI / 2) < 0.5) continue; for (let j = 0; j < 3; j++) { const h = 16 + R() * 14; rd.color('#4a8a3a').cyl(x + (j - 1) * 2.4, -4, y + R() * 3, 0.6, 0.4, h, 4); if (j === 1 && R() < 0.6) rd.color('#7a4a2a').sphere(x, h - 6, y, 1.3, 3.6, 1.3, 6, 5); } }
-      for (let k = 0; k < 9; k++) { const a = k * 2.4, r = 0.25 + (k % 3) * 0.2, x = P.x + Math.cos(a) * P.rx * r, y = P.y + Math.sin(a) * P.ry * r; rd.color('#3fae5c').cyl(x, WATER_Y3 + 0.2, y, 9, 9, 0.6, 14); if (k % 2) { rd.color('#ffffff').sphere(x + 2, WATER_Y3 + 2.2, y, 2.6, 1.8, 2.6, 8, 5); rd.color('#ffd1e6').sphere(x + 2, WATER_Y3 + 3, y, 1.4, 1.2, 1.4, 6, 4); } } }
+      rd.anim = -1.4;          // (the water lilies float: up and down with the swell)
+      for (let k = 0; k < 9; k++) { const a = k * 2.4, r = 0.25 + (k % 3) * 0.2, x = P.x + Math.cos(a) * P.rx * r, y = P.y + Math.sin(a) * P.ry * r; rd.color('#3fae5c').cyl(x, WATER_Y3 + 0.2, y, 9, 9, 0.6, 14); if (k % 2) { rd.color('#ffffff').sphere(x + 2, WATER_Y3 + 2.2, y, 2.6, 1.8, 2.6, 8, 5); rd.color('#ffd1e6').sphere(x + 2, WATER_Y3 + 3, y, 1.4, 1.2, 1.4, 6, 4); } } rd.anim = 0; }
     M.reeds = pack(rd);
   },
   build3D() {
@@ -20228,10 +20241,10 @@ const ISLE7 = {
     TRIP.isle3(R, t);          // (the stations' living things, litter, the frog, the forest's animals)
     GREEN7.draw3(R, t);          // (butterflies, bees, the ant trail, ducks, fish, birds, the forest's hungry animals, the garden's flowers)
     TRIP.crewDraw3(R, t, (x, y) => this.standY(x, y));
-    const look = Dialog.open && Dialog.focus ? Dialog.focus : null, py = this.standY(player.x, player.y) + (TRIP.hop ? TRIP.hop.h || 0 : 0);
-    drawPerson3(R, PLAYER_LOOK, { x: player.x, z: player.y, y: py, yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3 });
-    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, y: this.standY(sparky.x, sparky.y), yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
-    const tg = game.mode === 'play' ? Quests.target() : null;
+    const look = Dialog.open && Dialog.focus ? Dialog.focus : TRIP.busy3 && TRIP.lookAt ? TRIP.lookAt : null, py = this.standY(player.x, player.y) + (TRIP.hop ? TRIP.hop.h || 0 : 0);          // (at a station: toward what you look at)
+    drawPerson3(R, PLAYER_LOOK, Object.assign({ x: player.x, z: player.y, y: py, yaw: face3(player, dt, look, true), moving: player.moving, mv: mvOf3(player, dt), phase: player.phase, t, seed: player.seed, talk: Dialog.mouth === 'player', scale: CS3 }, KIT.held()));          // (the magnifier or the pond net in your hands)
+    drawAnimal3(R, 'dog', { x: sparky.x, z: sparky.y, idle: sparky.stillT || 0, y: this.standY(sparky.x, sparky.y), yaw: face3(sparky, dt, sparky.moving ? null : player), moving: sparky.moving, phase: sparky.phase, t, talk: Dialog.mouth === 'sparky', scale: CS3 });
+    const tg = game.mode === 'play' && !TRIP.busy3 ? Quests.target() : null;          // (not while you are busy at a station)
     if (tg && Math.hypot(tg.x - player.x, tg.y - player.y) > 130) {
       const side = sparky.x >= player.x ? 1 : -1, ax = sparky.x + side * 24, az = sparky.y + 6;
       const m = T3(ax, this.standY(ax, az) + 58 + Math.sin(t * 5) * 4, az); m4ry(m, Math.atan2(-(tg.y - az), tg.x - ax)); m4rx(m, -Math.PI / 2); m4s(m, 1.5, 1.5, 1.5);
@@ -20338,7 +20351,7 @@ const ISLE7 = {
       seg(c, p.x, y - 3, p.x, y + 3, INK, 1.6);
     }
     GREEN7.over2(c, t, inView);          // (birds flying over, sparkles)
-    const tg = game.mode === 'play' ? Quests.target() : null;
+    const tg = game.mode === 'play' && !TRIP.busy3 ? Quests.target() : null;          // (not while you are busy at a station)
     if (tg && Math.hypot(tg.x - player.x, tg.y - player.y) > 130) drawGuideArrow(c, sparky.x, sparky.y - 62 - (GREEN7.standY(sparky.x, sparky.y) || 0) * 0.8, Math.atan2(tg.y - sparky.y, tg.x - sparky.x), t);
   },
   draw2DAtSea(c, cx, cy, vw, vh, t) {
@@ -20680,7 +20693,7 @@ Object.assign(TRIP, {
   whatOpts(id) { return [[NATURE.word(id), 1]].concat(this.wordsLike(id).map((o) => [NATURE.word(o)])); },
   look(it) {          // the magnifier: what is it? Then: an animal or a plant (the notebook), or is it living? No: the bin
     const C = GAME_CONTENT.trip.st3, T = this.isle(), id = it.id, A = NATURE.a(id, true);
-    this.busy3 = true; player.path = null; player.goal = null; this.panel('lens', id);
+    this.busy3 = true; player.path = null; player.goal = null; this.lookAt = { x: it.x, y: it.y }; player.dir = faceDir(it.x - player.x, it.y - player.y, player.dir); this.panel('lens', id);          // (you turn to it, the magnifier in your hand)
     SCHOOLIN.choose(C.what, this.whatOpts(id), () => {
       if (!NATURE.living(id)) {
         SCHOOLIN.choose(C.living, [[C.no, 1], [C.yes]], () => { T.bin[id] = 1; Save.save(); Coins.add(3); this.panel(null); const l = fmt(C.bin, { A }); Toast.show('🗑️ ' + l); Speech.speak(l, { who: 'player' }); this.after3(); }, C.notSure);
@@ -20695,17 +20708,27 @@ Object.assign(TRIP, {
     T.got[id] = 1; Save.save(); Coins.add(3); this.panel(null); Toast.show('📒 ' + l); Speech.speak(l, { who: 'player' });
     this.after3();
   },
-  after3() { this.busy3 = false; Hud.cardKey = ''; Hud.refresh(); },
+  after3() { this.busy3 = false; this.dipping = null; this.lookAt = null; KIT.dipK = 0; Hud.cardKey = ''; Hud.refresh(); },
   sign(k) {          // a sign by the way: its title and subtitles; what is it about?
     const C = GAME_CONTENT.trip.st3, S = k === 'pond' ? C.pondSign : C.forestSign, T = this.isle();
     this.busy3 = true; player.path = null; player.goal = null; this.panel('page', S);
     SCHOOLIN.choose(S.ask, S.opts.map(([t, ok]) => [t, ok]), () => { if (k === 'pond') T.ps = 1; else T.fs = 1; Save.save(); Coins.add(5); this.panel(null); Dialog.focus = null; Dialog.show(S.ok, () => this.after3()); }, S.no);
     $('lsBtns').className = 'lines';
   },
-  dip() {          // the net into the pond: a tadpole, a fish, a water lily
-    const C = GAME_CONTENT.trip.st3, T = this.isle(), n = T.dip | 0, id = this.CATCH[n]; if (!id) return;
-    this.busy3 = true; player.path = null; player.goal = null; player.dir = 'up'; this.splash = { t: 0 }; Sfx.play('pop');
-    setTimeout(() => { if (!this.busy3) return; this.panel('lens', id); SCHOOLIN.choose(C.dip, this.whatOpts(id), () => { T.dip = n + 1; this.got(id); }, C.notSure); }, 800);
+  dip() {          // the pond net (KIT): to the end of the little pier, down into the water, up with something in it: a tadpole, a fish, a water lily
+    const T = this.isle(), n = T.dip | 0, id = this.CATCH[n]; if (!id) return;
+    this.busy3 = true; player.path = null; player.goal = null; player.dir = 'up'; GREEN7.sfx('swish');
+    this.dipping = { t: 0, x0: player.x, y0: player.y, id, n }; this.lookAt = { x: ISLE7.JETTY_END[0] + 70, y: ISLE7.JETTY_END[1] - 70 };          // (out over the water, a little to the right: the net is not behind your head)
+  },
+  dipTick(dt) {          // (ISLE7.update) a dip, step by step: to the end of the pier; the net down (a splash), a swish in the water, up again (dripping); then: what is it?
+    const D = this.dipping, I = ISLE7, C = GAME_CONTENT.trip.st3, E = [I.JETTY_END[0], I.JETTY_END[1] + 2], s = (a, b) => clamp((D.t - a) / (b - a), 0, 1), e = (u) => u * u * (3 - 2 * u);
+    D.t += dt; player.path = null; player.dir = 'up';
+    const k = s(0, 0.3), far = Math.hypot(E[0] - D.x0, E[1] - D.y0) > 4;
+    player.x = D.x0 + (E[0] - D.x0) * e(k); player.y = D.y0 + (E[1] - D.y0) * e(k); player.moving = far && k < 1; if (player.moving) player.phase += dt * 11;
+    KIT.dipK = e(s(0.45, 0.8)) * (1 - e(s(1.2, 1.55)));
+    if (!D.sp && D.t > 0.76) { D.sp = 1; this.splash = { t: 0 }; Sfx.play('pop'); }
+    if (!D.up && D.t > 1.25) { D.up = 1; GREEN7.sfx('drip'); }
+    if (!D.q && D.t > 1.6) { D.q = 1; const T = this.isle(); this.panel('lens', D.id); SCHOOLIN.choose(C.dip, this.whatOpts(D.id), () => { T.dip = D.n + 1; this.got(D.id); }, C.notSure); }
   },
   hopStart() {          // pad to pad, to the frog on its big water lily
     const I = ISLE7; this.busy3 = true; player.path = null; player.goal = null;
@@ -20777,19 +20800,18 @@ Object.assign(TRIP, {
       ok.addEventListener('click', () => { Sfx.play('tap'); const f = this.noteDone; this.noteDone = null; this.panel(null); setMode('play'); if (f) f(); });
       P.appendChild(ok); document.body.appendChild(P);
     }
+    this.pk = kind || null;          // (what the panel shows: KIT.held)
     if (!kind) { P.classList.add('hidden'); return; }
     P.className = kind; const cv = P.firstChild, g = cv.getContext('2d');
     P.lastChild.textContent = kind === 'poster' ? GAME_CONTENT.trip.back.poster.done + ' ✔' : GAME_CONTENT.trip.st3.notebook.ok + ' 👍';
-    if (kind === 'lens') { cv.width = cv.height = 512; this.lensPaint(g, arg); }
+    if (kind === 'lens') { cv.width = cv.height = 640; this.lensPaint(g, arg); cv.style.animation = 'none'; void cv.offsetWidth; cv.style.animation = ''; }          // (each look: it swings in again)
     else if (kind === 'bino') { cv.width = 960; cv.height = 540; this.binoPaint(g, arg); cv.style.animation = 'none'; void cv.offsetWidth; cv.style.animation = ''; }          // (each animal: the focusing blur again)
     else if (kind === 'page') { cv.width = 800; cv.height = 600; this.signPaint(g, arg); }
     else if (kind === 'poster') { cv.width = 900; cv.height = 640; this.posterPaint(g); if (this.pst && !this.pst.left.length) P.classList.add('full'); }
     else { cv.width = 900; cv.height = 600; this.notePaint(g); }
   },
-  lensPaint(g, id) {
-    const W = 512, gr = g.createRadialGradient(W / 2, W * 0.42, 20, W / 2, W / 2, W / 2); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#e3f2d4');
-    g.fillStyle = gr; g.fillRect(0, 0, W, W); NATURE.pic(g, id, W / 2, W / 2 + 8, W * 0.6);
-    g.fillStyle = 'rgba(255,255,255,.4)'; g.beginPath(); g.ellipse(W * 0.3, W * 0.24, W * 0.15, W * 0.06, -0.6, 0, TAU); g.fill();
+  lensPaint(g, id) {          // the magnifier (KIT.lens2): a gold rim, a wooden handle; under its glass the living thing, big, where it lives
+    g.clearRect(0, 0, 640, 640); KIT.lens2(g, 250, 250, 200, Math.PI / 4, (q) => KIT.lensBack(q, id, 250, 250, 200));
   },
   binoPaint(g, id) {          // looking through binoculars: two round lenses as one view (no lines in the middle), the forest round the animal, rubber rims, a shine on the glass
     const W = 960, H = 540, R = 238, d = 300, cx1 = W / 2 - d / 2, cx2 = W / 2 + d / 2, cy = H / 2, th = Math.acos(d / 2 / R), R0 = rng(id.length * 13 + 7);
@@ -20854,8 +20876,9 @@ Object.assign(TRIP, {
     m.color('#b8875a').box(J.x0, 2.6, J.y0, J.x1, 4.4, J.y1 - 36); m.color('#9a6c42'); for (let y = J.y0 + 6; y < J.y1 - 36; y += 12) m.box(J.x0, 4.4, y, J.x1, 4.7, y + 1.4);
     { const a = Math.atan2(4.1, 36), c = (J.x0 + J.x1) / 2, w = (J.x1 - J.x0) / 2, l = 18 / Math.cos(a);          // (its land end: a ramp down to the grass)
       m.at(RX3(T3(c, 2.65, J.y1 - 18), a)); m.color('#b8875a').box(-w, -1.8, -l, w, 0, l); m.color('#9a6c42'); for (const z of [-12, 0, 12]) m.box(-w, 0, z, w, 0.3, z + 1.4); m.at(null); } m.color('#6b4a2a'); for (const y of [J.y0 + 4, J.y0 + 40]) for (const x of [J.x0 + 3, J.x1 - 3]) m.cyl(x, -24, y, 2.4, 2.4, 29, 8);
+    m.anim = -1.4;          // (the water lilies float: up and down with the swell)
     for (const p of I.PADS.concat([I.FROG_PAD])) { const r = p === I.FROG_PAD ? 21 : 16; m.color('#3fae5c').cyl(p[0], WATER_Y3 + 0.2, p[1], r, r, 0.9, 18); m.color('#2e9e4f').box(p[0] - 0.8, WATER_Y3 + 1.1, p[1] + 2, p[0] + 0.8, WATER_Y3 + 1.3, p[1] + r - 1); }
-    m.color('#ff8cc6').sphere(I.FROG_PAD[0] + 13, WATER_Y3 + 3, I.FROG_PAD[1] - 8, 3.4, 2.4, 3.4, 8, 5); m.color('#ffd23c').sphere(I.FROG_PAD[0] + 13, WATER_Y3 + 4.6, I.FROG_PAD[1] - 8, 1.4, 1, 1.4, 6, 4);
+    m.color('#ff8cc6').sphere(I.FROG_PAD[0] + 13, WATER_Y3 + 3, I.FROG_PAD[1] - 8, 3.4, 2.4, 3.4, 8, 5); m.color('#ffd23c').sphere(I.FROG_PAD[0] + 13, WATER_Y3 + 4.6, I.FROG_PAD[1] - 8, 1.4, 1, 1.4, 6, 4); m.anim = 0;
     m.color('#3fae5c').cyl(B[0], 0, B[1], 11, 12, 26, 14); m.color('#2e9e4f').cyl(B[0], 26, B[1], 12.6, 12.6, 3, 14); m.color('#ffffff').box(B[0] - 4, 10, B[1] + 11.6, B[0] + 4, 18, B[1] + 12.4);
     for (const [x, y] of [I.POND_SIGN, I.FOREST_SIGN]) { m.color('#6b4a2a').box(x - 34, 0, y - 2, x - 30, 46, y + 2).box(x + 30, 0, y - 2, x + 34, 46, y + 2); m.color('#b8875a').box(x - 38, 26, y - 2.4, x + 38, 50, y + 2.4); }
     const ant = I.ITEMS.find((it) => it.id === 'ant'), worm = I.ITEMS.find((it) => it.id === 'earthworm');
@@ -20877,7 +20900,7 @@ Object.assign(TRIP, {
       else if (k === 'flower' || k === 'grass') { const m = GREEN7.mat(k, it.x, 0, it.y, it.yaw || 0, k === 'flower' ? 36 : 24); m4rz(m, Math.sin(t * 1.4 + it.x) * 0.05); R.draw(NATURE.mesh(k), m); }          // (they sway)
       else this.thing3(R, k, it.x, 0, it.y, it.yaw || 0, 15);
     }
-    const F = I.FROG_PAD; GREEN7.frog(R, F[0] - 2, WATER_Y3 + 1.2, F[1] + 2, Math.atan2(I.JETTY_END[0] - F[0], I.JETTY_END[1] - F[1]), 18, t);          // (it breathes; now and then it jumps)
+    const F = I.FROG_PAD; GREEN7.frog(R, F[0] - 2, WATER_Y3 + 1.2 + wave3(F[0] - 2, F[1] + 2, t), F[1] + 2, Math.atan2(I.JETTY_END[0] - F[0], I.JETTY_END[1] - F[1]), 18, t);          // (it breathes; now and then it jumps)
     for (const z of I.ZOO) {
       if (z.id === 'rabbit') drawAnimal3(R, 'rabbit', { x: z.x, z: z.y, y: 0, yaw: z.yaw, moving: false, phase: 0, t, scale: CS3 });
       else this.thing3(R, z.id, z.x, z.id === 'bird' ? 22 + Math.max(0, Math.sin(t * 3)) * 3 : z.id === 'squirrel' ? 16 : 0, z.y, z.yaw + (z.id === 'deer' ? Math.sin(t * 0.6) * 0.15 : 0), z.id === 'deer' ? 56 : z.id === 'squirrel' ? 20 : 16);
@@ -20891,7 +20914,7 @@ Object.assign(TRIP, {
       if (st === 'pondSign') ring(I.POND_SIGN[0], I.POND_SIGN[1] + 18, 0, 26); if (st === 'forestSign') ring(I.FOREST_SIGN[0], I.FOREST_SIGN[1] + 18, 0, 26);
       if (st === 'dip' || st === 'hop') ring(I.JETTY_END[0], I.JETTY_END[1], 4.4, 18); if (st === 'forest') ring(I.LOOKOUT[0], I.LOOKOUT[1], GREEN7.TH.H + 0.6, 26);
     }
-    if (this.splash) { const s = this.splash; s.t += 1 / 60; const k = s.t / 1.2; if (k >= 1) this.splash = null; else { R.setTint(1, 1, 1, 0.8 * (1 - k), 1); const m = T3(I.JETTY_END[0], WATER_Y3 + 1, I.JETTY_END[1] - 26); m4s(m, 6 + k * 30, 1, 6 + k * 30); R.draw(W3.dyn.ripple, m); } }
+    if (this.splash) { const s = this.splash; s.t += 1 / 60; const k = s.t / 1.2; if (k >= 1) this.splash = null; else { R.setTint(1, 1, 1, 0.8 * (1 - k), 1); const sx = this.dipping && KIT.tip3 ? KIT.tip3[0] : I.JETTY_END[0], sz = this.dipping && KIT.tip3 ? KIT.tip3[2] : I.JETTY_END[1] - 26, m = T3(sx, WATER_Y3 + 1 + wave3(sx, sz, t), sz); m4s(m, 6 + k * 30, 1, 6 + k * 30); R.draw(W3.dyn.ripple, m); } }          // (where the net goes in)
     R.setTint(1, 1, 1, 1, 0);
   },
   isle2Ground(g) {          // (ISLE7.paint2D) the little pier, the water lilies, the mud, the lookout's floor
@@ -20914,15 +20937,320 @@ Object.assign(TRIP, {
       L.push({ y: y, draw: (cc) => NATURE.draw2(cc, k, x, y - h - s * 0.4, s, fly ? GREEN7.flap2(k, t, it.x) : k === 'earthworm' ? t * 4 : undefined) });          // (wings flap; the worm wiggles)
     }
     { const F = I.FROG_PAD, c = t % 4.6, j = c > 4 ? Math.sin((c - 4) / 0.6 * Math.PI) : 0; L.push({ y: F[1], draw: (cc) => NATURE.draw2(cc, 'frog', F[0], F[1] - 10 - j * 10, 26, Math.max(0, Math.sin(t * 5.2)) ** 2) }); }          // (it breathes, it jumps)
+    if (this.dipping) L.push({ y: player.y - 1, draw: (cc, tt) => KIT.dip2(cc, tt) });          // (the pond net in your hands)
     for (const z of I.ZOO) L.push({ y: z.y, draw: (cc) => NATURE.draw2(cc, z.id, z.x, z.y - (z.id === 'deer' ? 40 : z.id === 'bird' ? 30 : 14), z.id === 'deer' ? 80 : z.id === 'rabbit' ? 30 : 26) });
     { const B = I.BIN; L.push({ y: B[1], draw: (cc) => { rrect(cc, B[0] - 12, B[1] - 30, 24, 30, 4, '#3fae5c', 2); rrect(cc, B[0] - 14, B[1] - 34, 28, 6, 3, '#2e9e4f', 2); } }); }
     const C = GAME_CONTENT.trip.st3;
     for (const [S, P] of [[C.pondSign, I.POND_SIGN], [C.forestSign, I.FOREST_SIGN]]) L.push({ y: P[1], draw: (cc) => { seg(cc, P[0] - 32, P[1], P[0] - 32, P[1] - 46, '#6b4a2a', 4); seg(cc, P[0] + 32, P[1], P[0] + 32, P[1] - 46, '#6b4a2a', 4); rrect(cc, P[0] - 40, P[1] - 54, 80, 26, 4, '#fff4dc', 2.5); cc.save(); SCHOOLIN.write(cc, S.title, P[0], P[1] - 40, 72, 11, '#5a3a22'); cc.restore(); } });
-    if (this.splash) { const s = this.splash; s.t += 1 / 60; const k = s.t / 1.2; if (k >= 1) this.splash = null; else { c.strokeStyle = 'rgba(255,255,255,' + (0.8 * (1 - k)).toFixed(3) + ')'; c.lineWidth = 2.4; c.beginPath(); c.ellipse(I.JETTY_END[0], I.JETTY_END[1] - 26, 6 + k * 30, (6 + k * 30) * 0.6, 0, 0, TAU); c.stroke(); } }
+    if (this.splash) { const s = this.splash; s.t += 1 / 60; const k = s.t / 1.2; if (k >= 1) this.splash = null; else { c.strokeStyle = 'rgba(255,255,255,' + (0.8 * (1 - k)).toFixed(3) + ')'; c.lineWidth = 2.4; const sx = this.dipping ? I.JETTY_END[0] + 34 : I.JETTY_END[0], sy = this.dipping ? I.JETTY_END[1] - 62 : I.JETTY_END[1] - 26; c.beginPath(); c.ellipse(sx, sy, 6 + k * 30, (6 + k * 30) * 0.6, 0, 0, TAU); c.stroke(); } }          // (where the net goes in)
   },
 });
 
 
+/* ---- the explorer's kit: the tools of the Green Islands' games, drawn flat and built in 3D. The magnifier (a gold rim, a
+   wooden handle; under its glass the living thing where it lives), the bug net and its jar, a trowel, a seed packet, a
+   watering can, a basket; out on the islands, in your hands: the magnifier and a pond net. */
+const KIT = {
+  dipK: 0, tip3: null,          // (the pond net: 0 held up .. 1 down in the water; where its hoop is in 3D, for the splash)
+  HOME: { tadpole: 'under', fish: 'under', lily: 'pond', frog: 'pond', ant: 'soil', earthworm: 'soil', bee: 'air', butterfly: 'air', dragonfly: 'air', mosquito: 'air' },
+  SEEDCOL: { sunflower: ['#ffd23c', '#7a4a24'], tulip: ['#ff4d5e', '#c8323e'], daisy: ['#ffffff', '#ffd23c'] },
+  held() {          // what you hold out on the Green Islands now (drawPerson's act and prop): the pond net while dipping, the magnifier while looking
+    if (!ISLE7.here() || !TRIP.busy3) return null;
+    if (TRIP.dipping) return { act: 'dip', prop: 'dipnet' };
+    return TRIP.pk === 'lens' ? { act: 'lens', prop: 'lens' } : null;
+  },
+  // ---- the magnifier (flat): its glass round (cx, cy), R big; the handle out at angle a; inner(g) paints what is under the glass
+  lens2(g, cx, cy, R, a, inner) {
+    const rw = R * 0.16, r1 = R + rw, x0 = r1 - 10, x1 = r1 + R * 0.16, x2 = r1 + R * 0.88, hh = R * 0.11, gh = R * 0.13;
+    const gold = (y0, y1) => { const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, '#fff2b8'); gr.addColorStop(0.4, '#f5c64e'); gr.addColorStop(1, '#a8661a'); return gr; };
+    g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+    const ex = cx + Math.cos(a) * (x2 + 8), ey = cy + Math.sin(a) * (x2 + 8);          // (a red cord through the end of the handle, hanging)
+    g.beginPath(); g.moveTo(ex, ey); g.bezierCurveTo(ex + 30, ey + 8, ex + 30, ey + 58, ex + 4, ey + 62); g.bezierCurveTo(ex - 16, ey + 64, ex - 14, ey + 26, ex, ey);
+    g.strokeStyle = '#8a1e14'; g.lineWidth = 7; g.stroke(); g.strokeStyle = '#e8402e'; g.lineWidth = 4; g.stroke();
+    g.translate(cx, cy); g.rotate(a);
+    const grip = () => { g.beginPath(); g.moveTo(x1, -gh * 0.86); g.quadraticCurveTo((x1 + x2) / 2, -gh * 1.14, x2, -gh); g.lineTo(x2, gh); g.quadraticCurveTo((x1 + x2) / 2, gh * 1.14, x1, gh * 0.86); g.closePath(); };
+    let gr = g.createLinearGradient(0, -gh, 0, gh); gr.addColorStop(0, '#5a2e12'); gr.addColorStop(0.2, '#a8642e'); gr.addColorStop(0.38, '#dc9a5c'); gr.addColorStop(0.62, '#94522a'); gr.addColorStop(1, '#4a2410');
+    grip(); g.fillStyle = gr; g.fill();
+    g.save(); grip(); g.clip(); g.strokeStyle = 'rgba(60,26,8,.3)'; g.lineWidth = 1.8;
+    for (let i = 0; i < 5; i++) { const y = -gh * 0.7 + i * gh * 0.35; g.beginPath(); g.moveTo(x1, y); g.bezierCurveTo(x1 + 40, y - 4, x1 + 80, y + 5, x2, y - 2); g.stroke(); }          // (the wood's grain)
+    for (let k = 0; k < 3; k++) { const x = x2 - 24 - k * 15; g.strokeStyle = 'rgba(40,16,4,.55)'; g.lineWidth = 3.4; g.beginPath(); g.moveTo(x, -gh * 1.2); g.quadraticCurveTo(x + 5, 0, x, gh * 1.2); g.stroke(); g.strokeStyle = 'rgba(255,214,160,.35)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(x + 3.5, -gh * 1.2); g.quadraticCurveTo(x + 8.5, 0, x + 3.5, gh * 1.2); g.stroke(); }          // (grooves for the fingers)
+    g.strokeStyle = 'rgba(255,236,200,.5)'; g.lineWidth = 4; g.beginPath(); g.moveTo(x1 + 14, -gh * 0.5); g.lineTo(x2 - 58, -gh * 0.62); g.stroke();          // (a shine along it)
+    g.restore();
+    grip(); g.strokeStyle = '#3a1a08'; g.lineWidth = 3; g.stroke();
+    g.fillStyle = gold(-gh, gh); g.beginPath(); rrPath(g, x2 - 4, -gh * 1.04, 20, gh * 2.08, 9); g.fill(); g.stroke();          // (a gold cap)
+    g.fillStyle = '#3a1a08'; g.beginPath(); g.arc(x2 + 8, 0, 3.4, 0, TAU); g.fill();
+    g.fillStyle = gold(-hh, hh); g.beginPath(); rrPath(g, x0, -hh, x1 - x0 + 8, hh * 2, 5); g.fill(); g.strokeStyle = '#6b3f10'; g.stroke();          // (the gold collar, two ridges)
+    for (const x of [x0 + 18, x1 - 2]) { g.strokeStyle = 'rgba(110,60,10,.65)'; g.lineWidth = 2.6; g.beginPath(); g.moveTo(x, -hh + 2); g.lineTo(x, hh - 2); g.stroke(); g.strokeStyle = 'rgba(255,245,200,.7)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x + 3, -hh + 2); g.lineTo(x + 3, hh - 2); g.stroke(); }
+    g.restore();
+    // the glass: what is under it; darker toward the rim, the rim's shadow, shines
+    g.save(); g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.clip();
+    inner(g);
+    gr = g.createRadialGradient(cx, cy, R * 0.55, cx, cy, R); gr.addColorStop(0, 'rgba(10,40,70,0)'); gr.addColorStop(1, 'rgba(10,40,70,.26)'); g.fillStyle = gr; g.fillRect(cx - R, cy - R, R * 2, R * 2);
+    g.strokeStyle = 'rgba(0,16,32,.22)'; g.lineWidth = 16; g.beginPath(); g.arc(cx + 5, cy + 6, R + 6, 0, TAU); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.26)'; g.beginPath(); g.ellipse(cx - R * 0.34, cy - R * 0.42, R * 0.52, R * 0.2, -0.72, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.ellipse(cx - R * 0.46, cy - R * 0.5, R * 0.2, R * 0.065, -0.72, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.32)'; g.beginPath(); g.ellipse(cx + R * 0.52, cy + R * 0.5, R * 0.15, R * 0.05, -0.72, 0, TAU); g.fill();
+    g.restore();
+    // the rim: gold and rounded (lighter up to the left), a bright edge, dark lines inside and out
+    g.save(); g.lineCap = 'round';
+    g.beginPath(); g.arc(cx, cy, r1, 0, TAU); g.arc(cx, cy, R, 0, TAU, true);
+    gr = g.createLinearGradient(cx - r1, cy - r1, cx + r1, cy + r1); gr.addColorStop(0, '#fff6c8'); gr.addColorStop(0.3, '#f8d060'); gr.addColorStop(0.65, '#e0a032'); gr.addColorStop(1, '#9a5c16'); g.fillStyle = gr; g.fill();
+    g.beginPath(); g.arc(cx, cy, R + rw * 0.42, 0, TAU); g.arc(cx, cy, R, 0, TAU, true);
+    gr = g.createLinearGradient(cx - r1, cy - r1, cx + r1, cy + r1); gr.addColorStop(0, 'rgba(150,88,18,.55)'); gr.addColorStop(1, 'rgba(255,244,190,.4)'); g.fillStyle = gr; g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = rw * 0.2; g.beginPath(); g.arc(cx, cy, R + rw * 0.7, Math.PI * 1.06, Math.PI * 1.42); g.stroke(); g.beginPath(); g.arc(cx, cy, R + rw * 0.7, Math.PI * 1.5, Math.PI * 1.56); g.stroke();
+    g.strokeStyle = 'rgba(90,48,8,.3)'; g.lineWidth = rw * 0.24; g.beginPath(); g.arc(cx, cy, R + rw * 0.7, Math.PI * 0.08, Math.PI * 0.42); g.stroke();
+    g.strokeStyle = '#6b3f10'; g.lineWidth = 4; g.beginPath(); g.arc(cx, cy, r1, 0, TAU); g.stroke(); g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.stroke();
+    g.restore();
+  },
+  lensBack(g, id, cx, cy, R) {          // under the glass: where it lives, soft as if out of focus; the living thing big and sharp; a blade or two close up
+    const H = this.HOME[id] || 'grass', x0 = cx - R, y0 = cy - R, D = R * 2, rnd = rng(id.length * 31 + 5);
+    const lin = (cols) => { const gr = g.createLinearGradient(0, y0, 0, y0 + D); cols.forEach((c, i) => gr.addColorStop(i / (cols.length - 1), c)); return gr; };
+    const soft = (x, y, r, c, a) => { const gr = g.createRadialGradient(x, y, r * 0.15, x, y, r); gr.addColorStop(0, c + a + ')'); gr.addColorStop(0.7, c + (a * 0.7).toFixed(3) + ')'); gr.addColorStop(1, c + '0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); };
+    const blade = (x, y, h, w, lean, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(x - w, y); g.quadraticCurveTo(x - w * 0.3 + lean * 0.4, y - h * 0.6, x + lean, y - h); g.quadraticCurveTo(x + w * 0.3 + lean * 0.4, y - h * 0.55, x + w, y); g.fill(); };
+    if (H === 'under') {          // under the pond's water: light from above, sand, pond weed, bubbles
+      g.fillStyle = lin(['#a6e6f2', '#58b9d0', '#2c86a0']); g.fillRect(x0, y0, D, D);
+      for (let i = 0; i < 5; i++) { const x = x0 + D * (0.08 + i * 0.21); g.fillStyle = 'rgba(255,255,255,.09)'; g.beginPath(); g.moveTo(x, y0); g.lineTo(x + 40, y0); g.lineTo(x - 20, y0 + D); g.lineTo(x - 76, y0 + D); g.fill(); }
+      g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 3; for (let k = 0; k < 3; k++) { g.beginPath(); for (let x = 0; x <= D; x += 16) g.lineTo(x0 + x, y0 + 22 + k * 16 + Math.sin(x * 0.05 + k * 2) * 5); g.stroke(); }
+      g.fillStyle = '#d9c48e'; g.beginPath(); g.moveTo(x0, y0 + D); for (let x = 0; x <= D; x += 20) g.lineTo(x0 + x, y0 + D * 0.83 + Math.sin(x * 0.028 + 1) * 12); g.lineTo(x0 + D, y0 + D); g.fill();
+      for (let i = 0; i < 9; i++) { g.fillStyle = ['#b9a777', '#a3967a', '#c9b98a'][i % 3]; g.beginPath(); g.ellipse(x0 + rnd() * D, y0 + D * (0.88 + rnd() * 0.1), 7 + rnd() * 9, 4 + rnd() * 4, 0, 0, TAU); g.fill(); }
+      for (const [sx, h, ph] of [[0.1, 0.62, 0], [0.2, 0.45, 1], [0.84, 0.58, 2], [0.93, 0.4, 3]]) { const bx = x0 + D * sx; g.strokeStyle = 'rgba(58,140,72,.85)'; g.lineWidth = 10; g.beginPath(); g.moveTo(bx, y0 + D); for (let k = 1; k <= 8; k++) g.lineTo(bx + Math.sin(k * 0.9 + ph) * 12, y0 + D - D * h * k / 8); g.stroke(); }
+      for (let i = 0; i < 12; i++) { const r = 3 + rnd() * 7, x = x0 + D * (0.15 + rnd() * 0.7), y = y0 + D * (0.1 + rnd() * 0.6); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, r, 0, TAU); g.stroke(); g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(x - r * 0.35, y - r * 0.35, r * 0.28, 0, TAU); g.fill(); }
+    } else if (H === 'pond') {          // on the water: rings, water lilies further off; the frog's own big water lily
+      g.fillStyle = lin(['#8ad8ea', '#4fb0cc', '#3a96b6']); g.fillRect(x0, y0, D, D);
+      g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 3; for (let k = 1; k <= 4; k++) { g.beginPath(); g.ellipse(cx, cy + R * 0.3, R * 0.3 * k, R * 0.12 * k, 0, 0, TAU); g.stroke(); }
+      for (const [x, y, r] of [[0.12, 0.2, 0.2], [0.86, 0.28, 0.16], [0.82, 0.86, 0.22]]) { g.fillStyle = 'rgba(80,170,90,.55)'; g.beginPath(); g.moveTo(x0 + D * x, y0 + D * y); g.ellipse(x0 + D * x, y0 + D * y, D * r, D * r * 0.55, 0.3, 0.3, TAU - 0.3); g.closePath(); g.fill(); }
+      if (id === 'frog') { const py = cy + R * 0.42; g.fillStyle = '#4cae5a'; g.beginPath(); g.moveTo(cx, py); g.ellipse(cx, py, R * 0.78, R * 0.34, 0, 0.25, TAU - 0.25); g.closePath(); g.fill(); g.strokeStyle = '#3a8f48'; g.lineWidth = 3; g.stroke(); g.strokeStyle = 'rgba(40,110,50,.5)'; g.lineWidth = 2; for (let k = 0; k < 7; k++) { const an = 0.6 + k * 0.8; g.beginPath(); g.moveTo(cx, py); g.lineTo(cx + Math.cos(an) * R * 0.7, py + Math.sin(an) * R * 0.3); g.stroke(); } }
+    } else if (H === 'soil') {          // down on the ground: grass behind, soil with pebbles and crumbs, a fallen leaf
+      g.fillStyle = lin(['#a4d986', '#6fae52', '#4f8f3a']); g.fillRect(x0, y0, D, D);
+      for (let i = 0; i < 7; i++) soft(x0 + rnd() * D, y0 + rnd() * D * 0.45, 24 + rnd() * 30, 'rgba(240,255,220,', 0.35);
+      for (let i = 0; i < 26; i++) blade(x0 + (i / 26) * D + rnd() * 10, cy + R * 0.12, R * (0.35 + rnd() * 0.4), 7, (rnd() - 0.5) * 30, i % 2 ? 'rgba(70,140,52,.75)' : 'rgba(90,160,62,.7)');
+      const sy = cy + R * 0.1, gr = g.createLinearGradient(0, sy, 0, y0 + D); gr.addColorStop(0, '#8a5d3a'); gr.addColorStop(1, '#5a3a22'); g.fillStyle = gr;
+      g.beginPath(); g.moveTo(x0, y0 + D); for (let x = 0; x <= D; x += 16) g.lineTo(x0 + x, sy + Math.sin(x * 0.035) * 8 + Math.sin(x * 0.11) * 3); g.lineTo(x0 + D, y0 + D); g.fill();
+      for (let i = 0; i < 16; i++) { g.fillStyle = ['#a3907c', '#6e4a2e', '#b8a48c', '#4e3220'][i % 4]; g.beginPath(); g.ellipse(x0 + rnd() * D, sy + 20 + rnd() * (y0 + D - sy - 20), 3 + rnd() * 8, 2 + rnd() * 5, rnd() * 3, 0, TAU); g.fill(); }
+      g.fillStyle = '#e0a63a'; g.beginPath(); g.ellipse(cx - R * 0.55, sy + R * 0.32, R * 0.16, R * 0.07, -0.4, 0, TAU); g.fill(); g.strokeStyle = '#b07a22'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx - R * 0.68, sy + R * 0.37); g.lineTo(cx - R * 0.42, sy + R * 0.27); g.stroke();
+    } else if (H === 'air') {          // up among the flowers: sky, soft flowers out of focus
+      g.fillStyle = lin(['#dff4ff', '#e9f8e0', '#a8dc86', '#78bf58']); g.fillRect(x0, y0, D, D);
+      for (let i = 0; i < 14; i++) soft(x0 + rnd() * D, y0 + D * (0.35 + rnd() * 0.6), 18 + rnd() * 34, ['rgba(255,150,190,', 'rgba(255,215,80,', 'rgba(255,255,255,', 'rgba(190,150,255,'][i % 4], 0.55);
+      for (let i = 0; i < 18; i++) blade(x0 + rnd() * D, y0 + D, R * (0.3 + rnd() * 0.35), 9, (rnd() - 0.5) * 40, 'rgba(80,150,60,.45)');
+    } else {          // the meadow's grass (a flower, grass; litter)
+      g.fillStyle = lin(['#d8f2c0', '#a8da86', '#79bd5a']); g.fillRect(x0, y0, D, D);
+      for (let i = 0; i < 10; i++) soft(x0 + rnd() * D, y0 + rnd() * D * 0.7, 20 + rnd() * 30, i % 3 ? 'rgba(255,255,230,' : 'rgba(255,220,120,', 0.4);
+      for (let i = 0; i < 30; i++) blade(x0 + (i / 30) * D + rnd() * 8, y0 + D, R * (0.25 + rnd() * 0.5), 7, (rnd() - 0.5) * 34, i % 2 ? 'rgba(70,140,52,.6)' : 'rgba(96,168,66,.55)');
+      if (id === 'flower' || id === 'grass') { const sy = cy + R * 0.62; g.fillStyle = '#7a5232'; g.beginPath(); g.moveTo(x0, y0 + D); for (let x = 0; x <= D; x += 20) g.lineTo(x0 + x, sy + Math.sin(x * 0.04) * 6); g.lineTo(x0 + D, y0 + D); g.fill(); }
+    }
+    if (H !== 'air' && H !== 'under') { g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(cx, cy + R * 0.58, R * 0.42, R * 0.08, 0, 0, TAU); g.fill(); }          // (its shadow)
+    NATURE.pic(g, id, cx, cy + R * 0.04, R * 1.4);
+    if (H !== 'under' && H !== 'pond') { blade(x0 + D * 0.08, y0 + D, R * 0.75, 16, 30, 'rgba(110,190,80,.55)'); blade(x0 + D * 0.95, y0 + D, R * 0.6, 14, -26, 'rgba(110,190,80,.5)'); }          // (close up in front, out of focus)
+  },
+  // ---- the bug net (flat): its hoop at (hx, hy) (sq: how round it looks), the handle out at angle a to your hand, the bag hanging toward (dx, dy); inside(g, x, y): what is in the bag
+  net2(g, hx, hy, a, sq, dx, dy, inside) {
+    const r = 27, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, ex = hx + Math.cos(a) * r * sq, ey = hy + Math.sin(a) * r * sq;
+    const p1x = hx + nx * r * 0.96, p1y = hy + ny * r * 0.96, p2x = hx - nx * r * 0.96, p2y = hy - ny * r * 0.96, tx = hx + dx, ty = hy + dy, mx = hx + dx / 2, my = hy + dy / 2;
+    const bag = () => { g.beginPath(); g.moveTo(p1x, p1y); g.bezierCurveTo(p1x + dx * 0.55, p1y + dy * 0.55, tx + nx * 16, ty + ny * 16, tx, ty); g.bezierCurveTo(tx - nx * 16, ty - ny * 16, p2x + dx * 0.55, p2y + dy * 0.55, p2x, p2y); g.closePath(); };
+    g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+    bag(); g.fillStyle = 'rgba(255,255,255,.5)'; g.fill();
+    g.save(); bag(); g.clip(); if (inside) inside(g, hx + dx * 0.6, hy + dy * 0.6);
+    g.fillStyle = 'rgba(200,215,228,.35)'; g.beginPath(); g.ellipse(tx - dx * 0.2 - nx * 8, ty - dy * 0.2 - ny * 8, 14, 10, Math.atan2(dy, dx), 0, TAU); g.fill();          // (a soft shade deep in the bag)
+    g.strokeStyle = 'rgba(120,140,160,.55)'; g.lineWidth = 0.9; g.beginPath(); for (let k = -100; k <= 100; k += 7) { g.moveTo(mx + k - 100, my - 100); g.lineTo(mx + k + 100, my + 100); g.moveTo(mx + k + 100, my - 100); g.lineTo(mx + k - 100, my + 100); } g.stroke();          // (the netting)
+    g.restore();
+    bag(); g.strokeStyle = 'rgba(130,150,170,.9)'; g.lineWidth = 1.6; g.stroke();
+    g.save(); g.translate(hx, hy); g.rotate(a);          // (the hoop: a green ring, a shine)
+    g.beginPath(); g.ellipse(0, 0, r * sq, r, 0, 0, TAU); g.strokeStyle = '#2e7d3a'; g.lineWidth = 6.4; g.stroke(); g.strokeStyle = '#4cc36a'; g.lineWidth = 3.6; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.65)'; g.lineWidth = 1.6; g.beginPath(); g.ellipse(0, 0, r * sq, r, 0, Math.PI * 1.1, Math.PI * 1.55); g.stroke();
+    g.restore();
+    g.save(); g.translate(ex, ey); g.rotate(a);          // (the handle: wood, a red grip with white tape, a metal collar at the hoop)
+    let gr = g.createLinearGradient(0, -4, 0, 4); gr.addColorStop(0, '#ecc08c'); gr.addColorStop(0.5, '#c98f55'); gr.addColorStop(1, '#8a5a30');
+    g.fillStyle = gr; g.strokeStyle = '#5a3a1c'; g.lineWidth = 1.6; g.beginPath(); rrPath(g, -2, -3.6, 220, 7.2, 3.6); g.fill(); g.stroke();
+    gr = g.createLinearGradient(0, -5, 0, 5); gr.addColorStop(0, '#ff7a5e'); gr.addColorStop(0.5, '#e8402e'); gr.addColorStop(1, '#a8261a'); g.fillStyle = gr; g.beginPath(); rrPath(g, 100, -4.8, 130, 9.6, 4.8); g.fill(); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2; for (let x = 106; x < 200; x += 9) { g.beginPath(); g.moveTo(x, 4); g.lineTo(x + 5, -4); g.stroke(); }
+    g.fillStyle = '#b8c2cc'; g.strokeStyle = '#5a6672'; g.beginPath(); rrPath(g, -5, -4.6, 13, 9.2, 3); g.fill(); g.stroke();
+    g.restore(); g.restore();
+  },
+  // ---- the jar (flat): glass, a twig and a leaf on its bottom, inside(g) what was caught, shines; a red lid with white dots and air holes (off: 0..1, it pops off)
+  jar2(g, cx, cy, w, h, off, inside) {
+    const nw = w * 0.66, top = cy - h / 2, bot = cy + h / 2, nk = top + 16, lw = nw + 16;
+    const body = () => { g.beginPath(); g.moveTo(cx - nw / 2, top + 4); g.lineTo(cx - nw / 2, nk); g.bezierCurveTo(cx - w / 2, nk + 2, cx - w / 2, nk + 6, cx - w / 2, nk + 26); g.lineTo(cx - w / 2, bot - 22); g.quadraticCurveTo(cx - w / 2, bot, cx - w / 2 + 22, bot); g.lineTo(cx + w / 2 - 22, bot); g.quadraticCurveTo(cx + w / 2, bot, cx + w / 2, bot - 22); g.lineTo(cx + w / 2, nk + 26); g.bezierCurveTo(cx + w / 2, nk + 6, cx + w / 2, nk + 2, cx + nw / 2, nk); g.lineTo(cx + nw / 2, top + 4); g.closePath(); };
+    g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+    g.fillStyle = 'rgba(0,0,0,.16)'; g.beginPath(); g.ellipse(cx, bot + 4, w * 0.55, 10, 0, 0, TAU); g.fill();
+    g.save(); body(); g.clip();
+    let gr = g.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0); gr.addColorStop(0, 'rgba(170,215,240,.6)'); gr.addColorStop(0.3, 'rgba(225,245,255,.3)'); gr.addColorStop(0.75, 'rgba(225,245,255,.25)'); gr.addColorStop(1, 'rgba(150,200,230,.6)');
+    g.fillStyle = gr; g.fillRect(cx - w / 2, top, w, h);
+    g.strokeStyle = '#8a5a34'; g.lineWidth = 4; g.beginPath(); g.moveTo(cx - w * 0.36, bot - 8); g.quadraticCurveTo(cx - w * 0.05, bot - 30, cx + w * 0.3, bot - 46); g.stroke(); g.lineWidth = 2.6; g.beginPath(); g.moveTo(cx + w * 0.05, bot - 27); g.lineTo(cx + w * 0.17, bot - 12); g.stroke();          // (a twig)
+    g.fillStyle = '#5cb84a'; g.beginPath(); g.ellipse(cx + w * 0.16, bot - 11, 17, 7, -0.25, 0, TAU); g.fill(); g.strokeStyle = '#3f8a35'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(cx + w * 0.16 - 15, bot - 7); g.lineTo(cx + w * 0.16 + 15, bot - 15); g.stroke();          // (a leaf)
+    g.strokeStyle = '#6cbf4a'; g.lineWidth = 2.2; for (const x of [-0.3, -0.22, 0.32, 0.38]) { g.beginPath(); g.moveTo(cx + w * x, bot); g.lineTo(cx + w * x + 3, bot - 12); g.stroke(); }          // (a few blades of grass)
+    if (inside) inside(g);
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); rrPath(g, cx - w / 2 + 10, nk + 22, 9, h - 60, 4.5); g.fill();          // (shines on the glass)
+    g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); rrPath(g, cx - w / 2 + 24, nk + 26, 4, h * 0.4, 2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.3)'; g.beginPath(); rrPath(g, cx + w / 2 - 16, nk + 30, 5, h * 0.3, 2.5); g.fill();
+    g.restore();
+    body(); g.strokeStyle = 'rgba(90,140,170,.95)'; g.lineWidth = 3; g.stroke();
+    g.strokeStyle = 'rgba(120,170,200,.6)'; g.lineWidth = 2; g.beginPath(); g.ellipse(cx, bot - 7, w / 2 - 10, 5, 0, 0, Math.PI); g.stroke();          // (the thick glass bottom)
+    g.strokeStyle = 'rgba(90,140,170,.6)'; g.lineWidth = 1.6; for (const y of [top + 9, top + 13.5]) { g.beginPath(); g.moveTo(cx - nw / 2, y); g.lineTo(cx + nw / 2, y); g.stroke(); }          // (the neck's threads)
+    const o = Math.min(1, off || 0), lx = cx + o * w * 0.72, ly = top - 2 - Math.sin(o * Math.PI) * 34 + o * 24;
+    g.translate(lx, ly); g.rotate(o * 0.95);          // (the lid)
+    g.fillStyle = '#e8402e'; g.strokeStyle = '#8a1e14'; g.lineWidth = 2.4; g.beginPath(); rrPath(g, -lw / 2, -9, lw, 18, 6); g.fill(); g.stroke();
+    g.fillStyle = '#ffffff'; for (const [x, y, r] of [[-lw * 0.3, 1, 3.4], [-lw * 0.05, -2, 2.6], [lw * 0.2, 2, 3.2], [lw * 0.4, -3, 2]]) { g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); }
+    g.fillStyle = '#ff6a50'; g.beginPath(); g.ellipse(0, -9, lw / 2 - 1, 4.6, 0, 0, TAU); g.fill(); g.stroke();
+    g.fillStyle = '#7a1e12'; for (const x of [-12, 0, 12]) { g.beginPath(); g.arc(x, -9, 1.6, 0, TAU); g.fill(); }          // (air holes)
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(-lw / 2 + 6, -3); g.lineTo(-lw / 2 + 20, -3); g.stroke();
+    g.restore();
+  },
+  // ---- the watering can (flat), standing at (x, y), its spout up to the left; tilt < 0 tips it to pour. Returns where the water comes out
+  can2(g, x, y, s, tilt) {
+    const th = Math.atan2(-36, -34), ux = Math.cos(th), uy = Math.sin(th), bx = -19, by = -13;
+    g.save(); g.translate(x, y); g.scale(s, s); if (tilt) { g.translate(-23, 0); g.rotate(tilt); g.translate(23, 0); }
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    const tube = (path, w) => { path(); g.strokeStyle = '#1f5f86'; g.lineWidth = w + 3; g.stroke(); g.strokeStyle = '#2f9fd8'; g.lineWidth = w; g.stroke(); };
+    tube(() => { g.beginPath(); g.moveTo(20, -36); g.bezierCurveTo(38, -34, 38, -10, 20, -9); }, 4.5);          // (the handle behind)
+    tube(() => { g.beginPath(); g.moveTo(-13, -42); g.bezierCurveTo(-9, -64, 13, -64, 17, -42); }, 4.5);          // (the handle on top)
+    g.save(); g.translate(bx, by); g.rotate(th);          // (the spout, its rose: a yellow shower head with holes)
+    g.fillStyle = '#2f9fd8'; g.strokeStyle = '#1f5f86'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, -5.5); g.lineTo(46, -2.8); g.lineTo(46, 2.8); g.lineTo(0, 5.5); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#ffd23c'; g.strokeStyle = '#b8860b'; g.beginPath(); g.moveTo(45, -3.2); g.lineTo(54, -8.6); g.lineTo(54, 8.6); g.lineTo(45, 3.2); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#fff0a0'; g.beginPath(); g.ellipse(54.5, 0, 2.6, 8.6, 0, 0, TAU); g.fill(); g.stroke();
+    g.fillStyle = '#3a7a9a'; for (const yy of [-5, -1.7, 1.7, 5]) { g.beginPath(); g.arc(55, yy, 0.9, 0, TAU); g.fill(); }
+    g.restore();
+    g.beginPath(); rrPath(g, -23, -44, 46, 44, 13); let gr = g.createLinearGradient(-23, 0, 23, 0); gr.addColorStop(0, '#86d6f7'); gr.addColorStop(0.45, '#3fb0e6'); gr.addColorStop(1, '#2378ad'); g.fillStyle = gr; g.fill();
+    g.save(); g.clip(); g.fillStyle = '#ffffff'; g.fillRect(-24, -27, 48, 9); g.restore();          // (a white band, a yellow flower on it)
+    g.beginPath(); rrPath(g, -23, -44, 46, 44, 13); g.strokeStyle = '#1f5f86'; g.lineWidth = 2.4; g.stroke();
+    for (let k = 0; k < 5; k++) { const an = k / 5 * TAU - Math.PI / 2; circ(g, 2 + Math.cos(an) * 3.6, -22.5 + Math.sin(an) * 3.6, 2.8, '#ffd23c', 0); } circ(g, 2, -22.5, 2.2, '#ff8c1a', 0);
+    ell(g, 4, -44, 10, 3.2, '#1f5f86', 0);
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); rrPath(g, -17, -38, 5, 26, 2.5); g.fill();
+    g.restore();
+    const ca = Math.cos(tilt || 0), sa = Math.sin(tilt || 0), px = bx + ux * 56 + 23, py = by + uy * 56;
+    return { x: x + s * (-23 + px * ca - py * sa), y: y + s * (px * sa + py * ca) };
+  },
+  // ---- a garden trowel (flat): its tip at (x, y), the handle up, turned by a
+  trowel2(g, x, y, s, a) {
+    g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s); g.lineJoin = 'round'; g.lineCap = 'round';
+    let gr = g.createLinearGradient(-10, 0, 10, 0); gr.addColorStop(0, '#f2f6fa'); gr.addColorStop(0.5, '#c3ced8'); gr.addColorStop(1, '#8a96a2');
+    g.fillStyle = gr; g.strokeStyle = '#4e5a66'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(-12, -9, -9.5, -25); g.quadraticCurveTo(0, -29, 9.5, -25); g.quadraticCurveTo(12, -9, 0, 0); g.closePath(); g.fill(); g.stroke();
+    seg(g, 0, -4, 0, -24, 'rgba(78,90,102,.5)', 1.4); seg(g, -5, -9, -6.4, -21, 'rgba(255,255,255,.85)', 1.8);
+    g.fillStyle = '#9aa3ad'; g.beginPath(); rrPath(g, -1.7, -36, 3.4, 11, 1.5); g.fill(); g.stroke();
+    g.fillStyle = '#d3dae2'; g.beginPath(); rrPath(g, -3.8, -40, 7.6, 5.5, 2); g.fill(); g.stroke();
+    gr = g.createLinearGradient(-5, 0, 5, 0); gr.addColorStop(0, '#ff7a5e'); gr.addColorStop(0.5, '#e8402e'); gr.addColorStop(1, '#a8261a'); g.fillStyle = gr; g.beginPath(); rrPath(g, -4.6, -66, 9.2, 27, 4.6); g.fill(); g.stroke();
+    seg(g, -2, -61, -2, -44, 'rgba(255,255,255,.45)', 1.5); g.fillStyle = '#5a1a10'; g.beginPath(); g.arc(0, -61, 1.6, 0, TAU); g.fill();
+    g.restore();
+  },
+  // ---- a seed packet (flat): paper with a zigzag top, its flower's picture on the front, a coloured band with seeds on it
+  packet2(g, x, y, s, kind, a) {
+    const col = (this.SEEDCOL[kind] || this.SEEDCOL.sunflower)[0];
+    g.save(); g.translate(x, y); g.rotate(a || 0); g.scale(s, s); g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(-15, 21); g.lineTo(15, 21); g.lineTo(15, -17); for (let k = 1; k <= 6; k++) g.lineTo(15 - k * 5, k % 2 ? -21 : -17); g.closePath();
+    g.fillStyle = '#fff4dc'; g.fill(); g.strokeStyle = INK; g.lineWidth = 1.8; g.stroke();
+    g.fillStyle = '#bfe6ff'; g.beginPath(); rrPath(g, -11, -13, 22, 21, 3); g.fill(); g.fillStyle = '#86c964'; g.fillRect(-11, 3, 22, 5);
+    NATURE.draw2(g, kind, 0, -3, 20);
+    g.fillStyle = col === '#ffffff' ? '#ffd23c' : col; g.fillRect(-15, 11, 30, 10); g.strokeStyle = INK; g.lineWidth = 1.8; g.beginPath(); g.moveTo(-15, 11); g.lineTo(15, 11); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.8)'; for (let k = 0; k < 3; k++) { g.beginPath(); g.ellipse(-6 + k * 6, 16, 1.6, 1.1, 0.5, 0, TAU); g.fill(); }
+    g.restore();
+  },
+  // ---- a woven basket (flat), its rim at y = ry: 'back' (the handle, a checked cloth, the basket) before what is in it; then 'front' (its rim)
+  basket2(g, cx, ry, part) {
+    const w = 128, bw = 100, h = 38;
+    g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+    if (part === 'front') {
+      g.fillStyle = '#b97d45'; g.beginPath(); rrPath(g, cx - w / 2 - 5, ry - 6, w + 10, 12, 6); g.fill();
+      g.save(); g.clip(); g.strokeStyle = 'rgba(96,56,22,.6)'; g.lineWidth = 2; for (let x = cx - w / 2 - 6; x < cx + w / 2 + 8; x += 7) { g.beginPath(); g.moveTo(x, ry - 7); g.lineTo(x + 6, ry + 7); g.stroke(); } g.restore();
+      g.beginPath(); rrPath(g, cx - w / 2 - 5, ry - 6, w + 10, 12, 6); g.strokeStyle = INK; g.lineWidth = 2.4; g.stroke();
+      seg(g, cx - w / 2, ry - 3, cx + w / 2, ry - 3, 'rgba(255,232,196,.55)', 1.6);
+      g.restore(); return;
+    }
+    const hx0 = cx - w * 0.42, hx1 = cx + w * 0.42, hy = ry - 72;
+    g.beginPath(); g.moveTo(hx0, ry); g.bezierCurveTo(hx0, hy, hx1, hy, hx1, ry); g.strokeStyle = INK; g.lineWidth = 11; g.stroke(); g.strokeStyle = '#c98f55'; g.lineWidth = 7; g.stroke();          // (the handle, wrapped)
+    g.strokeStyle = 'rgba(122,74,36,.75)'; g.lineWidth = 1.8;
+    for (let k = 1; k < 12; k++) { const u = k / 12, v = 1 - u, px = (v * v * v + 3 * v * v * u) * hx0 + (3 * v * u * u + u * u * u) * hx1, py = (v * v * v + u * u * u) * ry + (3 * v * v * u + 3 * v * u * u) * hy; g.beginPath(); g.moveTo(px - 3, py - 3); g.lineTo(px + 3, py + 3); g.stroke(); }
+    g.save(); g.beginPath(); g.moveTo(cx - w / 2 + 4, ry + 2); g.quadraticCurveTo(cx - w * 0.26, ry - 18, cx, ry - 11); g.quadraticCurveTo(cx + w * 0.26, ry - 20, cx + w / 2 - 4, ry + 2); g.closePath(); g.fillStyle = '#ffffff'; g.fill(); g.clip();          // (a red and white cloth over the edge)
+    g.fillStyle = '#e8402e'; for (let i = 0; i < 12; i++) for (let j = 0; j < 3; j++) if ((i + j) % 2 === 0) g.fillRect(cx - w / 2 + i * 11, ry - 22 + j * 9, 11, 9);
+    g.restore();
+    const body = () => { g.beginPath(); g.moveTo(cx - w / 2, ry); g.lineTo(cx + w / 2, ry); g.lineTo(cx + bw / 2, ry + h - 9); g.quadraticCurveTo(cx + bw / 2 - 1, ry + h, cx + bw / 2 - 12, ry + h); g.lineTo(cx - bw / 2 + 12, ry + h); g.quadraticCurveTo(cx - bw / 2 + 1, ry + h, cx - bw / 2, ry + h - 9); g.closePath(); };
+    body(); const gr = g.createLinearGradient(0, ry, 0, ry + h); gr.addColorStop(0, '#c48a50'); gr.addColorStop(1, '#9a6a3a'); g.fillStyle = gr; g.fill();
+    g.save(); body(); g.clip();          // (woven rows)
+    for (let r = 0; r < 6; r++) for (let i = -1; i < 11; i++) { const x = cx - w / 2 + i * 13 + (r % 2) * 6.5, y = ry + 3 + r * 6.6; g.fillStyle = '#e2ab6e'; g.beginPath(); rrPath(g, x, y, 11, 5, 2.5); g.fill(); g.fillStyle = 'rgba(255,240,210,.45)'; g.fillRect(x + 2, y + 1, 7, 1.3); }
+    g.restore();
+    body(); g.strokeStyle = INK; g.lineWidth = 2.4; g.stroke();
+    g.restore();
+  },
+  // ---- the pond net in your hands (flat: TRIP.isle2): up in front of you, down into the water and up again (dipK), dripping
+  dip2(c, t) {
+    const p = player, u = this.dipK, I = ISLE7, hx = p.x + 4, hy = p.y - 32, ux = p.x + 8, uy = p.y - 102, dx = I.JETTY_END[0] + 34, dy = I.JETTY_END[1] - 62;
+    const ox = ux + (dx - ux) * u + Math.sin(t * 7) * 3 * u, oy = uy + (dy - uy) * u;
+    const bag = () => { c.beginPath(); c.moveTo(ox - 11, oy); c.quadraticCurveTo(ox - 10, oy + 20, ox, oy + 22); c.quadraticCurveTo(ox + 10, oy + 20, ox + 11, oy); c.closePath(); };
+    c.save(); c.lineCap = 'round'; c.lineJoin = 'round'; c.globalAlpha = 1 - 0.7 * u;
+    bag(); c.fillStyle = 'rgba(255,255,255,.8)'; c.fill();
+    c.save(); bag(); c.clip(); c.strokeStyle = 'rgba(120,140,160,.6)'; c.lineWidth = 0.8; c.beginPath(); for (let k = -24; k <= 24; k += 4.5) { c.moveTo(ox + k - 12, oy - 2); c.lineTo(ox + k + 12, oy + 24); c.moveTo(ox + k + 12, oy - 2); c.lineTo(ox + k - 12, oy + 24); } c.stroke(); c.restore();
+    bag(); c.strokeStyle = 'rgba(110,130,150,.9)'; c.lineWidth = 1.3; c.stroke();
+    c.globalAlpha = 1;
+    seg(c, hx, hy, ox, oy - 5, INK, 4.6); seg(c, hx, hy, ox, oy - 5, '#c98f55', 2.8);
+    c.beginPath(); c.ellipse(ox, oy, 12, 6, 0, 0, TAU); c.strokeStyle = '#2e7d3a'; c.lineWidth = 3.8; c.stroke(); c.strokeStyle = '#4cc36a'; c.lineWidth = 2.2; c.stroke();
+    const D = TRIP.dipping; if (D && D.t > 1.3 && u < 0.4) for (let k = 0; k < 3; k++) { const f = (t * 1.5 + k / 3) % 1; circ(c, ox - 4 + k * 4, oy + 22 + f * 24, 1.8, 'rgba(110,190,255,' + (1 - f).toFixed(2) + ')', 0); }
+    c.restore();
+  },
+  // ---- 3D: each on its own origin (push a matrix to place it)
+  can3(m) {          // a watering can on y = 0, its spout to -x: a sky-blue barrel, a white band with a yellow flower each side, a yellow rose with holes, a handle over the top and one behind
+    m.color('#3fb0e6').lathe(0, 0, 0, [[0.01, 0], [14.6, 0], [16.2, 1.6], [16.9, 6], [16.9, 22], [15.8, 27], [12.2, 30.2], [0.01, 31.2]], 18);
+    m.color('#ffffff').cyl(0, 11.5, 0, 17.05, 17.05, 4.5, 18, { top: false });
+    for (const sz of [-1, 1]) { for (let k = 0; k < 5; k++) { const an = k / 5 * TAU; m.color('#ffd23c').sphere(Math.cos(an) * 2.6, 13.75 + Math.sin(an) * 2.6, sz * 17.2, 1.9, 1.9, 0.5, 8, 3); } m.color('#ff8c1a').sphere(0, 13.75, sz * 17.45, 1.3, 1.3, 0.5, 8, 3); }
+    m.color('#1f6f9e').disc(4, 31.15, 0, 5.2, 12);
+    m.push(RZ3(T3(-12, 7, 0), Math.PI / 4)); m.color('#2f9fd8').cyl(0, 0, 0, 3.4, 2.1, 36, 10); m.color('#ffd23c').cyl(0, 35, 0, 2.3, 6.2, 4.5, 14); m.color('#fff0a0').disc(0, 39.55, 0, 6.2, 14);
+    for (let k = 0; k < 7; k++) { const an = k / 6 * TAU, r = k ? 3.6 : 0; m.color('#3a7a9a').sphere(Math.cos(an) * r, 39.6, Math.sin(an) * r, 0.75, 0.3, 0.75, 6, 3); }
+    m.pop();
+    m.color('#2a8ccc').torus(2, 30, 0, 11.5, 2.1, 14, 6, 'z', 0.25, Math.PI - 0.25).torus(15.2, 15, 0, 9, 2.1, 12, 6, 'z', -Math.PI / 2 + 0.35, Math.PI / 2 - 0.35);
+  },
+  trowel3(m) {          // a garden trowel, its tip at the origin and its handle up (+y): a pointed steel scoop, a red handle, a yellow ring to hang it up
+    m.push(m4s(T3(0, 0, 0), 1, 1, 0.24)); m.color('#c9d3dc').cyl(0, 0, 0, 0.4, 6.4, 11, 12, { top: false }).sphere(0, 11, 0, 6.4, 6, 6.4, 12, 6, { l1: 0.5 }); m.pop();
+    m.color('#aab6c2').box(-0.7, 2, 1.2, 0.7, 15, 1.9);
+    m.color('#9aa3ad').cyl(0, 16.5, 0, 1, 0.9, 6, 8); m.color('#c3ccd6').cyl(0, 22, 0, 2.3, 2.3, 2.6, 10);
+    m.color('#e8402e').lathe(0, 24.5, 0, [[2.2, 0], [2.9, 2.5], [2.8, 9.5], [2.3, 12.5], [0.01, 13]], 10);
+    m.color('#ffd23c').torus(0, 39, 0, 2, 0.55, 10, 4, 'z');
+  },
+  packet3(m, kind) {          // a seed packet standing on its bottom edge, its front +z: paper, a sky picture with its flower, a coloured band
+    const col = this.SEEDCOL[kind] || this.SEEDCOL.sunflower;
+    m.color('#fff4dc').box(-8, 0, -1.1, 8, 21, 1.1); m.color('#efe2c4').box(-8, 21, -1.1, 8, 22.6, 1.1);
+    m.color('#bfe6ff').box(-6.4, 6.5, 1.1, 6.4, 18.5, 1.35); m.color('#4f9a3c').box(-0.35, 7, 1.35, 0.35, 12.5, 1.55);
+    for (let k = 0; k < 6; k++) { const an = k / 6 * TAU; m.color(col[0]).sphere(Math.cos(an) * 2.3, 14 + Math.sin(an) * 2.3, 1.6, 1.6, 1.6, 0.35, 6, 3); }
+    m.color(col[1]).sphere(0, 14, 1.85, 1.2, 1.2, 0.35, 6, 3);
+    m.color(col[0] === '#ffffff' ? '#ffd23c' : col[0]).box(-8, 0, 1.1, 8, 4.6, 1.3);
+  },
+  basket3(m, low) {          // a woven basket on y = 0 (35 round, 23 high): wicker rows light and dark, ribs (not when low), a thick rim, a handle over it, a red and white cloth inside
+    const A = rgb3('#d9a066').concat(1), B = rgb3('#b98a55').concat(1), Rd = rgb3('#e8402e').concat(1), Wh = rgb3('#ffffff').concat(1);
+    m.color('#d9a066').lathe(0, 0, 0, [[0.01, 0], [29, 0], [30.5, 3], [31.8, 6], [32.8, 9], [33.6, 12], [34.2, 15], [34.6, 18], [34.9, 21], [35, 23]], 20, { cols: [A, A, B, A, B, A, B, A, B] });
+    if (!low) { m.color('#a8703f'); for (let k = 0; k < 20; k++) { const an = (k + 0.5) / 20 * TAU; rod3(m, [Math.cos(an) * 29.4, 0.5, Math.sin(an) * 29.4], [Math.cos(an) * 35.3, 22.5, Math.sin(an) * 35.3], 0.7, 4); } }
+    m.color('#a8703f').torus(0, 23, 0, 35, 2.3, low ? 16 : 24, 6, 'y');
+    m.color('#b98a55').torus(0, 23, 0, 33, 2, low ? 12 : 18, 6, 'z', 0.1, Math.PI - 0.1);
+    m.color('#ffffff').sphere(0, 23, 0, 31, 3.4, 31, 16, 6, { l1: 0.5, colFn: (i, j) => ((i >> 1) + j) % 2 ? Rd : Wh });
+  },
+  net3(m) {          // a bug net standing on its handle's end (the hoop up top, facing +z; the bag behind it): a red grip, a wooden pole, a green hoop, white netting
+    const W = rgb3('#f6f8fa').concat(1), Gr = rgb3('#c9d6de').concat(1);
+    m.color('#e8402e').cyl(0, 0, 0, 1.3, 1.3, 9, 8); m.color('#c98f55').cyl(0, 9, 0, 1, 1, 31, 6); m.color('#9aa3ad').cyl(0, 39.5, 0, 1.35, 1.35, 2.4, 8);
+    m.color('#3fae5c').torus(0, 49.5, 0, 7.8, 0.85, 18, 5, 'z');
+    m.push(RX3(T3(0, 49.5, 0), -Math.PI / 2)); m.color('#f6f8fa').sphere(0, 0, 0, 7.4, 11, 7.4, 12, 6, { l1: 0.5, colFn: (i, j) => ((i + j) % 2 ? W : Gr) }); m.pop();
+  },
+  lensH(m) {          // (in a hand: up the arm +y, in front of the hand +z) the magnifier held out low in front: the handle in the fist, the gold rim lying almost flat, its glass
+    m.push(RX3(m4(), 0.78));
+    m.color('#8a4f24'); rod3(m, [0, 0, -3.5], [0, 0, 6.2], 1.25, 8);
+    m.color('#f2c14e'); rod3(m, [0, 0, 6], [0, 0, 8.2], 1.7, 8);
+    m.color('#e8b84a').torus(0, 0, 15.2, 7, 1.3, 24, 6, 'y');
+    m.color('#d6f1ff').sphere(0, 0, 15.2, 6, 0.5, 6, 16, 4);
+    m.color('#ffffff').sphere(-2.4, 0.45, 13.2, 1.9, 0.2, 0.9, 8, 3);
+    m.pop();
+  },
+  dipH(m) {          // (in a hand) the pond net: a long pole on down the arm (-y), a green hoop, a white netting bag hanging from it (-z)
+    const W = rgb3('#f6f8fa').concat(1), Gr = rgb3('#c9d6de').concat(1);
+    m.color('#e8402e'); rod3(m, [0, 9, 0], [0, 3, 0], 1.15, 8);
+    m.color('#c98f55'); rod3(m, [0, 3, 0], [0, -34, 0], 0.95, 6);
+    m.color('#9aa3ad'); rod3(m, [0, -32, 0], [0, -34.6, 0], 1.25, 8);
+    m.color('#3fae5c').torus(0, -41, 0, 7, 0.75, 18, 5, 'z');
+    m.push(RX3(T3(0, -41, 0), Math.PI / 2)); m.color('#f6f8fa').sphere(0, 0, 0, 6.6, 9.5, 6.6, 12, 6, { l0: 0.5, colFn: (i, j) => ((i + j) % 2 ? W : Gr) }); m.pop();
+  },
+  hand3() {          // (drawProp3) the things held out on the islands, made once
+    if (!this.H3) { const mk = (seed, fn) => { const m = new MB(seed); m.smooth = 40; fn(m); return pack(m); }; this.H3 = { lens: mk(1701, (m) => this.lensH(m)), dipnet: mk(1702, (m) => this.dipH(m)) }; }
+    return this.H3;
+  },
+  dipFx(R, hand, st) {          // (drawProp3) the pond net: where its hoop is (the splash goes there), water dripping from it once it is up again
+    this.tip3 = m4apply(hand, 0, -41, 0);
+    const D = TRIP.dipping; if (!D || D.t < 1.3 || this.dipK > 0.3 || !W3.dyn.drop) return;
+    for (let k = 0; k < 3; k++) { const f = ((st.t || 0) * 42 + k * 8) % 24, p = m4apply(hand, (k - 1) * 2.5, -41, -8); R.draw(W3.dyn.drop, T3(p[0], p[1] - f, p[2])); }
+  },
+};
 /* ---- the Green Islands, more to do and to see. Optional, found on the way (Sparky says so once, and a sparkle stays until
    you have tried it): a bug net on the meadow (catch a bug, look at it in the jar, let it go), a seed to plant in the little
    garden by the picnic place (water, the sun: it grows), food for the forest's animals (who eats what?), a photo safari (the
@@ -21112,23 +21440,24 @@ const GREEN7 = {
     for (const dx of [-24, 0, 24]) m.color('#4a2e1a').disc(x + dx, 9.7, z, 4, 10);
     m.color('#6b4a2a').box(x - 1.5, 0, z - 22, x + 1.5, 28, z - 19); m.color('#fff4dc').box(x - 18, 18, z - 20, x + 18, 31, z - 18.6);
     for (const [dx, c, d] of [[-11, '#ffd23c', '#7a4a24'], [0, '#ff4d5e', '#c8323e'], [11, '#ffffff', '#ffd23c']]) { m.color(c).sphere(x + dx, 24.5, z - 18.3, 3.2, 3.2, 0.6, 8, 3); m.color(d).sphere(x + dx, 24.5, z - 17.8, 1.3, 1.3, 0.4, 6, 3); }
-    m.push(T3(x + 48, 0, z + 6)); m.color('#4cc36a').cyl(0, 0, 0, 6, 6, 11, 12); m.color('#3fae5c').push(RZ3(T3(5, 3, 0), -0.9)); m.cyl(0, 0, 0, 1.6, 1.2, 12, 6); m.pop(); m.cyl(-0.5, 11, 0, 2, 2, 1, 8).torus(-2, 13, 0, 5, 1.2, 10, 4, 'z', 0, Math.PI); m.pop();
+    m.push(m4s(RY3(T3(x + 48, 0, z + 6), -0.5), 0.36, 0.36, 0.36)); KIT.can3(m); m.pop();          // (the kit's watering can, a trowel stuck in the soil)
+    m.push(m4s(RZ3(T3(x + 30, 7.5, z + 4), -0.45), 0.5, 0.5, 0.5)); KIT.trowel3(m); m.pop();
     return m;
   },
   netMesh() {          // the bug net's stand: a post with a butterfly board, the net leaning on it, a glass jar on a stump
     const m = new MB(1604), [x, z] = this.NET; m.smooth = 30;
     m.color('#6b4a2a').box(x - 2, 0, z - 2, x + 2, 34, z + 2); m.color('#fff4dc').box(x - 12, 24, z + 2, x + 12, 34, z + 3.2);
     m.color('#ff9a1f').sphere(x - 4.2, 29, z + 3.4, 3.6, 2.6, 0.5, 8, 3).sphere(x + 4.2, 29, z + 3.4, 3.6, 2.6, 0.5, 8, 3); m.color('#2a2026').box(x - 0.7, 25.5, z + 3.2, x + 0.7, 32.5, z + 3.9);
-    m.push(T3(x + 9, 0, z + 5)).push(RZ3(m4(), 0.28)); m.color('#c98f55').cyl(0, 0, 0, 1, 1, 40, 6); m.color('#9aa3ad').torus(0, 47.5, 0, 7.5, 0.7, 14, 4, 'z');
-    m.push(RX3(T3(0, 47.5, 0), -Math.PI / 2)); m.color('#f4f4f4').sphere(0, 0, 0, 7, 10, 7, 10, 5, { l1: 0.5 }); m.pop(); m.pop().pop();
+    m.push(RZ3(T3(x + 9, 0, z + 5), 0.28)); KIT.net3(m); m.pop();          // (the kit's bug net)
     m.color('#8a5a34').cyl(x + 19, 0, z + 9, 6, 6.6, 8, 10); m.color('#e0c08a').disc(x + 19, 8.05, z + 9, 5.4, 10); m.color('#d9f1ff').cyl(x + 19, 8, z + 9, 4.4, 4.4, 9, 10); m.color('#e8402e').cyl(x + 19, 17, z + 9, 4.8, 4.8, 2, 10);
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; m.color('#ffffff').sphere(x + 19 + Math.cos(a) * 4.75, 18, z + 9 + Math.sin(a) * 4.75, 0.9, 0.7, 0.9, 6, 3); }          // (white dots on the jar's lid)
     return m;
   },
   feedMesh() {          // the forest's feeding place: a tree stump with a basket of carrots, nuts and seeds; a bush, a log, a bird house on a post
     const m = new MB(1605), [x, z] = this.FEED; m.smooth = 30;
     m.color('#8a5a34').cyl(x, 0, z, 13, 12, 14, 14); m.color('#e0c08a').disc(x, 14.05, z, 11.4, 14); m.color('#b8935a').torus(x, 14.2, z, 6.5, 0.4, 12, 3).torus(x, 14.2, z, 3, 0.35, 10, 3);
     const bx = x - 2, bz = z + 3;
-    m.color('#c98f55').cyl(bx, 14, bz, 8, 9.4, 7, 12, { top: false }); m.color('#a8703f').disc(bx, 15, bz, 8, 12); m.color('#8a5a34').torus(bx, 21, bz, 9.4, 0.9, 12, 3).torus(bx, 21, bz, 9.4, 0.7, 12, 3, 'z', 0, Math.PI);
+    m.push(m4s(T3(bx, 14, bz), 0.27, 0.3, 0.27)); KIT.basket3(m, true); m.pop();          // (the kit's basket)
     for (const [dx, dz, a] of [[-4, -2, 0.5], [-2, 3, 0.2]]) { m.push(T3(bx + dx, 19, bz + dz)).push(RZ3(m4(), Math.PI / 2 + a)); m.color('#ff8c1a').cone(0, -3, 0, 2, 12, 6); m.color('#3fae5c').push(RZ3(m4(), Math.PI)); m.cone(0, 3, 0, 0.8, 5, 4); m.pop(); m.pop().pop(); }
     for (const [dx, dz] of [[3, 0], [5, 3], [2, 4]]) { m.color('#c98f55').sphere(bx + dx, 20, bz + dz, 1.7, 2, 1.7, 6, 4); m.color('#7a4a24').sphere(bx + dx, 21.3, bz + dz, 1.9, 1, 1.9, 6, 3); }
     m.color('#e8d6a8').cyl(bx + 3, 15, bz - 4, 2.6, 3, 7, 8);
@@ -21237,7 +21566,7 @@ const GREEN7 = {
     if (near(2300, 7690, 30, 200)) {
       for (let k = 0; k < 4; k++) { const d = this.duckAt(k, t); drawAnimal3(R, k ? 'duckling' : 'duck', { x: d.x, z: d.y, y: WATER_Y3 - 1.5 + Math.sin(t * 2 + k) * 0.6, yaw: d.yaw, t: t + k, scale: CS3 }); }
       for (let k = 0; k < 4; k++) { const f = this.pondFish(k, t); this.fish(R, f.x, f.h, f.y, f.yaw, 13, t + k, f.pitch); }
-      const f2 = this.frog2At(t); this.frog(R, f2.x, WATER_Y3 + 1.2 + f2.h, f2.y, f2.yaw, 15, t + 1.3);
+      const f2 = this.frog2At(t); this.frog(R, f2.x, WATER_Y3 + 1.2 + f2.h + wave3(f2.x, f2.y, t), f2.y, f2.yaw, 15, t + 1.3);
     }
     for (const j of this.seaJumps(t)) if (j.u >= 0 && near(j.x, j.y, 30, 40)) this.fish(R, j.x + j.dir * (j.u - 0.5) * 60, WATER_Y3 - 6 + Math.sin(j.u * Math.PI) * 34, j.y, j.dir > 0 ? 0 : Math.PI, 18, t, (0.5 - j.u) * 2.2, true);
     for (const b of this.flocks(t)) if (R.visible([b.x - 20, b.h - 10, b.y - 20, b.x + 20, b.h + 10, b.y + 20])) this.bird(R, b.x, b.h, b.y, b.yaw, 22, b.flap);
@@ -21254,7 +21583,7 @@ const GREEN7 = {
     const X = this.x(), M = this.models(), vis = (x, z, y0, y1, r) => R.visible([x - r, y0, z - r, x + r, y1, z + r]);
     const spark = (p, h) => { if (!vis(p[0], p[1], h - 10, h + 30, 30)) return; for (let k = 0; k < 3; k++) { const a = t * 1.6 + k * TAU / 3, m = T3(p[0] + Math.cos(a) * 16, h + Math.sin(t * 3 + k) * 5 + k * 6, p[1] + Math.sin(a) * 9); m4ry(m, -Math.atan2(CAM3.x - p[0], 900)); const s = 1 + 0.35 * Math.sin(t * 5 + k * 2); m4s(m, s, s, s); R.setTint(1, 0.9, 0.35, 0.65 + 0.3 * Math.sin(t * 4 + k), 1); R.draw(M.star, m); } };
     if (this.on()) { if (!X.net) spark(this.NET, 52); if (!Object.keys(X.seed).length) spark(this.BED, 40); if (!['rabbit', 'squirrel', 'bird'].every((k) => X.fed[k])) spark(this.FEED, 44); }
-    const ring = (x, z, k, a, s) => { if (!vis(x, z, -8, 2, s * 1.4)) return; R.setTint(1, 1, 1, a, 1); const m = T3(x, WATER_Y3 + 1, z); m4s(m, s * (0.3 + k), 1, s * (0.3 + k)); R.draw(W3.dyn.ripple, m); };
+    const ring = (x, z, k, a, s) => { if (!vis(x, z, -8, 2, s * 1.4)) return; R.setTint(1, 1, 1, a, 1); const m = T3(x, WATER_Y3 + 1 + wave3(x, z, t), z); m4s(m, s * (0.3 + k), 1, s * (0.3 + k)); R.draw(W3.dyn.ripple, m); };
     for (let k = 0; k < 4; k++) { const f = this.pondFish(k, t); if (f.jump >= 0 && (f.jump < 0.25 || f.jump > 0.75)) ring(f.x, f.y, f.jump < 0.5 ? f.jump * 4 : (f.jump - 0.75) * 4, 0.7, 14); }
     for (const j of this.seaJumps(t)) if (j.u < 0) ring(j.x, j.y, j.ring, 0.75 * (1 - j.ring), 30);
     for (const b of this.flocks(t)) if (vis(b.x, b.y, 0, 3, 12) && ISLE7.coastD(b.x, b.y) > 0) { R.setTint(1, 1, 1, 0.5, 0); const m = T3(b.x, 1.4, b.y); m4s(m, 9, 1, 6); R.draw(W3.dyn.blob || ISLE5.M.shadow, m); }
@@ -21374,6 +21703,8 @@ const GREEN7 = {
       else if (k === 'bee') { S.tone(215, 0.55, 'sawtooth', 0.012, 0, 245); S.tone(430, 0.5, 'triangle', 0.008, 0.02, 470); }
       else if (k === 'duck') { S.tone(380, 0.12, 'sawtooth', 0.016, 0, 300); S.tone(360, 0.12, 'sawtooth', 0.016, 0.18, 290); }
       else if (k === 'swish') S.tone(900, 0.14, 'triangle', 0.05, 0, 260);
+      else if (k === 'drip') for (let i = 0; i < 4; i++) S.tone(1300 + r() * 700, 0.05, 'sine', 0.025, 0.05 + i * 0.1, 650);
+      else if (k === 'dig') for (const at of [0, 0.3]) { S.tone(210, 0.09, 'triangle', 0.05, at, 130); S.tone(520, 0.05, 'square', 0.012, at + 0.04, 300); }
       else if (k === 'munch') for (let i = 0; i < 3; i++) S.tone(180 + r() * 60, 0.05, 'square', 0.03, i * 0.13);
       else if (k === 'pour') for (let i = 0; i < 5; i++) S.tone(700 + r() * 500, 0.08, 'sine', 0.025, i * 0.12, 300);
       else if (k === 'click') { S.tone(1800, 0.04, 'square', 0.05); S.tone(1100, 0.07, 'square', 0.04, 0.05); }
@@ -21445,7 +21776,7 @@ Object.assign(FUN, {
     G.swing = { x, y, t: 0 }; GREEN7.sfx('swish');
     let best = null, bd = 56; for (const b of G.bugs) if (!b.got) { const d = Math.hypot(b.x - x, b.y - y); if (d < bd) { bd = d; best = b; } }
     if (!best) { if (G.miss++ % 3 === 0) this.say(C.miss, 'sparky'); return; }
-    best.got = true;
+    best.got = true; G.swing.got = best.id;          // (it is in the net)
     setTimeout(() => { if (this.G !== G) return; G.jar = { id: best.id, t: 0, out: null, b: best }; Sfx.play('ok'); this.say(C.jar[best.id], 'player'); this.buttons([{ t: '👋 ' + C.free, cls: 'done', act: () => this.net7Free() }]); }, 380);
   },
   net7Free() {
@@ -21475,17 +21806,24 @@ Object.assign(FUN, {
     }, t);
     this.net7Over(g, t);
   },
-  net7Over(g, t) {          // (both views) the net's swing; the jar with its bug, its word
-    const G = this.G;
-    if (G.swing) { const S = G.swing, k = S.t / 0.45; g.save(); g.translate(S.x + 46, S.y + 84); g.rotate(-0.5 + k * 0.9); g.strokeStyle = '#c98f55'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-40, -72); g.stroke(); g.translate(-46, -84); g.fillStyle = 'rgba(255,255,255,.55)'; g.strokeStyle = '#9aa3ad'; g.lineWidth = 3; g.beginPath(); g.ellipse(0, 0, 24, 18, -0.5, 0, TAU); g.fill(); g.stroke(); g.strokeStyle = 'rgba(150,160,170,.6)'; g.lineWidth = 1; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(i * 8, -14); g.lineTo(i * 8, 14); g.stroke(); } g.restore(); }
+  net7Over(g, t) {          // (both views) your bug net (KIT.net2): resting at the corner, swooping where you tap (what it caught inside); the jar with its bug, its word
+    const G = this.G, rest = { x: 324 + Math.sin(t * 1.3) * 2, y: 238 + Math.sin(t * 1.9) * 3 }, hand = [452, 372];
+    let H = rest, sq = 0.52, vx = 0, vy = 0, bug = null;
+    if (G.swing) {
+      const S = G.swing, u = Math.min(1, S.t / 0.45), at = (v) => { if (v < 0.38) { const e = 1 - (1 - v / 0.38) * (1 - v / 0.38); return { x: rest.x + (S.x - rest.x) * e, y: rest.y + (S.y - rest.y) * e - Math.sin(e * Math.PI) * 28 }; } const e = (v - 0.38) / 0.62, s = e * e * (3 - 2 * e); return { x: S.x + (rest.x - S.x) * s, y: S.y + (rest.y - S.y) * s }; };
+      H = at(u); const H0 = at(Math.max(0, u - 0.05)); vx = H.x - H0.x; vy = H.y - H0.y;
+      sq = 0.52 + 0.48 * (u < 0.38 ? Math.sin(u / 0.38 * Math.PI / 2) : 1 - (u - 0.38) / 0.62);
+      if (u < 0.6) { g.save(); g.strokeStyle = 'rgba(255,255,255,' + (0.7 * (1 - u / 0.6)).toFixed(3) + ')'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); for (let k = 0; k <= 8; k++) { const p = at(Math.max(0, u - 0.035 * k)); if (k) g.lineTo(p.x, p.y); else g.moveTo(p.x, p.y); } g.stroke(); g.restore(); }          // (a swoosh)
+      if (S.got && u > 0.3) bug = S.got;
+    }
+    const sp = Math.hypot(vx, vy), f = Math.min(1, sp / 10), dx = (sp > 0.01 ? -vx / sp * f : 0) + Math.sin(t * 1.7) * 0.12 * (1 - f), dy = (sp > 0.01 ? -vy / sp * f : 0) + (1 - f), dl = Math.hypot(dx, dy) || 1;
+    KIT.net2(g, H.x, H.y, Math.atan2(hand[1] - H.y, hand[0] - H.x), sq, dx / dl * 46, dy / dl * 46, bug ? (q, x, y) => NATURE.draw2(q, bug, x, y, 30, GREEN7.flap2(bug, t)) : null);
     if (!G.jar) return;
-    const J = G.jar, a = Math.min(1, J.t / 0.35), cx = 200, cy = 160, w = 116, h = 134, out = J.out == null ? 0 : Math.min(1, J.out / 1.6);
-    g.save(); g.globalAlpha = a;
-    g.fillStyle = 'rgba(0,0,0,.16)'; g.beginPath(); g.ellipse(cx, cy + h / 2 + 4, w * 0.55, 10, 0, 0, TAU); g.fill();
-    g.fillStyle = 'rgba(214,240,255,.6)'; g.strokeStyle = 'rgba(110,160,190,.95)'; g.lineWidth = 3; g.beginPath(); rrPath(g, cx - w / 2, cy - h / 2, w, h, 26); g.fill(); g.stroke();
-    if (out < 1) { const bx = cx + Math.sin(out * 6) * 40 * out, by = cy + 6 - out * 250 + Math.sin(J.t * 3) * 5, fl = GREEN7.flap2(J.id, performance.now() / 1000); g.save(); g.translate(bx, by); if (G3.on) { g.scale(0.82 + 0.18 * fl, 1); NATURE.pic(g, J.id, 0, 0, 74); } else NATURE.draw2(g, J.id, 0, 0, 74, fl); g.restore(); }
-    g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(cx - w / 2 + 12, cy - h / 2 + 22, 8, h - 46);
-    g.fillStyle = '#e8402e'; if (J.out == null) { g.beginPath(); rrPath(g, cx - w / 2 - 6, cy - h / 2 - 16, w + 12, 20, 6); g.fill(); } else { g.save(); g.translate(cx + w / 2 + 20, cy - h / 2 + 10); g.rotate(0.9); g.beginPath(); rrPath(g, -w / 2, -10, w, 20, 6); g.fill(); g.restore(); }
+    const J = G.jar, a = Math.min(1, J.t / 0.35), cx = 200, cy = 160, w = 116, h = 134, out = J.out == null ? 0 : Math.min(1, J.out / 1.6), k = 0.7 + 0.3 * a;
+    const bugAt = (q) => { const bx = cx + Math.sin(out * 6) * 40 * out, by = cy + 10 - out * 250 + Math.sin(J.t * 3) * 5, fl = GREEN7.flap2(J.id, performance.now() / 1000); q.save(); q.translate(bx, by); if (G3.on) { q.scale(0.82 + 0.18 * fl, 1); NATURE.pic(q, J.id, 0, 0, 74); } else NATURE.draw2(q, J.id, 0, 0, 74, fl); q.restore(); };
+    g.save(); g.globalAlpha = a; g.translate(cx, cy); g.scale(k, k); g.translate(-cx, -cy);          // (it pops up)
+    KIT.jar2(g, cx, cy, w, h, J.out == null ? 0 : Math.min(1, J.out / 0.4), J.out == null ? bugAt : null);
+    if (J.out != null && out < 1) bugAt(g);
     this.tag(g, cx, cy + h / 2 + 18, NATURE.word(J.id), '#2f64b0');
     g.restore();
   },
@@ -21500,7 +21838,7 @@ Object.assign(FUN, {
   seed7Tap(x, y) {
     const G = this.G, C = GAME_CONTENT.trip.x7.seed, H = G.hit, hit = (o) => o && Math.hypot(x - o.x, y - o.y) < o.r, later = (ms, f) => setTimeout(() => { if (this.G === G) f(); }, ms);
     if (G.busy || G.over) return;
-    if (G.step === 'dig' && hit(H.soil)) { G.busy = true; G.holeT = 0; Sfx.play('pop'); later(1300, () => { G.busy = false; G.step = 'water'; this.say(C.inSoil + ' ' + C.water, 'sparky'); }); }
+    if (G.step === 'dig' && hit(H.soil)) { G.busy = true; G.holeT = 0; GREEN7.sfx('dig'); later(1450, () => { G.busy = false; G.step = 'water'; this.say(C.inSoil + ' ' + C.water, 'sparky'); }); }
     else if ((G.step === 'water' || G.step === 'water2') && hit(H.can)) {
       const again = G.step === 'water2'; G.busy = true; G.pourT = 0; GREEN7.sfx('pour');
       later(1400, () => { G.pourT = null; G.grow = again ? 3 : 1; Sfx.play('pop');
@@ -21521,6 +21859,18 @@ Object.assign(FUN, {
     if (v > 1) for (const [s, f] of [[-1, 0.3], [1, 0.4]]) ell(g, x + s * 9, y - h * f, 9 * Math.min(1, v - 1), 4.4, '#4f9a3c', 0, s * 0.5);
     if (v > 1.6) { ell(g, x + sw, y - h - 5, 6, 8, '#5cb84a', 0); ell(g, x + sw, y - h - 9, 4, 4, G.kind === 'sunflower' ? '#ffd23c' : G.kind === 'tulip' ? '#ff4d5e' : '#ffffff', 0); }
   },
+  seed7Tools2(g, t) {          // (flat) the seed packets to choose from; the trowel (stuck in the soil; two scoops); the packet pours the seed in
+    const G = this.G, hk = G.holeT, e = (u) => u * u * (3 - 2 * u);
+    if (G.step === 'pick') GREEN7.SEEDS.forEach((k, i) => KIT.packet2(g, 150 + i * 50, 238 + Math.sin(t * 3 + i) * 2, 1.05, k, (i - 1) * 0.14));
+    const dig = hk != null && hk < 0.6 ? hk / 0.6 : null;
+    if (dig == null) { KIT.trowel2(g, 136, 216, 1, -0.38); ell(g, 136, 216, 9, 3.6, '#6b4a2a', 0); }
+    else {
+      const dp = 0.5 - 0.5 * Math.cos(dig * 4 * Math.PI); KIT.trowel2(g, 192 + 4 * dp, 194 + 18 * dp, 1, -0.55 + 0.25 * dp);
+      for (let s = 0; s < 2; s++) { const cu = clamp((dig - s * 0.5 - 0.22) / 0.28, 0, 1); if (cu > 0 && cu < 1) for (let i = 0; i < 6; i++) circ(g, 204 + (i - 2.5) * 10 * cu, 206 - 34 * cu + 42 * cu * cu, 2.3, i % 2 ? '#6b4a2a' : '#8a5d3a', 0); }
+    }
+    if (hk != null && hk > 0.45 && hk < 1.45) { const k = clamp((hk - 0.45) / 0.8, 0, 1); g.save(); g.globalAlpha = Math.min(1, (hk - 0.45) / 0.15) * (1 - clamp((hk - 1.25) / 0.2, 0, 1)); KIT.packet2(g, 220, 152, 1.1, G.kind, -1.9 * e(Math.min(1, k * 1.6))); g.restore(); }
+    if (hk != null && hk > 0.6 && hk < 1.2) circ(g, 200, 160 + (hk - 0.6) / 0.6 * 50, 3.4, '#5a3a22', 0);          // (the seed falls into the hole)
+  },
   seed7Draw(g, t) {
     const G = this.G, H = G.hit, sunGo = G.sunT == null ? 0 : Math.min(1, G.sunT / 0.9), cx = 110 + sunGo * 240;
     let gr = g.createLinearGradient(0, 0, 0, 300); gr.addColorStop(0, '#8fd0ff'); gr.addColorStop(0.7, '#e4f6ff'); g.fillStyle = gr; g.fillRect(0, 0, 400, 300);
@@ -21530,15 +21880,15 @@ Object.assign(FUN, {
     H.cloud = { x: cx, y: 66, r: 52 };
     g.fillStyle = '#9fd77a'; g.fillRect(0, 196, 400, 104); g.fillStyle = '#86c964'; g.fillRect(0, 262, 400, 38);
     rrect(g, 106, 206, 188, 48, 6, '#a8703f', 2.5); ell(g, 200, 210, 88, 12, '#6b4a2a', 0); H.soil = { x: 200, y: 214, r: 62 };
-    if (G.holeT != null) { const k = Math.min(1, G.holeT / 0.6); ell(g, 200, 211, 14 * k, 5 * k, '#3a2414', 0); if (G.holeT > 0.6 && G.holeT < 1.2) circ(g, 200, 160 + (G.holeT - 0.6) / 0.6 * 50, 3.4, '#5a3a22', 0); }
+    if (G.holeT != null) { const k = Math.min(1, G.holeT / 0.6); ell(g, 200, 211, 14 * k, 5 * k, '#3a2414', 0); }
     this.seed7Plant2(g, 200, 210, t);
-    const pour = G.pourT != null, cxn = 330, cyn = 196; H.can = { x: cxn, y: cyn - 10, r: 46 };
-    g.save(); g.translate(cxn, cyn); g.rotate(pour ? -0.7 : 0); rrect(g, -22, -30, 44, 36, 8, '#4cc36a', 2.5); g.strokeStyle = '#3fae5c'; g.lineWidth = 5; g.beginPath(); g.moveTo(-20, -14); g.lineTo(-50, -34); g.stroke(); g.lineWidth = 4; g.beginPath(); g.arc(4, -34, 13, Math.PI, TAU); g.stroke(); g.restore();
-    if (pour) for (let i = 0; i < 9; i++) { const u = ((G.pourT * 1.8 + i / 9) % 1); circ(g, 252 - i * 3 + u * -18, 150 + u * 56, 2.6, '#7fc8ff', 0); }
+    this.seed7Tools2(g, t);
+    const pour = G.pourT != null, rose = KIT.can2(g, 332, 206, 1, pour ? -0.62 : 0); H.can = { x: 328, y: 180, r: 48 };
+    if (pour) for (let i = 0; i < 16; i++) { const u = (G.pourT * 1.7 + i / 16) % 1, tx = 204 + ((i % 4) - 1.5) * 6, x = rose.x + (tx - rose.x) * u, y = rose.y + (202 - rose.y) * u * u; circ(g, x, y, 2.4, '#7fc8ff', 0); circ(g, x - 0.8, y - 0.8, 0.8, '#ffffff', 0); }
     this.seed7Aim(g, this.seed7Target(), t);
   },
   seed7Draw3(g, t) {
-    const G = this.G, H = G.hit, sunGo = G.sunT == null ? 0 : Math.min(1, G.sunT / 0.9), pour = G.pourT != null;
+    const G = this.G, H = G.hit, sunGo = G.sunT == null ? 0 : Math.min(1, G.sunT / 0.9), pour = G.pourT != null, hk = G.holeT, e = (u) => u * u * (3 - 2 * u);
     const cloudX = -150 + sunGo * 330, cam = { eye: [0, 96, 200], at: [0, 46, 0], fov: 0.8 };
     const R = this.scene(g, ['#8fd0ff', '#e4f6ff'], cam, (R) => {
       this.ground3(R, '#8ed06b', -600, 600, -500, 300, 0);
@@ -21546,21 +21896,29 @@ Object.assign(FUN, {
       R.draw(this.m3('sun7', (m) => { m.color('#ffd84a').sphere(0, 0, 0, 30, 30, 8, 18, 8); for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; m.color('#ffc21a').push(RZ3(T3(Math.cos(a) * 40, Math.sin(a) * 40, 0), a - Math.PI / 2)); m.cone(0, -4, 0, 4, 12, 5); m.pop(); } cute3(m, 0, 6, 7.4, 10, 3.6, { my: 9, mz: 8, mw: 7 }); }), T3(-150, 150, -300));
       if (G.grow < 2 || G.step === 'sun') R.draw(this.m3('cloud', (m) => { m.color('#ffffff'); for (const [dx, dy, r] of [[0, 0, 22], [24, 6, 28], [50, 0, 20], [24, -6, 18]]) m.ico(dx, dy, 0, r, { jit: 0.1, detail: 1 }); }), m4s(T3(cloudX - 30, 146, -270), 1.4, 1.4, 1.4));
       R.draw(this.m3('bed7', (m) => { m.color('#a8703f').box(-80, 0, -26, 80, 24, 26); m.color('#6b4a2a').box(-74, 24, -20, 74, 25, 20); m.color('#8a5a34'); for (const sx of [-1, 1]) for (const sz of [-1, 1]) m.box(sx * 80 - 3, 0, sz * 26 - 3, sx * 80 + 3, 28, sz * 26 + 3); }));
-      if (G.holeT != null) { const k = Math.min(1, G.holeT / 0.6); R.draw(this.m3('hole7', (m) => m.color('#3a2414').disc(0, 25.2, 0, 1, 14)), m4s(T3(0, 0, 4), 12 * k, 1, 8 * k)); if (G.holeT > 0.6 && G.holeT < 1.2) R.draw(this.m3('seed7', (m) => m.color('#5a3a22').sphere(0, 0, 0, 2.4, 1.6, 1.6, 8, 4)), T3(0, 80 - (G.holeT - 0.6) / 0.6 * 54, 4)); }
+      if (hk != null) { const k = Math.min(1, hk / 0.6); R.draw(this.m3('hole7', (m) => m.color('#3a2414').disc(0, 25.2, 0, 1, 14)), m4s(T3(0, 0, 4), 12 * k, 1, 8 * k)); if (hk > 0.6 && hk < 1.2) R.draw(this.m3('seed7', (m) => m.color('#5a3a22').sphere(0, 0, 0, 2.4, 1.6, 1.6, 8, 4)), T3(0, 80 - (hk - 0.6) / 0.6 * 54, 4)); }
       const v = G.g;
       if (v > 2.4) { const k = Math.min(1, (v - 2.4) / 0.6); R.draw(NATURE.mesh(G.kind), GREEN7.mat(G.kind, 0, 25, 4, 0.3, (G.kind === 'sunflower' ? 96 : 70) * (0.4 + 0.6 * k))); }
       else if (v > 0.05) { const s = v < 1 ? v : 1 + Math.min(1, v - 1) * 0.9, m = T3(0, 25, 4); m4rz(m, Math.sin(t * 2) * 0.04); m4s(m, s, s, s); R.draw(this.m3('sprout7', (mb) => { mb.color('#4f9a3c').cyl(0, 0, 0, 1.2, 1, 18, 6); for (const sd of [-1, 1]) mb.color('#5cb84a').sphere(sd * 6, 15 + (sd > 0 ? 3 : 0), 0, 6, 1.4, 3.6, 10, 3); }), m);
         if (v > 1.5) { const k = Math.min(1, (v - 1.5) / 0.5), bc = G.kind === 'sunflower' ? '#ffd23c' : G.kind === 'tulip' ? '#ff4d5e' : '#ffffff'; R.draw(this.m3('bud7' + G.kind, (mb) => { mb.color('#5cb84a').sphere(0, 0, 0, 3.4, 5, 3.4, 8, 5); mb.color(bc).sphere(0, 4, 0, 2.4, 2.4, 2.4, 8, 4); for (const sd of [-1, 1]) mb.color('#4f9a3c').sphere(sd * 7, -12, 0, 7, 1.3, 3.4, 10, 3); }), m4s(T3(0, 25 + 18 * s, 4), k * s, k * s, k * s)); } }
-      const cm = T3(108, 0, 20); m4ry(cm, -0.5); if (pour) { m4t(cm, 0, 22, 0); m4rz(cm, 0.8); m4t(cm, 0, -22, 0); }
-      R.draw(this.m3('can7', (m) => { m.color('#4cc36a').cyl(0, 0, 0, 16, 16, 30, 16); m.color('#3fae5c').push(RZ3(T3(-12, 8, 0), 0.95)); m.cyl(0, 0, 0, 4, 3, 34, 8); m.color('#2e9e4f').cyl(0, 34, 0, 5, 5, 3, 8); m.pop(); m.color('#3fae5c').cyl(0, 30, 0, 5, 5, 3, 10).torus(4, 34, 0, 13, 2.6, 12, 4, 'z', 0, Math.PI); }), cm);
-      if (pour) for (let i = 0; i < 10; i++) { const u = ((G.pourT * 1.6 + i / 10) % 1); R.draw(W3.dyn.drop, m4s(T3(22 - u * 18 + (i % 3) * 3, 92 - u * 64, 6 + (i % 2) * 4), 1.3, 1.6, 1.3)); }
+      const pk = (k) => this.m3('packet7' + k, (mb) => KIT.packet3(mb, k));
+      if (G.step === 'pick') GREEN7.SEEDS.forEach((k, i) => { const m = T3(-48 + i * 48, 0, 31); m4ry(m, (1 - i) * 0.12); m4rx(m, -0.22); R.draw(pk(k), m4s(m, 1.25, 1.25, 1.25)); });          // (the seed packets to choose from, leaning on the garden)
+      const dig = hk != null && hk < 0.6 ? hk / 0.6 : null; let tm;          // (the trowel: stuck in the soil at the side; two scoops)
+      if (dig == null) { tm = T3(-60, 19, 8); m4rz(tm, 0.42); }
+      else { const dp = 0.5 - 0.5 * Math.cos(dig * 4 * Math.PI); tm = T3(-10 + 2 * dp, 30 - 9 * dp, 6); m4rz(tm, 0.75 - 0.35 * dp); }
+      R.draw(this.m3('trowel7', (m) => KIT.trowel3(m)), m4s(tm, 1.25, 1.25, 1.25));
+      if (dig != null) for (let s = 0; s < 2; s++) { const cu = clamp((dig - s * 0.5 - 0.22) / 0.28, 0, 1); if (cu > 0 && cu < 1) for (let i = 0; i < 6; i++) R.draw(this.m3('crumb7', (m) => m.color('#6b4a2a').ico(0, 0, 0, 1.8, { jit: 0.3, detail: 0 })), T3((i - 2.5) * 6 * cu, 26 + 24 * cu - 30 * cu * cu, 4 + (i % 3) * 3)); }
+      if (hk != null && hk > 0.45 && hk < 1.45) { const k = clamp((hk - 0.45) / 0.8, 0, 1), up = clamp((hk - 1.2) / 0.25, 0, 1), pm = T3(20, 84 + 30 * up, 6); m4rz(pm, 2.0 * e(Math.min(1, k * 1.6))); m4t(pm, 0, -11, 0); R.draw(pk(G.kind), m4s(pm, 1.2, 1.2, 1.2)); }          // (the packet pours the seed in)
+      const lift = pour ? e(Math.min(1, G.pourT / 0.3)) : 0, cm = T3(70, 0, 46); m4ry(cm, -0.54); if (lift) { m4t(cm, -10 * lift, 30 * lift, 0); m4t(cm, 0, 16, 0); m4rz(cm, 0.62 * lift); m4t(cm, 0, -16, 0); }          // (the watering can: lifted and tipped to pour)
+      R.draw(this.m3('kitcan', (m) => KIT.can3(m)), cm);
+      if (pour && lift > 0.6) { const rs = m4apply(cm, -41, 35.5, 0); for (let i = 0; i < 12; i++) { const u = (G.pourT * 1.6 + i / 12) % 1, tx = (i % 3 - 1) * 4, tz = 4 + (i % 2) * 4; R.draw(W3.dyn.drop, m4s(T3(rs[0] + (tx - rs[0]) * u, rs[1] + (30 - rs[1]) * u * u, rs[2] + (tz - rs[2]) * u), 1.3, 1.6, 1.3)); } }
     }, t);
     const p = (x, y, z, r) => { const s = R.project(x, y, z); return s ? { x: s.x, y: s.y, r } : null; };
-    H.soil = p(0, 25, 4, 64); H.can = p(108, 30, 20, 50); H.cloud = p(cloudX, 146, -270, 58);
+    H.soil = p(0, 25, 4, 64); H.can = p(70, 22, 46, 50); H.cloud = p(cloudX, 146, -270, 58);
     this.seed7Aim(g, this.seed7Target(), t);
   },
   // feeding the forest's animals: tap a food, then the animal that eats it; it comes and eats (a wrong one says no, thank you)
-  FEED7: { rabbit: { home: [70, 206], eat: [124, 244] }, squirrel: { home: [338, 132], eat: [280, 242] }, bird: { home: [214, 66], eat: [204, 204] }, food: { carrot: [164, 256], nut: [204, 260], seeds: [244, 256] } },
+  FEED7: { rabbit: { home: [70, 206], eat: [124, 244] }, squirrel: { home: [338, 132], eat: [280, 242] }, bird: { home: [214, 66], eat: [204, 204] }, food: { carrot: [168, 238], nut: [204, 234], seeds: [240, 238] } },
   start_feed7() {
     const G = this.G, C = GAME_CONTENT.trip.x7.feed, X = GREEN7.x(), all = ['rabbit', 'squirrel', 'bird'].every((k) => X.fed[k]);
     Object.assign(G, { food: null, fed: all ? {} : Object.assign({}, X.fed), act: null, hit: {}, tick: (dt) => { if (G.act) G.act.t += dt; }, draw: (g, t) => this.feed7Draw(g, t), tap: (x, y) => this.feed7Tap(x, y) });
@@ -21597,16 +21955,17 @@ Object.assign(FUN, {
     for (const [x, r] of [[30, 60], [120, 50], [250, 58], [380, 62]]) { g.fillStyle = '#7fc06e'; g.beginPath(); g.arc(x, 90, r, 0, TAU); g.fill(); }
     g.fillStyle = '#5e9e48'; g.fillRect(0, 170, 400, 130); g.fillStyle = '#6cae52'; g.fillRect(0, 230, 400, 70);
     g.fillStyle = '#7a5234'; g.fillRect(318, 30, 40, 200); g.fillStyle = '#6b4430'; g.fillRect(150, 70, 140, 9);
+    KIT.basket2(g, 204, 252, 'back');          // (the basket: its handle, a cloth, the basket; the animals; the food in it; its rim)
     const pos = {}; for (const a of ['rabbit', 'squirrel', 'bird']) pos[a] = this.feed7Pos(a, t);
     const draw = (a) => { const p = pos[a]; g.save(); g.translate(p.x, p.y); g.rotate(p.shake || 0); g.scale(a === 'squirrel' ? -1 : 1, 1); NATURE.draw2(g, a, 0, -22, a === 'rabbit' ? 74 : 62); g.restore(); if (p.eat) NATURE.draw2(g, { rabbit: 'carrot', squirrel: 'nut', bird: 'seeds' }[a], p.x + (a === 'squirrel' ? -22 : 22), p.y - 8, 26); H[a] = { x: p.x, y: p.y - 24, r: 46 }; };
     draw('rabbit'); if (!pos.rabbit.eat && !(G.act && G.act.id === 'rabbit' && !G.act.no)) for (const [dx, dy, r] of [[-16, 10, 26], [14, 16, 22], [-2, 24, 24]]) circ(g, F.rabbit.home[0] + dx, F.rabbit.home[1] + dy, r, '#3f8f3c', 0);
     draw('squirrel'); draw('bird');
-    ell(g, 204, 262, 58, 16, '#a8703f', 2); rrect(g, 148, 244, 112, 22, 8, '#c98f55', 2); g.strokeStyle = '#8a5a34'; g.lineWidth = 3; g.beginPath(); g.ellipse(204, 244, 56, 30, 0, Math.PI, TAU); g.stroke();
-    for (const f of Object.keys(F.food)) { const [x, y] = F.food[f]; NATURE.draw2(g, f, x, y - 10, 40); H[f] = { x, y: y - 10, r: 26 }; }
+    for (const f of Object.keys(F.food)) { const [x, y] = F.food[f]; NATURE.draw2(g, f, x, y, 40); H[f] = { x, y, r: 26 }; }
+    KIT.basket2(g, 204, 252, 'front');
     this.feed7Basket2(g, t);
   },
   feed7Draw3(g, t) {
-    const G = this.G, H = G.hit, P3 = { rabbit: { home: [-120, 0, -20], eat: [-50, 0, 70] }, squirrel: { home: [128, 64, -24], eat: [52, 0, 74] }, bird: { home: [20, 128, -60], eat: [0, 30, 66] } }, food = { carrot: [-16, 32, 70], nut: [0, 32, 74], seeds: [16, 32, 70] };
+    const G = this.G, H = G.hit, P3 = { rabbit: { home: [-120, 0, -20], eat: [-50, 0, 70] }, squirrel: { home: [128, 64, -24], eat: [52, 0, 74] }, bird: { home: [20, 128, -60], eat: [0, 30, 66] } }, food = { carrot: [-16, 34, 70], nut: [0, 34, 74], seeds: [16, 34, 70] };
     const at = (a) => { const F = P3[a], A = G.act; if (G.fed[a]) return { p: F.eat, eat: true }; if (A && A.id === a && !A.no) { const k = Math.min(1, A.t / 1.2), e = k * k * (3 - 2 * k); return { p: [F.home[0] + (F.eat[0] - F.home[0]) * e, F.home[1] + (F.eat[1] - F.home[1]) * e + Math.sin(e * Math.PI) * 26, F.home[2] + (F.eat[2] - F.home[2]) * e], move: true }; } return { p: F.home, shake: A && A.id === a && A.no ? Math.sin(A.t * 30) * 0.4 : 0 }; };
     const pos = { rabbit: at('rabbit'), squirrel: at('squirrel'), bird: at('bird') };
     const R = this.scene(g, ['#bfe6c8', '#e8f6e0'], { eye: [0, 96, 250], at: [0, 50, 0], fov: 0.8 }, (R) => {
@@ -21614,7 +21973,7 @@ Object.assign(FUN, {
       for (const [k, x, z] of [['pine0', -330, -330], ['tree1', -170, -400], ['pine1', 220, -380], ['tree0', 360, -300], ['pine0', 60, -460]]) R.draw(this.tall(k), this.at3(x, 0, z, x * 0.01, 1));
       R.draw(this.m3('trunk7', (m) => { m.color('#7a5234').cyl(150, 0, -30, 18, 14, 220, 12); m.push(T3(150, 120, -30)).push(RZ3(m4(), 1.2)); m.cyl(0, 0, 0, 6, 4, 70, 8); m.pop().pop(); m.color('#6b4430').push(T3(-60, 124, -60)).push(RZ3(m4(), -Math.PI / 2)); m.cyl(0, 0, 0, 4, 3.4, 150, 8); m.pop().pop(); m.color('#4f9e46').ico(-70, 132, -66, 18, { jit: 0.25, seed: 3 }).ico(84, 128, -64, 16, { jit: 0.25, seed: 4 }); }));
       if (!pos.rabbit.eat && !pos.rabbit.move) R.draw(this.m3('bush7', (m) => { m.color('#3f8f3c').ico(-118, 18, 16, 26, { jit: 0.25, sy: 0.8, seed: 5 }); m.color('#4aa046').ico(-92, 14, 26, 18, { jit: 0.25, seed: 6 }); }));
-      R.draw(this.m3('basket7', (m) => { m.color('#c98f55').cyl(0, 0, 70, 30, 34, 24, 16, { top: false }); m.color('#a8703f').disc(0, 22, 70, 30, 16); m.color('#8a5a34').torus(0, 24, 70, 34, 2.4, 16, 4).torus(0, 24, 70, 32, 2, 16, 4, 'z', 0, Math.PI); }));
+      R.draw(this.m3('kitbasket', (m) => KIT.basket3(m)), T3(0, 0, 70));          // (a woven basket with a checked cloth)
       for (const f of Object.keys(food)) { const q = food[f]; R.draw(NATURE.mesh(f), GREEN7.mat(f, q[0], q[1] - 8, q[2], f === 'carrot' ? 0.4 : 0, f === 'carrot' ? 26 : 16)); }
       const r = pos.rabbit; drawAnimal3(R, 'rabbit', { x: r.p[0], y: r.p[1], z: r.p[2], yaw: (r.eat ? 0.6 : 0.3) + (r.shake || 0), t, moving: !!r.move, phase: t * 9, graze: r.eat && Math.sin(t * 2) > -0.3, scale: 2.4 });
       const s = pos.squirrel, sm = GREEN7.mat('squirrel', s.p[0], s.p[1] + (s.eat ? Math.abs(Math.sin(t * 6)) * 1.5 : 0), s.p[2], (s.eat ? -2.2 : -2.6) + (s.shake || 0), 34); R.draw(NATURE.mesh('squirrel'), sm);
@@ -24164,6 +24523,7 @@ function update(dt, tour) {
   updatePlayer(dt);
   if (!ISLE6.ride && !TRIP.hop) updateFollower(sparky, 62, dt);          // (on a ride: ISLE6 tells him where to wait)
   if (!sparky.moving && game.mode === 'play' && !player.moving) sparky.face = player.x < sparky.x ? -1 : 1;
+  sparky.stillT = sparky.moving || player.moving || game.mode !== 'play' || Dialog.open || SEA.active || TRIP.busy3 || TRIP.hop ? 0 : (sparky.stillT || 0) + dt;          // (how long all has been quiet round him)
   updateNPCs(dt);
   updateAnimals(dt);
   updateHerd(dt);
@@ -24494,7 +24854,7 @@ function boot() {
 window.SH = {
   get state() { return state; }, player, sparky, NPC, Quests, Dialog, Speech, Save, cam, view, game, keys, LAB, SHIP, Parts, shoreC,
   findPath, circleFree, interactables, nearestInteractable, interact, startGame, tapAt, walkTo, LANDMARK,
-  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, ISLE7, SCHOOLIN, TRIP, NATURE, GREEN7, SchoolQuiz, SeaPick, Where, Update, LOOK3, ENV_DAY, ENV_EVE, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
+  VoiceWarn, EGGS, resetInPlace, Title, Menu, MG, Device, Touch, Joy, FS, Music, MINI, HERD, CHORE_ITEMS, CHORE_TARGETS, PAJAMAS, BEDS, DOOR, PEN_GATE, Cert, CaptainCert, SEA, ISLE5, ISLE6, ISLE7, SCHOOLIN, TRIP, NATURE, GREEN7, KIT, SchoolQuiz, SeaPick, Where, Update, LOOK3, ENV_DAY, ENV_EVE, Wardrobe, Parent, Creator, Toast, Coins, Hud, Shop, FUN, wearAccessory, refreshPlayerLook, get look() { return PLAYER_LOOK; },
   quickStart(name) {     // skip the parent screen and the creator (tests only)
     state.parentSeen = true; state.created = true; if (name) state.name = name;
     $('parent').classList.add('hidden'); $('creator').classList.add('hidden');
