@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{AD}} · {{OGRETMEN}}</title>
+<meta name="description" content="{{OGRETMEN}} · 2. sınıflar için İngilizce oyunlar: Sunny Hill, Pocket Quest. Kayıt bulutta: her cihazda kaldığın yerden devam et.">
+<meta property="og:title" content="{{AD}} · {{OGRETMEN}}">
+<meta property="og:description" content="2. sınıflar için İngilizce oyunlar. Kartındaki kullanıcı adı ve şifreyle giriş yap, kaldığın yerden devam et.">
+<meta property="og:image" content="/img/sh-ship.jpg">
+<meta name="theme-color" content="#1d2b53">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="nav">
+  <div class="container">
+    <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>{{OGRETMEN}}</small></span></a>
+    <nav class="links" id="navLinks"><a href="#oyunlar">Oyunlar</a><a href="#nasil">Nasıl çalışır?</a><a href="#veliler">Veliler için</a></nav>
+    <div class="right">
+      <a class="btn ghost sm" id="navTeacher" href="/ogretmen"><i class="pi pi-lock"></i>Öğretmen girişi</a>
+      <div class="userchip" id="navUser" hidden><span class="av" id="navAv"></span><span><b id="navName"></b><small id="navCls"></small></span></div>
+      <button class="btn ghost sm" type="button" id="logout" hidden><i class="pi pi-logout"></i>Çıkış</button>
+    </div>
+  </div>
+</header>
+
+<p class="warn container" id="old">Bu tarayıcı çok eski olduğu için site açılamıyor. Lütfen Chrome ya da Safari'yi güncelleyin.</p>
+
+<div id="landing">
+  <section class="hero">
+    <div class="scene" aria-hidden="true"><i class="sun"></i><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="tree"></i><i class="maskot hop"></i><i class="ground"></i></div>
+    <div class="container">
+      <div class="pitch">
+        <span class="badge"><i class="pi pi-star"></i>2. sınıflar için İngilizce</span>
+        <h1>İngilizceyi <span class="hl">oynayarak</span> öğren.</h1>
+        <p class="lead">Sunny Hill ve Pocket Quest tek adreste. Kayıtların bulutta durur: telefon, tablet ya da bilgisayar fark etmez, kaldığın yerden devam edersin.</p>
+        <ul class="ticks"><li>Her cihazda kaldığın yerden</li><li>Reklamsız ve güvenli</li><li>Öğretmen takibi</li></ul>
+      </div>
+
+      <section class="login" id="login" hidden>
+        <div class="login-head"><img src="/img/logo.svg" alt=""><div><h2>Öğrenci girişi</h2><p>Kartındaki bilgilerle giriş yap.</p></div></div>
+        <div class="known" id="known" hidden>
+          <p>Bu cihazda giren:</p>
+          <div class="chips" id="chips"></div>
+        </div>
+        <label class="field">
+          <span>Kullanıcı adı</span>
+          <span class="ic"><i class="pi pi-user"></i>
+          <input id="user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"
+                 enterkeyhint="next" placeholder="adın + soyadının ilk harfi" maxlength="24"></span>
+        </label>
+        <div class="field">
+          <span>Şifre (4 rakam)</span>
+          <div class="dots" id="dots" aria-live="polite"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="pad" id="pad">
+          <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+          <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+          <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+          <button type="button" data-k="del" class="del" aria-label="Sil"><i class="pi pi-del"></i></button>
+          <button type="button" data-k="0">0</button>
+          <button type="button" data-k="ok" class="ok" aria-label="Giriş yap"><i class="pi pi-check"></i></button>
+        </div>
+        <p class="msg" id="msg" role="alert"></p>
+        <p class="login-foot"><span>Şifreni mi unuttun? Öğretmenine sor.</span><a href="/ogretmen">Öğretmen girişi</a></p>
+      </section>
+    </div>
+  </section>
+
+  <section class="section" id="oyunlar">
+    <div class="container">
+      <span class="eyebrow">Oyunlar</span>
+      <h2>Derste öğren, oyunda pekiştir</h2>
+      <p class="sub">Her oyun 2. sınıf İngilizce ünitelerine göre hazırlandı. Çocuklar konuşarak, keşfederek ve görevleri tamamlayarak öğrenir.</p>
+      <div class="games2" id="gameCards"></div>
+    </div>
+  </section>
+
+  <section class="section alt" id="nasil">
+    <div class="container">
+      <span class="eyebrow">Nasıl çalışır?</span>
+      <h2>Üç adımda oyunda</h2>
+      <p class="sub">Kurulum yok, uygulama indirmek yok. Bir tarayıcı yeterli.</p>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><h3>Giriş yap</h3><p>Öğretmeninin verdiği karttaki kullanıcı adını yaz, 4 rakamlı şifreye dokun.</p></div>
+        <div class="step"><span class="n">2</span><h3>Oyununu seç</h3><p>Sunny Hill ya da Pocket Quest; oyun tam ekran açılır.</p></div>
+        <div class="step"><span class="n">3</span><h3>Kaldığın yerden devam et</h3><p>Kaydın bulutta durur. Tablet, telefon ya da bilgisayar: hangisinden girersen gir.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="veliler">
+    <div class="container">
+      <span class="eyebrow">Veliler için</span>
+      <h2>Güvenli, sade, reklamsız</h2>
+      <p class="sub">Site yalnızca eğitim için hazırlandı. Çocuğunuzun kaydı kaybolmaz; kişisel bilgi istenmez.</p>
+      <div class="trust">
+        <div class="tbox"><span class="ic2"><i class="pi pi-cloud"></i></span><h3>Kayıt kaybolmaz</h3><p>İlerleme bulutta saklanır ve düzenli yedeklenir.</p></div>
+        <div class="tbox"><span class="ic2"><i class="pi pi-shield"></i></span><h3>Kişisel bilgi yok</h3><p>E-posta, telefon ya da fotoğraf istenmez.</p></div>
+        <div class="tbox"><span class="ic2"><i class="pi pi-noads"></i></span><h3>Reklam yok</h3><p>Satın alma, reklam ya da dikkat dağıtan bağlantı yok.</p></div>
+        <div class="tbox"><span class="ic2"><i class="pi pi-chart"></i></span><h3>Öğretmen takibi</h3><p>Öğretmen ilerlemeyi görür, gerekirse kaydı geri yükler.</p></div>
+      </div>
+      <div class="cta"><a class="btn lg" href="#top" id="ctaLogin">Giriş yap</a><a class="btn n lg" href="/gizlilik">Gizlilik ve KVKK</a></div>
+    </div>
+  </section>
+</div>
+
+<main class="container dash" id="games" hidden>
+  <section class="welcome">
+    <div>
+      <h1>Merhaba, <span id="hiName"></span>!</h1>
+      <p>Bugün hangi oyunu oynamak istersin?</p>
+      <span class="pill" id="hiCls"></span>
+    </div>
+    <i class="maskot hop" aria-hidden="true"></i>
+  </section>
+  <div id="warns"></div>
+  <section class="contcard" id="cont" hidden>
+    <div class="pic"><img id="contImg" alt=""></div>
+    <div class="in">
+      <span class="eyebrow">Kaldığın yerden devam et</span>
+      <h3 id="contTitle"></h3>
+      <span class="sumline" id="contSum"></span>
+      <a class="btn go lg" id="contBtn"><i class="pi pi-play"></i>Devam et</a>
+    </div>
+  </section>
+  <h2 class="h">Oyunların</h2>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>© 2026 {{OGRETMEN}}</small></span></a>
+    <span><a href="/gizlilik">Gizlilik</a><a href="/ogretmen">Öğretmen girişi</a></span>
+  </div>
+</footer>
+
+<script src="/js/oyun-sitesi.js"></script>
+<script type="module" src="/js/portal.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# built by build.mjs
+dist/
+# wrangler's local files
+.wrangler/
+node_modules/

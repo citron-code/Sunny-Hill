@@ -1,0 +1,10 @@
+{
+  "name": "oyun-sitesi",
+  "private": true,
+  "type": "module",
+  "description": "Batuhan Teacher's games site: logins, cloud saves, the teacher page (Cloudflare Pages + D1).",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs --local && node tools/test-api.mjs && node tools/test-browser.mjs"
+  }
+}
