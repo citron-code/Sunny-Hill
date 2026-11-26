@@ -1,0 +1,9 @@
+# Cloudflare Pages settings for the games site. kur.mjs fills in database_id at the first setup.
+name = "citrobit"
+pages_build_output_dir = "./dist"
+compatibility_date = "2025-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "oyun-kayitlari"
+database_id = "kur-mjs-dolduracak"

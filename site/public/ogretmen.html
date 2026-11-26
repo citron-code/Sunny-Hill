@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Öğretmen paneli · {{AD}}</title>
+<link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/ogretmen.css">
+</head>
+<body class="teacher">
+<header class="nav noprint">
+  <div class="container wide">
+    <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>Öğretmen paneli</small></span></a>
+    <div class="right">
+      <a class="btn ghost sm" href="/"><i class="pi pi-home"></i>Öğrenci sayfası</a>
+      <button class="btn ghost sm" id="tLogout" type="button" hidden><i class="pi pi-logout"></i>Çıkış</button>
+    </div>
+  </div>
+</header>
+
+<section class="tband noprint" id="tLogin" hidden>
+  <div class="tlogin">
+    <div class="login-head"><img src="/img/logo.svg" alt=""><div><h2>Öğretmen girişi</h2><p>Hesaplar, kartlar ve öğrenci kayıtları</p></div></div>
+    <form id="tForm">
+      <label class="field"><span>Şifre</span>
+        <span class="ic"><i class="pi pi-lock"></i>
+        <input type="password" id="tPass" autocomplete="current-password"></span></label>
+      <button class="btn lg" type="submit" style="width:100%">Giriş yap</button>
+      <p class="msg" id="tMsg" role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<main class="container wide tpage" id="tMain" hidden>
+  <div class="thead noprint">
+    <div><h1>Öğrenciler ve hesaplar</h1><p class="muted">Hesap açın, giriş kartlarını yazdırın, ilerlemeyi izleyin.</p></div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <nav class="tabs noprint" id="tabs">
+    <button type="button" data-tab="list" class="on">Öğrenciler</button>
+    <button type="button" data-tab="add">Hesap aç</button>
+    <button type="button" data-tab="cards">Kartlar <span id="cardCount"></span></button>
+    <button type="button" data-tab="names">Adlar</button>
+  </nav>
+
+  <div class="tab panel" id="tab-list">
+    <div class="bar noprint">
+      <div class="pills" id="pills"></div>
+      <span class="ic search"><i class="pi pi-search"></i>
+        <input id="search" placeholder="Ara: ad ya da kullanıcı adı" autocomplete="off"></span>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <div class="tab panel" id="tab-add" hidden>
+    <h2>Yeni hesaplar</h2>
+    <p class="muted">Sınıfı yazın, öğrencileri her satıra bir "Ad Soyad" olacak şekilde yapıştırın. Kullanıcı adı ad + soyadın ilk harfidir (Ali Kaya → alik); isterseniz değiştirebilirsiniz. Adlar siteye gönderilmez, yalnızca bu bilgisayarda kalır.</p>
+    <div class="two">
+      <label class="field"><span>Sınıf</span><input id="newCls" list="clsList" placeholder="örnek: 2-A" maxlength="20"><datalist id="clsList"></datalist></label>
+    </div>
+    <label class="field"><span>Öğrenciler</span><textarea id="newNames" rows="9" placeholder="Ali Kaya&#10;Ayşe Nur Demir&#10;Can Öztürk"></textarea></label>
+    <button class="btn" type="button" id="preview">Önizle</button>
+    <div id="previewBox"></div>
+  </div>
+
+  <div class="tab" id="tab-cards" hidden>
+    <div class="panel noprint cardbar">
+      <p id="cardsInfo" class="muted"></p>
+      <div class="row">
+        <button class="btn" type="button" id="print">Yazdır</button>
+        <button class="btn n" type="button" id="clearCards">Kartları temizle</button>
+      </div>
+    </div>
+    <div class="kcards" id="kcards"></div>
+  </div>
+
+  <div class="tab panel" id="tab-names" hidden>
+    <h2>Adlar bu bilgisayarda</h2>
+    <p class="muted">Çocukların adları siteye gönderilmez; yalnızca bu tarayıcıda saklanır ve öğrenci listesinde kullanıcı adının yanında görünür. Başka bir bilgisayarda da görmek için listeyi indirip orada yükleyin. Tarayıcının verileri silinirse adlar da silinir, bu yüzden listeyi ara sıra indirin.</p>
+    <p id="namesInfo"></p>
+    <div class="row">
+      <button class="btn" type="button" id="exportNames">Ad listesini indir (Excel)</button>
+      <label class="btn n"><input type="file" id="importNames" accept=".csv,.txt,.json" hidden>Ad listesini yükle</label>
+    </div>
+    <p class="msg" id="namesMsg"></p>
+  </div>
+</main>
+<div class="toast" id="toast" hidden></div>
+<script src="/js/oyun-sitesi.js"></script>
+<script type="module" src="/js/ogretmen.js"></script>
+</body>
+</html>

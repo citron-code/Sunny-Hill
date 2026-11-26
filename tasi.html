@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Eski kayıt taşınıyor…</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: linear-gradient(#7cc8f7, #cdeeff);
+         font: 600 20px/1.4 "Trebuchet MS", "Segoe UI", sans-serif; color: #4a3222; }
+  .c { background: #fffdf5; border: 3px solid #f3dcae; border-radius: 24px; box-shadow: 0 8px 0 #e3c99a; padding: 24px 28px; max-width: 420px; margin: 16px; text-align: center; }
+</style>
+</head>
+<body>
+<!-- The games' old address (citron-code.github.io) keeps their old saves in this browser. The new site
+     (site/ in this repo) sends a child here with a one-time code; this page reads that game's save here
+     and hands it to the site, then goes back. It only talks to the site's own addresses (site/shared/config.js). -->
+<div class="c"><p id="m">Eski kaydın aranıyor…</p></div>
+<script nomodule>document.getElementById('m').textContent = 'Bu tarayıcı çok eski. Lütfen güncelleyin.';</script>
+<script type="module">
+import { CONFIG } from './site/shared/config.js';
+import { gameById, ownsKey } from './site/shared/games.js';
+
+const m = document.getElementById('m');
+const p = new URLSearchParams(location.hash.slice(1));
+history.replaceState(null, '', location.pathname);                 // (the code leaves the address bar)
+const code = p.get('kod'), g = gameById(p.get('oyun')), site = p.get('site');
+const here = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const allowed = CONFIG.siteOrigins.concat(here ? [CONFIG.testSite] : []);
+
+if (!code || !g || !allowed.includes(site)) {
+  m.textContent = 'Bu bağlantı geçersiz.';
+} else {
+  const back = (s) => location.replace(site + '/oyna?oyun=' + encodeURIComponent(g.id) + '&eski=' + s);
+  const keys = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k != null && ownsKey(g, k)) keys[k] = localStorage.getItem(k);
+    }
+  } catch (e) { /* no storage here */ }
+  if (!Object.keys(keys).length) back('yok');
+  else {
+    m.textContent = 'Eski kaydın bulundu, taşınıyor…';
+    fetch(site + '/api/move/finish', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ code, game: g.id, keys }) })
+      .then((r) => r.json().then((d) => back(r.ok ? (d.applied ? 'tamam' : 'yedek') : 'hata'), () => back('hata')))
+      .catch(() => back('hata'));
+  }
+}
+</script>
+</body>
+</html>
