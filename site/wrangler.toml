@@ -1,9 +1,20 @@
-# Cloudflare Pages settings for the games site. kur.mjs fills in database_id at the first setup.
-name = "citrobit"
-pages_build_output_dir = "./dist"
+# Cloudflare settings for the games site: one Worker that serves dist/ and runs /api/ (server/worker.js).
+# Not Pages: all of pages.dev is blocked in Turkey (since November 2025), so the site lives on workers.dev.
+# kur.mjs fills in database_id at the first setup.
+name = "oyun"
+main = "server/worker.js"
 compatibility_date = "2025-09-01"
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"            # /oyna is oyna.html, as on Pages
+not_found_handling = "single-page-application"   # an unknown address shows the front page, as on Pages
+run_worker_first = ["/api/*"]                    # everything under /api/ goes to the server
 
 [[d1_databases]]
 binding = "DB"
 database_name = "oyun-kayitlari"
-database_id = "kur-mjs-dolduracak"
+database_id = "59f83b6c-8bd5-43d5-880e-1e3fc6f8c544"

@@ -1,7 +1,7 @@
 {
   "name": "{{AD}} · {{OGRETMEN}}",
   "short_name": "{{KISA}}",
-  "description": "{{OGRETMEN}} · 2. sınıflar için İngilizce oyunlar",
+  "description": "{{OGRETMEN}} · English games for Grade 2",
   "lang": "tr",
   "start_url": "/",
   "scope": "/",

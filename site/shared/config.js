@@ -8,7 +8,7 @@ export const CONFIG = {
   short: 'Citrobit',                      // under the icon on a phone's home screen (12 letters or so)
   mark: ['Citro', 'bit'],                  // the name in the logo: the second part is orange
   by: 'Batuhan Teacher',
-  siteOrigins: ['https://citrobit.pages.dev'],  // where the site lives
+  siteOrigins: ['https://oyun.citrobit.workers.dev'],  // where the site lives (kur.mjs writes the real address)
   oldSite: 'https://citron-code.github.io',           // where the games were before: their old saves are there
   moveUrl: 'https://citron-code.github.io/Sunny-Hill/tasi.html',
   // only for the tests on this computer (tools/dev.mjs)

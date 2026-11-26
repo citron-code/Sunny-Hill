@@ -135,15 +135,15 @@ try {
   console.log('1. Eski kayıt (eski adresten)');
   const A = await device('A');
   await A.go(OLD + '/tasi.html');
-  await A.wait("document.getElementById('m').textContent.includes('geçersiz')", 10000, 'tasi.html without a code');
+  await A.wait("document.getElementById('m').textContent.includes('does not work')", 10000, 'tasi.html without a code');
   await A.ev(`localStorage.setItem('sunnyHill.save.v1', ${JSON.stringify(JSON.stringify({ v: 1, parentSeen: true, created: true, started: true, name: 'Ali', stars: 5 }))});
     localStorage.setItem('sunnyHill.save.v1.album', '{}'); localStorage.setItem('pq.best', '{"l1":3}');`);
   await login(A, 'Ali K', ALI.pin);
   await A.shot('1-oyunlar');
   await A.ev("document.querySelector('.tile[data-oyun=sunny-hill] .btn').click()");
-  await press(A, 'Evet, eski kaydımı getir');
+  await press(A, 'Yes, get my old save');
   await A.wait(`location.href.includes('eski=') || location.search.includes('oyun=')`, 20000);
-  await press(A, 'Oyna');
+  await press(A, 'Play');
   await A.wait(inSunnyHill(5), 90000, 'Sunny Hill with the old save (5 stars)');
   check(true, 'eski kayıt taşındı, oyun onunla açıldı');
   check((await A.ev('location.search')) === '?sinif=A', 'sınıf oyuna geçti (?sinif=A)', await A.ev('location.search'));
@@ -153,7 +153,7 @@ try {
   /* ---------------------------------------------------------------- 2 */
   console.log('2. Başka cihazda devam, internetsiz oynama');
   check((await A.ev(save(7))) === 200, 'A: kayıt buluta gitti');
-  check((await summaryOf('alik', 'sunny-hill')) === 'Bölüm 1 · 7 yıldız', 'öğretmen listesinde ilerleme', await summaryOf('alik', 'sunny-hill'));
+  check((await summaryOf('alik', 'sunny-hill')) === 'Level 1 · 7 stars', 'öğretmen listesinde ilerleme', await summaryOf('alik', 'sunny-hill'));
   await A.shot('2-oyun');
   const B = await device('B');
   await only(B);
@@ -167,40 +167,40 @@ try {
   check(await B.ev("OyunSitesi.isDirty(OyunSitesi.meta(OyunSitesi.game))"), 'B: bekleyen değişiklik işaretli');
   await B.offline(false);
   check((await B.ev('OyunSitesi.flush().then((r) => r.status)')) === 200, 'B: internet gelince gitti');
-  check((await summaryOf('alik', 'sunny-hill')) === 'Bölüm 1 · 8 yıldız', 'bulutta 8 yıldız');
+  check((await summaryOf('alik', 'sunny-hill')) === 'Level 1 · 8 stars', 'bulutta 8 yıldız');
 
   /* ---------------------------------------------------------------- 3 */
   console.log('3. İki cihaz çakışınca');
   await only(A);
   check((await A.ev(save(3))) === 200, 'A (eski sürümden) kaydetti: şimdi oynayan kazandı');
-  check((await summaryOf('alik', 'sunny-hill')) === 'Bölüm 1 · 3 yıldız', 'bulutta 3 yıldız');
+  check((await summaryOf('alik', 'sunny-hill')) === 'Level 1 · 3 stars', 'bulutta 3 yıldız');
   const bks = await tApi('GET', 'backups?id=' + (await tApi('GET', 'students')).students.find((x) => x.username === 'alik').id + '&game=sunny-hill');
-  check(bks.backups.some((b) => b.reason === 'conflict' && b.summary.includes('8 yıldız')), 'B\'nin 8 yıldızlı kaydı yedekte', bks.backups);
+  check(bks.backups.some((b) => b.reason === 'conflict' && b.summary.includes('8 stars')), 'B\'nin 8 yıldızlı kaydı yedekte', bks.backups);
 
   /* ---------------------------------------------------------------- 4 */
   console.log('4. Aynı tablette iki çocuk; Pocket Quest');
   await only(B);
   await login(B, 'aysed', AYSE.pin);
   await B.ev("document.querySelector('.tile[data-oyun=sunny-hill] .btn').click()");
-  await press(B, 'Hayır, yeni başla');
+  await press(B, 'No, start new');
   await B.wait(inSunnyHill(0), 90000, 'Sunny Hill fresh for Ayşe');
   check(true, 'Ayşe yeni oyunla açıldı (Ali\'nin kaydı yok)');
   check((await B.ev(save(2))) === 200, 'Ayşe kaydetti');
   check((await B.ev("(async () => { localStorage.removeItem('sunnyHill.save.v1'); Save.save(); return (await OyunSitesi.flush()).status; })()")) === 200, 'oyun ana kaydını sildi (New Game gibi)');
   const ayseId = (await tApi('GET', 'students')).students.find((x) => x.username === 'aysed').id;
-  check((await tApi('GET', 'backups?id=' + ayseId + '&game=sunny-hill')).backups.some((b) => b.reason === 'new-game' && b.summary.includes('2 yıldız')), 'silinmeden önce bulutta yedeklendi');
+  check((await tApi('GET', 'backups?id=' + ayseId + '&game=sunny-hill')).backups.some((b) => b.reason === 'new-game' && b.summary.includes('2 stars')), 'silinmeden önce bulutta yedeklendi');
   await login(B, 'alik', ALI.pin);
   await B.ev("document.querySelector('.tile[data-oyun=sunny-hill] .btn').click()");
   await B.wait(inSunnyHill(3), 90000, 'Sunny Hill for Ali again (3 stars)');
   check(true, 'Ali aynı tablette kendi kaydıyla (3 yıldız) açıldı');
-  check((await summaryOf('aysed', 'sunny-hill')) === 'Bölüm 1 · 2 yıldız', 'Ayşe\'nin kaydı ayrı duruyor');
+  check((await summaryOf('aysed', 'sunny-hill')) === 'Level 1 · 2 stars', 'Ayşe\'nin kaydı ayrı duruyor');
   await only(A);
   await A.go(SITE + '/oyna?oyun=pocket-quest');
-  await press(A, 'Hayır, yeni başla');
+  await press(A, 'No, start new');
   await A.wait("location.pathname === '/oyun/pocket-quest/' && document.readyState === 'complete'", 30000, 'Pocket Quest');
   await sleep(1500);
   check((await A.ev(`(async () => { localStorage.setItem('pq.unit2.save', JSON.stringify({ v: 1, zone: 2, stars: 4 })); return (await OyunSitesi.flush()).status; })()`)) === 200, 'Pocket Quest kaydı buluta gitti');
-  check((await summaryOf('alik', 'pocket-quest')) === 'Sezon 1 · Bölge 3 · 4 yıldız', 'Pocket Quest ilerlemesi listede', await summaryOf('alik', 'pocket-quest'));
+  check((await summaryOf('alik', 'pocket-quest')) === 'Season 1 · Zone 3 · 4 stars', 'Pocket Quest ilerlemesi listede', await summaryOf('alik', 'pocket-quest'));
   await A.shot('3-pocket-quest');
 
   /* ---------------------------------------------------------------- 5 */
@@ -223,7 +223,7 @@ try {
   await T.wait(shown('tLogin'), 10000, 'teacher login');
   await T.ev("document.getElementById('tPass').value = 'ogretmen-test'; document.getElementById('tForm').requestSubmit()");
   await T.wait(`${shown('tMain')} && document.querySelectorAll('#list tbody tr[data-id]').length === 2`, 10000, 'the list');
-  check(await T.ev("document.querySelector('#list tbody').textContent.includes('3 yıldız')"), 'listede ilerleme görünüyor');
+  check(await T.ev("document.querySelector('#list tbody').textContent.includes('3 stars')"), 'listede ilerleme görünüyor');
   await T.ev("document.querySelector('[data-tab=add]').click(); document.getElementById('newCls').value = '2-B'; document.getElementById('newNames').value = 'Can Öztürk\\nElif Şahin\\nCan Özer'; document.getElementById('preview').click()");
   await T.wait("document.querySelectorAll('#previewBox input').length === 3");
   const pre = await T.ev("[...document.querySelectorAll('#previewBox input')].map((i) => i.value)");

@@ -1,143 +1,149 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{AD}} · {{OGRETMEN}}</title>
-<meta name="description" content="{{OGRETMEN}} · 2. sınıflar için İngilizce oyunlar: Sunny Hill, Pocket Quest. Kayıt bulutta: her cihazda kaldığın yerden devam et.">
+<meta name="description" content="{{OGRETMEN}} · English games for Grade 2: Sunny Hill and Pocket Quest. Your progress is saved in the cloud: pick up where you left off on any device.">
 <meta property="og:title" content="{{AD}} · {{OGRETMEN}}">
-<meta property="og:description" content="2. sınıflar için İngilizce oyunlar. Kartındaki kullanıcı adı ve şifreyle giriş yap, kaldığın yerden devam et.">
+<meta property="og:description" content="English games for Grade 2. Log in with the username and PIN on your card and pick up where you left off.">
 <meta property="og:image" content="/img/sh-ship.jpg">
 <meta name="theme-color" content="#1d2b53">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap" media="print" onload="this.media='all'">
+<link rel="preload" href="/fonts/pixelify-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
+<a class="skip" id="skip" href="#login">Skip to the login</a>
 <header class="nav">
   <div class="container">
     <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>{{OGRETMEN}}</small></span></a>
-    <nav class="links" id="navLinks"><a href="#oyunlar">Oyunlar</a><a href="#nasil">Nasıl çalışır?</a><a href="#veliler">Veliler için</a></nav>
+    <nav class="links" id="navLinks" aria-label="On this page"><a href="#play">Games</a><a href="#how">How to play</a><a href="#parents">For parents</a></nav>
     <div class="right">
-      <a class="btn ghost sm" id="navTeacher" href="/ogretmen"><i class="pi pi-lock"></i>Öğretmen girişi</a>
+      <a class="btn ghost sm" id="navTeacher" href="/ogretmen"><i class="pi pi-lock"></i>Teacher login</a>
       <div class="userchip" id="navUser" hidden><span class="av" id="navAv"></span><span><b id="navName"></b><small id="navCls"></small></span></div>
-      <button class="btn ghost sm" type="button" id="logout" hidden><i class="pi pi-logout"></i>Çıkış</button>
+      <button class="btn ghost sm" type="button" id="logout" hidden><i class="pi pi-logout"></i>Log out</button>
     </div>
   </div>
 </header>
 
-<p class="warn container" id="old">Bu tarayıcı çok eski olduğu için site açılamıyor. Lütfen Chrome ya da Safari'yi güncelleyin.</p>
+<p class="warn container" id="old">This browser is too old to open the site. Please update Chrome or Safari.</p>
 
-<div id="landing">
-  <section class="hero">
-    <div class="scene" aria-hidden="true"><i class="sun"></i><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="tree"></i><i class="maskot hop"></i><i class="ground"></i></div>
+<main id="main">
+<section class="hero" id="top">
     <div class="container">
-      <div class="pitch">
-        <span class="badge"><i class="pi pi-star"></i>2. sınıflar için İngilizce</span>
-        <h1>İngilizceyi <span class="hl">oynayarak</span> öğren.</h1>
-        <p class="lead">Sunny Hill ve Pocket Quest tek adreste. Kayıtların bulutta durur: telefon, tablet ya da bilgisayar fark etmez, kaldığın yerden devam edersin.</p>
-        <ul class="ticks"><li>Her cihazda kaldığın yerden</li><li>Reklamsız ve güvenli</li><li>Öğretmen takibi</li></ul>
+      <div class="pitch" id="pitch">
+        <h1 class="title"><i class="maskot hop" aria-hidden="true"></i><span class="word">{{MARK}}</span><span class="sr">: English games for Grade 2</span></h1>
+        <p class="title-sub">Learn English by playing.</p>
+        <button class="press" type="button" id="start"><i class="pi pi-play"></i>Press start</button>
       </div>
+      <div class="pitch hello" id="hello" hidden>
+        <span class="badge" id="hiCls"></span>
+        <h1 class="hi">Hello, <span id="hiName"></span>!</h1>
+        <p class="title-sub">What do you want to play today?</p>
+        <div class="stats">
+          <span class="stat" id="streak" hidden><i class="pi pi-flame"></i><span id="streakTxt"></span></span>
+          <span class="stat" id="starsBox" hidden><i class="pi pi-star"></i><span id="starsTxt"></span></span>
+        </div>
+        <div class="talk" id="batuSay" hidden>
+          <button class="bust" id="batuBtn" type="button" aria-label="Batuhan Teacher: tell me another one"><i class="batu-body" id="batuBody"></i><i class="batu-orange" id="batuOrange"></i></button>
+          <b class="who">Batuhan Teacher</b>
+          <p class="say"><span class="sr" id="batuSr" aria-live="polite"></span><span id="batuTxt" aria-hidden="true"></span><i class="more" aria-hidden="true"></i></p>
+        </div>
+      </div>
+      <div class="stage" aria-hidden="true"><canvas class="world" id="world" width="480" height="270"></canvas></div>
 
-      <section class="login" id="login" hidden>
-        <div class="login-head"><img src="/img/logo.svg" alt=""><div><h2>Öğrenci girişi</h2><p>Kartındaki bilgilerle giriş yap.</p></div></div>
+      <section class="login win" id="login" aria-labelledby="loginT" hidden>
+        <div class="login-head"><img src="/img/logo.svg" alt=""><div><h2 id="loginT">Student login</h2><p>Use the card from your teacher.</p></div>
+          <button class="sound" type="button" id="sound" aria-pressed="true" aria-label="Sound"><i class="pi pi-sound"></i></button></div>
         <div class="known" id="known" hidden>
-          <p>Bu cihazda giren:</p>
+          <p>On this device:</p>
           <div class="chips" id="chips"></div>
         </div>
         <label class="field">
-          <span>Kullanıcı adı</span>
+          <span>Username</span>
           <span class="ic"><i class="pi pi-user"></i>
           <input id="user" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"
-                 enterkeyhint="next" placeholder="adın + soyadının ilk harfi" maxlength="24"></span>
+                 enterkeyhint="next" placeholder="first name + first letter of surname" maxlength="24"></span>
         </label>
         <div class="field">
-          <span>Şifre (4 rakam)</span>
+          <span>PIN (4 digits)</span>
           <div class="dots" id="dots" aria-live="polite"><i></i><i></i><i></i><i></i></div>
         </div>
         <div class="pad" id="pad">
           <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
           <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
           <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
-          <button type="button" data-k="del" class="del" aria-label="Sil"><i class="pi pi-del"></i></button>
+          <button type="button" data-k="del" class="del" aria-label="Delete"><i class="pi pi-del"></i></button>
           <button type="button" data-k="0">0</button>
-          <button type="button" data-k="ok" class="ok" aria-label="Giriş yap"><i class="pi pi-check"></i></button>
+          <button type="button" data-k="ok" class="ok" aria-label="Log in"><i class="pi pi-check"></i></button>
         </div>
         <p class="msg" id="msg" role="alert"></p>
-        <p class="login-foot"><span>Şifreni mi unuttun? Öğretmenine sor.</span><a href="/ogretmen">Öğretmen girişi</a></p>
+        <p class="login-foot"><span>Forgot your PIN? Ask your teacher.</span><a href="/ogretmen">Teacher login</a></p>
       </section>
+      <div class="picks" id="picks" hidden><div class="grid" id="grid"></div></div>
     </div>
   </section>
 
-  <section class="section" id="oyunlar">
+<div class="deep" id="landing">
+
+  <section class="screen" id="play" aria-labelledby="playT">
     <div class="container">
-      <span class="eyebrow">Oyunlar</span>
-      <h2>Derste öğren, oyunda pekiştir</h2>
-      <p class="sub">Her oyun 2. sınıf İngilizce ünitelerine göre hazırlandı. Çocuklar konuşarak, keşfederek ve görevleri tamamlayarak öğrenir.</p>
-      <div class="games2" id="gameCards"></div>
+      <h2 class="stitle" id="playT">Choose your game</h2>
+      <p class="slead">Each game follows the Grade 2 English units. Children learn by talking, exploring and finishing quests.</p>
+      <div class="select" id="gameCards"></div>
     </div>
   </section>
 
-  <section class="section alt" id="nasil">
+  <section class="screen" id="how" aria-labelledby="howT">
     <div class="container">
-      <span class="eyebrow">Nasıl çalışır?</span>
-      <h2>Üç adımda oyunda</h2>
-      <p class="sub">Kurulum yok, uygulama indirmek yok. Bir tarayıcı yeterli.</p>
-      <div class="steps">
-        <div class="step"><span class="n">1</span><h3>Giriş yap</h3><p>Öğretmeninin verdiği karttaki kullanıcı adını yaz, 4 rakamlı şifreye dokun.</p></div>
-        <div class="step"><span class="n">2</span><h3>Oyununu seç</h3><p>Sunny Hill ya da Pocket Quest; oyun tam ekran açılır.</p></div>
-        <div class="step"><span class="n">3</span><h3>Kaldığın yerden devam et</h3><p>Kaydın bulutta durur. Tablet, telefon ya da bilgisayar: hangisinden girersen gir.</p></div>
+      <h2 class="stitle" id="howT">How to play</h2>
+      <p class="slead">Nothing to install, no app to download. A browser is all you need.</p>
+      <div class="level">
+        <ol class="signs">
+          <li class="sign"><h3><span class="n" aria-hidden="true">1</span>Log in</h3><p>Type the username on the card from your teacher, then tap your 4-digit PIN.</p></li>
+          <li class="sign"><h3><span class="n" aria-hidden="true">2</span>Pick a game</h3><p>Sunny Hill or Pocket Quest. The game opens full screen.</p></li>
+          <li class="sign"><h3><span class="n" aria-hidden="true">3</span>Keep going</h3><p>Your progress is saved in the cloud. Play on a tablet, a phone or a computer.</p></li>
+        </ol>
+        <canvas class="strip" id="strip" width="480" height="100" aria-hidden="true"></canvas>
       </div>
     </div>
   </section>
 
-  <section class="section" id="veliler">
+  <section class="screen" id="parents" aria-labelledby="parT">
     <div class="container">
-      <span class="eyebrow">Veliler için</span>
-      <h2>Güvenli, sade, reklamsız</h2>
-      <p class="sub">Site yalnızca eğitim için hazırlandı. Çocuğunuzun kaydı kaybolmaz; kişisel bilgi istenmez.</p>
-      <div class="trust">
-        <div class="tbox"><span class="ic2"><i class="pi pi-cloud"></i></span><h3>Kayıt kaybolmaz</h3><p>İlerleme bulutta saklanır ve düzenli yedeklenir.</p></div>
-        <div class="tbox"><span class="ic2"><i class="pi pi-shield"></i></span><h3>Kişisel bilgi yok</h3><p>E-posta, telefon ya da fotoğraf istenmez.</p></div>
-        <div class="tbox"><span class="ic2"><i class="pi pi-noads"></i></span><h3>Reklam yok</h3><p>Satın alma, reklam ya da dikkat dağıtan bağlantı yok.</p></div>
-        <div class="tbox"><span class="ic2"><i class="pi pi-chart"></i></span><h3>Öğretmen takibi</h3><p>Öğretmen ilerlemeyi görür, gerekirse kaydı geri yükler.</p></div>
+      <h2 class="stitle" id="parT">For parents</h2>
+      <div class="pwin">
+        <div class="phead">
+          <span class="bust" aria-hidden="true"><i class="pbody"></i><i class="porange"></i></span>
+          <b class="who">Batuhan Teacher</b>
+          <p class="pq">Hello! I made these games for my Grade 2 English classes. They are only for learning: safe, simple and free of ads.</p>
+        </div>
+        <ul class="items">
+          <li><span class="ic2"><i class="pi pi-cloud"></i></span><span><b>Progress is safe</b>Saved in the cloud and backed up regularly.</span></li>
+          <li><span class="ic2"><i class="pi pi-shield"></i></span><span><b>No personal data</b>No email, phone number or photo is asked for.</span></li>
+          <li><span class="ic2"><i class="pi pi-noads"></i></span><span><b>No ads</b>No purchases, no ads, no distracting links.</span></li>
+          <li><span class="ic2"><i class="pi pi-chart"></i></span><span><b>Teacher support</b>The teacher sees the progress and can bring back a save.</span></li>
+        </ul>
+        <div class="choices"><a class="choice" href="#top" id="ctaLogin">Log in</a><a class="choice" href="/gizlilik">Privacy (KVKK)</a></div>
       </div>
-      <div class="cta"><a class="btn lg" href="#top" id="ctaLogin">Giriş yap</a><a class="btn n lg" href="/gizlilik">Gizlilik ve KVKK</a></div>
     </div>
   </section>
 </div>
 
-<main class="container dash" id="games" hidden>
-  <section class="welcome">
-    <div>
-      <h1>Merhaba, <span id="hiName"></span>!</h1>
-      <p>Bugün hangi oyunu oynamak istersin?</p>
-      <span class="pill" id="hiCls"></span>
-    </div>
-    <i class="maskot hop" aria-hidden="true"></i>
-  </section>
+<div class="container dash" id="games" hidden>
   <div id="warns"></div>
-  <section class="contcard" id="cont" hidden>
-    <div class="pic"><img id="contImg" alt=""></div>
-    <div class="in">
-      <span class="eyebrow">Kaldığın yerden devam et</span>
-      <h3 id="contTitle"></h3>
-      <span class="sumline" id="contSum"></span>
-      <a class="btn go lg" id="contBtn"><i class="pi pi-play"></i>Devam et</a>
-    </div>
-  </section>
-  <h2 class="h">Oyunların</h2>
-  <div class="grid" id="grid"></div>
+</div>
 </main>
 
 <footer class="footer">
   <div class="container">
     <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>© 2026 {{OGRETMEN}}</small></span></a>
-    <span><a href="/gizlilik">Gizlilik</a><a href="/ogretmen">Öğretmen girişi</a></span>
+    <span><a href="/gizlilik">Privacy</a><a href="/ogretmen">Teacher login</a></span>
   </div>
 </footer>
 

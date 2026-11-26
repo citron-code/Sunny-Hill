@@ -1,0 +1,56 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>The front page's cast</title>
+<!-- The characters who walk in the front page's world (public/js/hero.js), drawn by Pocket Quest's own character code
+     at the game's world size: Batuhan Teacher with an orange, Grabbo, Pip. tools/make-cast.mjs saves them. -->
+<script src="../../../Pocket Quest/js/gfx/px.js"></script>
+<script src="../../../Pocket Quest/js/gfx/chars.js"></script>
+<body style="margin:0;background:#8fd3ff">
+<script>
+(function () {
+  'use strict';
+  var C2 = PQ.chars2, PX = PQ.px, P = C2.POSES;
+  var HOLD = [6.6, 5.8], DOWN = [0.7, 9.2];          // his near hand out in front with the orange; the far hand down
+
+  function orange(k) {          // the same orange as on the children's page (teacher-sprite.html)
+    var s = k, size = Math.ceil(18 * s), p = new PX.Pic(size, size), ox = Math.round(size / 2), oy = size - Math.ceil(2 * s);
+    function X(u) { return ox + u * s; } function Y(u) { return oy + u * s; }
+    var OR = PX.ramp('#ffd98a', '#ffa21f', '#ec7a16', '#b8501a', '#6e2c16');
+    var LEAF = PX.ramp('#bdf27f', '#66cb5b', '#379b50', '#256845', '#143d2f');
+    var WOOD = PX.ramp('#e8c08a', '#b07a48', '#875a34', '#5e3c22', '#3a2414');
+    p.part('fruit'); p.ellipse(X(0), Y(-4.8), 4.9 * s, 4.7 * s, OR, { flat: 1.2 });
+    p.part('stem'); p.capsule(X(0), Y(-9.3), X(0.5), Y(-10.7), 0.6 * s, WOOD, { tone: 3 });
+    p.part('leaf'); p.ellipse(X(2.5), Y(-10.3), 2.5 * s, 1.25 * s, LEAF, { tone: 1 });
+    p.decal(['w'], Math.round(X(-2.6)), Math.round(Y(-7.4)), { w: '#fff6dc' });
+    var c = p.toCanvas(); c.anchor = { x: ox + 1, y: oy + 1 }; return c;
+  }
+  function walk(i) { var r = P['run' + i]; return { feet: r.feet, hands: [HOLD, r.hands[1]], bob: r.bob * 0.6, lean: 0 }; }
+  var still = { feet: P.stand.feet, hands: [HOLD, DOWN], bob: 0, lean: 0 };
+  var shrug = { feet: P.stand.feet, hands: [HOLD, [6.4, 1.2]], bob: 0, lean: 0 };
+
+  var list = [];
+  for (var i = 0; i < 8; i++) list.push(['walk' + i, C2.get('batuhan', walk(i), 'neutral', 1), true]);
+  list.push(['stand', C2.get('batuhan', still, 'neutral', 1), true], ['blink', C2.get('batuhan', still, 'blink', 1), true],
+    ['surprised', C2.get('batuhan', still, 'surprised', 1), true], ['happy', C2.get('batuhan', still, 'happy', 1), true],
+    ['shrug', C2.get('batuhan', shrug, 'happy', 1), true],
+    ['grabbo0', C2.get('grabbo', 'float0', 'neutral', 1)], ['grabbo1', C2.get('grabbo', 'float1', 'neutral', 1)],
+    ['grabboOops', C2.get('grabbo', 'float0', 'sad', 1)],
+    ['pip0', C2.get('pip', 'flap', 'happy', 1)], ['pip1', C2.get('pip', 'rest', 'happy', 1)],
+    ['orange', orange(1)]);
+
+  var W = 0, H = 0, GAP = 2;
+  list.forEach(function (f) { W += f[1].width + GAP; H = Math.max(H, f[1].height); });
+  var sheet = document.createElement('canvas'); sheet.width = W; sheet.height = H;
+  var g = sheet.getContext('2d'), x = 0, atlas = {};
+  list.forEach(function (f) {
+    var c = f[1], a = { x: x, w: c.width, h: c.height, ax: c.anchor.x, ay: c.anchor.y };
+    if (f[2]) { a.hx = c.hands[0].x; a.hy = c.hands[0].y; }      // the near hand: the orange goes there
+    g.drawImage(c, x, 0); atlas[f[0]] = a; x += c.width + GAP;
+  });
+  window.SHEET = { png: sheet.toDataURL('image/png'), atlas: atlas };
+  var show = document.createElement('canvas'); show.width = W * 3; show.height = H * 3;
+  var sg = show.getContext('2d'); sg.imageSmoothingEnabled = false; sg.drawImage(sheet, 0, 0, W * 3, H * 3);
+  document.body.appendChild(show);
+  window.READY = true;
+})();
+</script>

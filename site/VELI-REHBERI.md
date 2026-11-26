@@ -2,23 +2,23 @@
 
 Aşağıda iki mesaj var: sınıf grubuna bir kez gönderilecek genel mesaj ve her veliye ayrı gidecek giriş bilgileri. Kişisel giriş mesajı öğretmen sayfasında, her kartın **Veli mesajını kopyala** düğmesiyle hazır gelir. Gerekirse sorulara verilecek kısa cevaplar en altta.
 
-Mesajlardaki `citrobit.pages.dev`, kurulumdan sonra sitenin gerçek adresiyle değiştirilmeli.
+Mesajlardaki adres (`oyun.citrobit.workers.dev`), kurulumun sonunda ekrana yazılan adresle aynı olmalı.
 
 ## 1. Sınıf grubuna (bir kez)
 
 ```text
 Değerli veliler,
 
-İngilizce oyunlar artık Citrobit adlı tek bir sitede toplandı: https://citrobit.pages.dev
+İngilizce oyunlar artık Citrobit adlı tek bir sitede toplandı: https://oyun.citrobit.workers.dev
 
 Her çocuğa bir kullanıcı adı ve 4 rakamlı bir şifre verdim. Giriş bilgilerini size ayrıca gönderiyorum. Oyun kayıtları artık sitede tutuluyor; çocuğunuz telefon, tablet ya da bilgisayar fark etmeden kaldığı yerden devam eder ve kayıtlar kaybolmaz.
 
 Nasıl girilir:
 1. Adresi Chrome ya da Safari'de açın. WhatsApp'ın içinde açılırsa menüden "Tarayıcıda aç"ı seçin.
 2. Kullanıcı adını yazın (adı ve soyadının ilk harfi, örneğin alik), sonra 4 rakamlı şifreye dokunun.
-3. Oyunun "Başla" ya da "Devam et" düğmesine basın.
+3. Oyunun "Play" ya da "Continue" düğmesine basın.
 
-Daha önce eski bağlantıdan oynadıysanız, oyunu her zamanki cihazda ilk kez açarken "Eski kaydımı getir" düğmesine basın. Eski kayıt hesaba taşınır.
+Daha önce eski bağlantıdan oynadıysanız, oyunu her zamanki cihazda ilk kez açarken "Get my old save" düğmesine basın. Eski kayıt hesaba taşınır.
 
 Siteyi ana ekrana eklerseniz oyunlar uygulama gibi tam ekran açılır:
 - Android (Chrome): sağ üstteki üç nokta, sonra "Ana ekrana ekle".
@@ -38,13 +38,13 @@ ELT Batuhan Teacher
 Merhaba,
 Ali Kaya için Citrobit İngilizce oyun sitesi giriş bilgileri aşağıdadır.
 
-Site: https://citrobit.pages.dev
+Site: https://oyun.citrobit.workers.dev
 Kullanıcı adı: alik
 Şifre: 4821
 
-Tek dokunuşla giriş: https://citrobit.pages.dev/#g=alik.4821
+Tek dokunuşla giriş: https://oyun.citrobit.workers.dev/#g=alik.4821
 
-Oyunlar kaydı artık sitede tutuyor; hangi cihazdan girilirse girilsin kaldığı yerden devam eder. Daha önce eski bağlantıdan oynandıysa, o cihazda ilk girişte "Eski kaydımı getir" düğmesine basmanız yeterli.
+Oyunlar kaydı artık sitede tutuyor; hangi cihazdan girilirse girilsin kaldığı yerden devam eder. Daha önce eski bağlantıdan oynandıysa, o cihazda ilk girişte "Get my old save" düğmesine basmanız yeterli.
 
 Bu bilgileri başkalarıyla paylaşmamanızı rica ederim.
 
@@ -57,4 +57,4 @@ ELT Batuhan Teacher
 - **"Şifre yanlış diyor."** Kullanıcı adı, çocuğun adı ve soyadının ilk harfidir. Türkçe harf, büyük-küçük harf ya da boşluk fark etmez. 5 yanlış denemeden sonra hesap 15 dakika kilitlenir; öğretmen sayfasında **Kilidi aç** ya da **Yeni şifre** düğmesiyle hemen çözülür.
 - **"İki kardeş aynı tableti kullanıyor."** Her çocuk kendi kullanıcı adıyla girer. Oyunlar sayfasındaki **Çıkış** ile diğer kardeş girer. Kayıtlar karışmaz.
 - **"Kayıt geri gitti."** Öğretmen sayfasında **Yedekler**'den önceki bir kayıt geri yüklenebilir.
-- **"Eski kayıt gelmedi."** Eski kayıt, eski bağlantıyla oynanan cihazın tarayıcısında durur. "Eski kaydımı getir" düğmesine o cihazda ve aynı tarayıcıda basılmalı.
+- **"Eski kayıt gelmedi."** Eski kayıt, eski bağlantıyla oynanan cihazın tarayıcısında durur. "Get my old save" düğmesine o cihazda ve aynı tarayıcıda basılmalı.
