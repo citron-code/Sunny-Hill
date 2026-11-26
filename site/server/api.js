@@ -1,5 +1,5 @@
-/* The site's server: everything under /api/. It runs as a Cloudflare Pages Function
-   (functions/api/[[path]].js) and, for the tests, under tools/dev.mjs with the same code.
+/* The site's server: everything under /api/. It runs in the Cloudflare Worker
+   (server/worker.js) and, for the tests, under tools/dev.mjs with the same code.
 
    env.DB               the D1 database (schema.sql)
    env.TEACHER_PASSWORD the teacher's password (a Cloudflare secret)
@@ -251,12 +251,17 @@ async function logout(req, env) {
   return json({ ok: true }, 200, { 'Set-Cookie': setCookie(req, 'sid', '', 0, '/api') });
 }
 
+// a day in Turkey's date (UTC+3 all year): 'YYYY-MM-DD'
+const trDay = (t) => new Date(t + 3 * HOUR).toISOString().slice(0, 10);
+
 async function me(req, env) {
   const st = await needStudent(req, env);
   const rows = await env.DB.prepare('SELECT game, summary, played_at FROM save_meta WHERE student_id = ?').bind(st.id).all();
   const games = {};
   for (const r of rows.results) games[r.game] = { summary: r.summary, played_at: r.played_at };
-  return json({ user: { username: st.username, cls: st.cls }, games });
+  const days = await env.DB.prepare('SELECT day FROM play_days WHERE student_id = ? AND day >= ? ORDER BY day DESC')
+    .bind(st.id, trDay(Date.now() - 60 * 24 * HOUR)).all();          // the last two months: enough for the days in a row
+  return json({ user: { username: st.username, cls: st.cls }, games, days: days.results.map((r) => r.day), today: trDay(Date.now()) });
 }
 
 async function getSave(req, env, m, url) {
@@ -292,6 +297,7 @@ async function putSave(req, env, m) {
   }
   const played = Math.min(Number(b.played_at) || now, now + MIN);
   S.push(metaStmt(env, st.id, g.id, cur + 1, played, backupAt, String(b.summary || '').slice(0, 120)));
+  S.push(env.DB.prepare('INSERT OR IGNORE INTO play_days (student_id, day) VALUES (?, ?)').bind(st.id, trDay(Math.min(played, now))));
   await env.DB.batch(S);
   return json({ rev: cur + 1 });
 }
@@ -456,6 +462,7 @@ async function tDelete(req, env) {
     env.DB.prepare('DELETE FROM save_meta WHERE student_id = ?').bind(id),
     env.DB.prepare('DELETE FROM save_keys WHERE student_id = ?').bind(id),
     env.DB.prepare('DELETE FROM backups WHERE student_id = ?').bind(id),
+    env.DB.prepare('DELETE FROM play_days WHERE student_id = ?').bind(id),
     env.DB.prepare('DELETE FROM codes WHERE student_id = ?').bind(id),
   ]);
   return json({ ok: true });

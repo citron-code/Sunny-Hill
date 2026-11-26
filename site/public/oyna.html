@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,12 +9,10 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="/css/site.css">
 </head>
-<body>
+<body class="deepbg">
 <header class="nav">
   <div class="container">
     <a class="brandmark" href="/"><img src="/img/logo.svg" alt=""><span>{{MARK}}<small>{{OGRETMEN}}</small></span></a>
@@ -22,10 +20,10 @@
 </header>
 <main class="container">
   <section class="launch">
+    <div class="gwin-head"><h1 id="title"></h1></div>
     <div class="cover" id="cover"><img id="coverImg" alt=""></div>
-    <h2 id="title"></h2>
     <div class="dotsload" id="bob" aria-hidden="true"><i></i><i></i><i></i></div>
-    <p id="text">Kaydın getiriliyor…</p>
+    <p id="text" aria-live="polite">Getting your save…</p>
     <div class="row" id="row"></div>
   </section>
 </main>

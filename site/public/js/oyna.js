@@ -31,16 +31,16 @@ function say(text, buttons = []) {
   }
   $('bob').style.visibility = buttons.length ? 'hidden' : 'visible';
 }
-const trouble = () => say('Kayıt şu an getirilemedi. Biraz sonra yeniden dene.', [
-  { t: 'Yeniden dene', go: () => location.reload() }, { t: 'Oyunlara dön', cls: 'n', href: '/' }]);
+const trouble = () => say('Your save cannot be fetched right now. Try again in a moment.', [
+  { t: 'Try again', go: () => location.reload() }, { t: 'Back to games', cls: 'n', href: '/' }]);
 
 function offline() {
   const user = S.get('oyunSitesi.kullanici'), m = S.meta(g);
   if (user && m && m.user === user) {
-    say('İnternet yok. Oyun bu cihazdaki kayıtla açılıyor; internet gelince kaydın buluta gider.');
+    say('No internet. The game opens with the save on this device; it goes to the cloud when you are back online.');
     setTimeout(() => play({ username: user, cls: S.get('oyunSitesi.sinif') || '' }), 1800);
   } else {
-    say('İnternet bağlantısı yok. Oyunu bu cihazda ilk kez açmak için internet gerekli.', [{ t: 'Yeniden dene', go: () => location.reload() }]);
+    say('No internet connection. The first time on this device, the game needs the internet to open.', [{ t: 'Try again', go: () => location.reload() }]);
   }
 }
 
@@ -56,7 +56,7 @@ function play(u) {
 }
 
 async function goMove() {
-  say('Eski adrese gidiliyor…');
+  say('Going to the old address…');
   const r = await S.api('move/start', { game: g.id });
   if (!r.ok) return trouble();
   location.href = MOVE_URL + '#kod=' + encodeURIComponent(r.data.code) + '&oyun=' + encodeURIComponent(g.id) +
@@ -64,15 +64,15 @@ async function goMove() {
 }
 
 function askOld(u) {
-  say('Bu oyunu daha önce bu cihazda, eski adresten oynadın mı? Oradaki kaydın hesabına taşınabilir.', [
-    { t: 'Evet, eski kaydımı getir', cls: 'o', go: goMove },
-    { t: 'Hayır, yeni başla', cls: 'n', go: () => { const m = S.meta(g); if (m) { m.asked = true; S.setMeta(g, m); } play(u); } },
+  say('Did you play this game on this device before, at the old address? Your save from there can move to your account.', [
+    { t: 'Yes, get my old save', cls: 'o', go: goMove },
+    { t: 'No, start new', cls: 'n', go: () => { const m = S.meta(g); if (m) { m.asked = true; S.setMeta(g, m); } play(u); } },
   ]);
 }
 
 // mode: '' to play; 'new' to start with nothing; 'move' to go to the old address after the sync
 async function sync(u, mode) {
-  say('Kaydın getiriliyor…');
+  say('Getting your save…');
   const user = u.username, sk = S.stashKey(user, g);
   let m = S.meta(g);
   if (m && m.user !== user) {
@@ -119,7 +119,7 @@ async function sync(u, mode) {
     }
     S.remove(sk);
   } else {
-    if (!S.write(g, cloud.keys)) return say('Bu cihazda yer kalmamış: kayıt yazılamadı. Tarayıcının verilerinden yer açmayı dene.', [{ t: 'Oyunlara dön', href: '/' }]);
+    if (!S.write(g, cloud.keys)) return say('This device is full: the save could not be written. Try to free some space in the browser\'s data.', [{ t: 'Back to games', href: '/' }]);
     const mm = S.freshMeta(user, cloud.rev, cloud.played_at);
     mm.asked = !!(m && m.asked);
     S.setMeta(g, mm);
@@ -130,13 +130,14 @@ async function sync(u, mode) {
 }
 
 async function main() {
-  if (!g) return say('Bu oyun bulunamadı.', [{ t: 'Oyunlara dön', href: '/' }]);
+  if (!g) return say('This game was not found.', [{ t: 'Back to games', href: '/' }]);
   document.title = g.title;
   $('title').textContent = g.title;
+  if (g.accent) document.querySelector('.launch').style.setProperty('--acc', g.accent);          // the game's window colour
   $('coverImg').src = g.cover;
   $('cover').classList.toggle('px', !!g.pixel);
   if (q.get('r') === '1' && Date.now() - Number(S.get('oyunSitesi.r.' + g.id) || 0) < 15000) {
-    return say('Bu tarayıcı oyunu açamadı (gizli sekme ya da kayıt izni kapalı olabilir). Normal bir sekmede açmayı dene.', [{ t: 'Oyunlara dön', href: '/' }]);
+    return say('This browser could not open the game (it may be a private tab, or saving is turned off). Try a normal tab.', [{ t: 'Back to games', href: '/' }]);
   }
   const me = await S.api('me');
   if (me.status === 0) return offline();
@@ -147,10 +148,10 @@ async function main() {
   S.set('oyunSitesi.sinif', u.cls || '');
   const eski = q.get('eski');
   if (eski || q.get('tasi')) history.replaceState(null, '', '/oyna?oyun=' + encodeURIComponent(g.id));
-  if (eski === 'tamam') return say('Eski kaydın geldi! Artık her cihazda buradan devam edersin.', [{ t: 'Oyna', go: () => sync(u) }]);
-  if (eski === 'yok') return say('Bu cihazda eski bir kayıt bulunamadı.', [{ t: 'Yeni başla', go: () => sync(u, 'new') }, { t: 'Oyunlara dön', cls: 'n', href: '/' }]);
-  if (eski === 'yedek') return say('Hesabında zaten bir kayıt vardı; o duruyor. Eski kayıt yedek olarak saklandı, öğretmenin istersen onu geri yükleyebilir.', [{ t: 'Oyna', go: () => sync(u) }]);
-  if (eski === 'hata') return say('Eski kayıt getirilemedi.', [{ t: 'Yeniden dene', cls: 'o', go: () => sync(u, 'move') }, { t: 'Yeni başla', cls: 'n', go: () => sync(u, 'new') }]);
+  if (eski === 'tamam') return say('Your old save is here! From now on you keep going from here, on every device.', [{ t: 'Play', go: () => sync(u) }]);
+  if (eski === 'yok') return say('No old save was found on this device.', [{ t: 'Start new', go: () => sync(u, 'new') }, { t: 'Back to games', cls: 'n', href: '/' }]);
+  if (eski === 'yedek') return say('Your account already had a save, and it stays. The old save is kept as a backup: your teacher can bring it back if you want.', [{ t: 'Play', go: () => sync(u) }]);
+  if (eski === 'hata') return say('The old save could not be fetched.', [{ t: 'Try again', cls: 'o', go: () => sync(u, 'move') }, { t: 'Start new', cls: 'n', go: () => sync(u, 'new') }]);
   return sync(u, q.get('tasi') === '1' ? 'move' : '');
 }
 main();

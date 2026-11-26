@@ -1,16 +1,17 @@
 /* Siteyi güncellemek (oyunlar GitHub'da yayınlandıktan sonra):  node yayinla.mjs
    Sunny Hill'in GitHub'daki (origin/main) son hâlini ve Pocket Quest'in yayındaki son hâlini alır,
-   siteyi derler ve Cloudflare'e yükler. Kayıtlara ve hesaplara dokunmaz.
+   siteyi derler ve Cloudflare'e (workers.dev'deki Worker'a) yükler. Kayıtlara ve hesaplara dokunmaz.
    node yayinla.mjs --tablolar   veritabanı tablolarını da yeniden kontrol eder (yeni bir sürüm isterse) */
-import { DB_NAME, say, stop, wrangler, git, node, project, domainOf, health } from './tools/cf.mjs';
+import { DB_NAME, say, stop, wrangler, git, node, deploy, rememberOrigin, health } from './tools/cf.mjs';
 
-const NAME = project();
 say('Oyunların son hâli alınıyor');
 if (!git('fetch origin main').ok) stop('GitHub\'a ulaşılamadı (git fetch).');
 if (!node('build.mjs')) stop('Derleme olmadı.');
-if (process.argv.includes('--tablolar') && !wrangler(`d1 execute ${DB_NAME} --remote --file=schema.sql`).ok) stop('Tablolar güncellenemedi.');
+if (process.argv.includes('--tablolar') && !wrangler(`d1 execute ${DB_NAME} --remote --yes --file=schema.sql`).ok) stop('Tablolar güncellenemedi.');
 say('Cloudflare\'e yükleniyor');
-if (!wrangler(`pages deploy dist --project-name ${NAME} --branch main --commit-dirty=true`).ok) stop('Yükleme olmadı. Gerekirse önce "node kur.mjs".');
-const origin = 'https://' + (domainOf(NAME) || NAME + '.pages.dev');
-const h = await health(origin);
-console.log(h && h.ok ? `\nSite güncel: ${origin}\n` : `\nYüklendi; kontrol cevabı: ${JSON.stringify(h)}. Birkaç dakika sonra ${origin} adresine bakın.\n`);
+const d = deploy();
+if (!d.ok) stop('Yükleme olmadı. Bir dakika sonra yeniden deneyin; giriş istenirse önce "node kur.mjs".');
+if (!d.url) { console.log('\nYüklendi, ama sitenin adresi okunamadı (yukarıda yazıyor).\n'); process.exit(0); }
+if (rememberOrigin(d.url)) console.log('Sitenin adresi değişti: shared/config.js güncellendi, GitHub\'da yayınlanmalı.');
+const h = await health(d.url);
+console.log(h && h.ok ? `\nSite güncel: ${d.url}\n` : `\nYüklendi; kontrol cevabı: ${JSON.stringify(h)}. Birkaç dakika sonra ${d.url}/api/health adresine bakın.\n`);

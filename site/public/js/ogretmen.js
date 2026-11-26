@@ -230,7 +230,7 @@ function parentMessage(c) {          // for WhatsApp: Turkish, first person sing
   return `Merhaba,\n${nm ? nm + ' için ' : ''}${CONFIG.name} İngilizce oyun sitesi giriş bilgileri aşağıdadır.\n\n` +
     `Site: ${site()}\nKullanıcı adı: ${c.username}\nŞifre: ${c.pin}\n\nTek dokunuşla giriş: ${link(c)}\n\n` +
     'Oyunlar kaydı artık sitede tutuyor; hangi cihazdan girilirse girilsin kaldığı yerden devam eder. ' +
-    'Daha önce eski bağlantıdan oynandıysa, o cihazda ilk girişte "Eski kaydımı getir" düğmesine basmanız yeterli.\n\n' +
+    'Daha önce eski bağlantıdan oynandıysa, o cihazda ilk girişte "Get my old save" düğmesine basmanız yeterli.\n\n' +
     'Bu bilgileri başkalarıyla paylaşmamanızı rica ederim.\n\nELT Batuhan Teacher';
 }
 

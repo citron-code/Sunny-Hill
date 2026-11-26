@@ -240,12 +240,12 @@
       if (ui.p.style.display === 'block') text();
     }
     var TXT = {
-      ok: 'Kaydın bulutta. Başka cihazda da kaldığın yerden devam edersin.',
-      wait: 'Kaydın buluta gidiyor…',
-      off: 'İnternet yok gibi. Oynamaya devam et: kaydın bu cihazda duruyor, internet gelince buluta gider.',
-      login: 'Bulut kaydı için yeniden giriş gerekiyor. Oyunlar sayfasına dönüp giriş yap; kaydın bu cihazda bekliyor.',
-      stale: 'Bu oyun başka bir cihazda daha yeni oynanmış. Oyun en son kayıtla yeniden açılıyor…',
-      blocked: 'Bu oyun başka bir sekmede başka bir hesapla açıldı. Bu sekme artık kaydetmiyor.',
+      ok: 'Your save is in the cloud. On another device, you pick up where you left off.',
+      wait: 'Your save is going to the cloud…',
+      off: 'No internet, it seems. Keep playing: your save is on this device and goes to the cloud when you are back online.',
+      login: 'To save in the cloud, log in again. Go back to the games page and log in; your save waits on this device.',
+      stale: 'This game was played later on another device. It opens again with the newest save…',
+      blocked: 'This game was opened in another tab with another account. This tab does not save any more.',
     };
     function text() { ui.t.textContent = TXT[state] || TXT.ok; }
     function open() { text(); ui.p.style.display = 'block'; }
@@ -265,20 +265,20 @@
         '#osHandle i{position:absolute;right:5px;top:6px;width:7px;height:7px;background:#3fbf3f;box-shadow:0 0 0 2px #1d2b53}' +
         '#osHandle[data-s=wait] i,#osHandle[data-s=stale] i{background:#ffdd3c}#osHandle[data-s=off] i,#osHandle[data-s=login] i,#osHandle[data-s=blocked] i{background:#e2364a}' +
         '#osPanel{display:none;position:fixed;left:46px;top:50%;transform:translateY(-50%);z-index:2147483001;width:min(300px,calc(100vw - 64px));' +
-        'background:#fffdf7;box-shadow:0 -4px 0 #1d2b53,0 4px 0 #1d2b53,-4px 0 0 #1d2b53,4px 0 0 #1d2b53,0 12px 0 rgba(14,24,56,.3);padding:14px 16px;font:500 16px/1.4 "Pixelify Sans","Trebuchet MS",system-ui,sans-serif;color:#1d2b53}' +
+        'background:#fffdf7;box-shadow:0 -4px 0 #1d2b53,0 4px 0 #1d2b53,-4px 0 0 #1d2b53,4px 0 0 #1d2b53,0 12px 0 rgba(14,24,56,.3);padding:14px 16px;font:500 16px/1.4 "Pixelify Sans","Trebuchet MS",system-ui,sans-serif;color:#1d2b53}#osPanel,#osPanel *{font-variant-ligatures:none!important}' +
         '#osPanel p{margin:0 0 14px}#osPanel .r{display:flex;gap:12px;padding:3px}#osPanel button{flex:1;font:600 16px "Pixelify Sans","Trebuchet MS",system-ui,sans-serif;border:0;border-radius:0;' +
         'padding:9px 6px 11px;cursor:pointer;color:#1d2b53;background:#ff9f1c;box-shadow:inset -3px -3px 0 rgba(0,0,0,.2),inset 3px 3px 0 rgba(255,255,255,.4),0 -3px 0 #1d2b53,0 3px 0 #1d2b53,-3px 0 0 #1d2b53,3px 0 0 #1d2b53}' +
         '#osPanel button.n{background:#fff}';
       var font = document.createElement('link');            // the site's pixel font, for the panel
-      font.rel = 'stylesheet'; font.href = 'https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600&display=swap';
+      font.rel = 'stylesheet'; font.href = '/fonts/fonts.css';
       document.head.appendChild(font);
       document.head.appendChild(css);
       var h = document.createElement('button');
-      h.id = 'osHandle'; h.type = 'button'; h.setAttribute('aria-label', 'Oyunlar ve bulut kaydı');
+      h.id = 'osHandle'; h.type = 'button'; h.setAttribute('aria-label', 'Games and cloud save');
       h.innerHTML = '<b></b><i></i>';
       var p = document.createElement('div');
       p.id = 'osPanel';
-      p.innerHTML = '<p></p><div class="r"><button type="button" class="b">Oyunlara dön</button><button type="button" class="n">Kapat</button></div>';
+      p.innerHTML = '<p></p><div class="r"><button type="button" class="b">Back to games</button><button type="button" class="n">Close</button></div>';
       document.body.appendChild(h); document.body.appendChild(p);
       ui = { h: h, p: p, t: p.querySelector('p'), b: p.querySelector('.b') };
       h.addEventListener('click', function (e) { e.stopPropagation(); if (p.style.display === 'block') p.style.display = 'none'; else open(); });

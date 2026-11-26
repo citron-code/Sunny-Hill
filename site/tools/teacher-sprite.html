@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Batuhan Teacher for the site</title>
+<!-- Batuhan Teacher as he is in Pocket Quest, drawn by the game's own character code (px.js, chars.js), holding an
+     orange. tools/make-teacher.mjs saves the frames as public/img/ogretmen/*.png (see that file). -->
+<script src="../../../Pocket Quest/js/gfx/px.js"></script>
+<script src="../../../Pocket Quest/js/gfx/chars.js"></script>
+<body style="margin:0;background:#8fd3ff">
+<script>
+(function () {
+  'use strict';
+  var C2 = PQ.chars2, PX = PQ.px, K = 2;                       // K = 2: the game's portrait size (finer faces than 1x)
+  var HOLD = [6.6, 5.8], DOWN = [0.7, 9.2];                    // the near hand out in front (the orange sits on it); the far hand down
+  function pose(far, chest) { return { feet: C2.POSES.stand.feet, hands: [HOLD, far || DOWN], bob: 0, lean: 0, chest: chest || 0 }; }
+  // the frames, in this order in the strip (public/js/batu.js uses the same names)
+  var FRAMES = [
+    ['idle', pose(), 'neutral'], ['breathe', pose(null, 1), 'neutral'], ['blink', pose(), 'blink'],
+    ['talk', pose(), 'talk'], ['happy', pose(), 'happy'],
+    ['wave', pose([6.8, -6.0]), 'talk'], ['wave2', pose([7.4, -4.8]), 'happy']
+  ];
+
+  // the orange, in the game's own item style (like its apple): a round fruit, a stem, a leaf, a shine
+  function orange(k) {
+    var s = k, size = Math.ceil(18 * s), p = new PX.Pic(size, size), ox = Math.round(size / 2), oy = size - Math.ceil(2 * s);
+    function X(u) { return ox + u * s; } function Y(u) { return oy + u * s; }
+    var OR = PX.ramp('#ffd98a', '#ffa21f', '#ec7a16', '#b8501a', '#6e2c16');
+    var LEAF = PX.ramp('#bdf27f', '#66cb5b', '#379b50', '#256845', '#143d2f');
+    var WOOD = PX.ramp('#e8c08a', '#b07a48', '#875a34', '#5e3c22', '#3a2414');
+    p.part('fruit'); p.ellipse(X(0), Y(-4.8), 4.9 * s, 4.7 * s, OR, { flat: 1.2 });
+    p.part('stem'); p.capsule(X(0), Y(-9.3), X(0.5), Y(-10.7), 0.6 * s, WOOD, { tone: 3 });
+    p.part('leaf'); p.ellipse(X(2.5), Y(-10.3), 2.5 * s, 1.25 * s, LEAF, { tone: 1 });
+    p.decal(['ww.', 'w..'], Math.round(X(-2.8)), Math.round(Y(-7.6)), { w: '#fff6dc' });
+    p.decal(['d', '.', '.', 'd'], Math.round(X(2.2)), Math.round(Y(-5)), { d: OR.c[2] });     // the peel's little dimples
+    p.decal(['d'], Math.round(X(-1.4)), Math.round(Y(-2.6)), { d: OR.c[2] });
+    var c = p.toCanvas(); c.anchor = { x: ox + 1, y: oy + 1 }; return c;
+  }
+
+  // all the frames on one strip, their feet on the same spot
+  var cvs = FRAMES.map(function (f) { return C2.get('batuhan', f[1], f[2], K); });
+  var L = 0, R = 0, T = 0, B = 0, PAD = 2;
+  cvs.forEach(function (c) { L = Math.max(L, c.anchor.x); R = Math.max(R, c.width - c.anchor.x); T = Math.max(T, c.anchor.y); B = Math.max(B, c.height - c.anchor.y); });
+  var O = orange(K), W = L + R + PAD * 2, H = T + B + PAD * 2;
+  var strip = document.createElement('canvas'); strip.width = W * cvs.length; strip.height = H;
+  var g = strip.getContext('2d'); g.imageSmoothingEnabled = false;
+  var hands = cvs.map(function (c, i) {
+    var dx = i * W + PAD + L - c.anchor.x, dy = H - B - c.anchor.y;
+    g.drawImage(c, dx, dy);
+    return { x: dx - i * W + c.hands[0].x, y: dy + c.hands[0].y };      // the near hand, in the frame
+  });
+  var oc = document.createElement('canvas'); oc.width = O.width; oc.height = O.height; oc.getContext('2d').drawImage(O, 0, 0);
+  window.SHEET = {
+    strip: strip.toDataURL('image/png'), orange: oc.toDataURL('image/png'),
+    meta: { frames: FRAMES.map(function (f) { return f[0]; }), w: W, h: H, orange: { w: O.width, h: O.height },
+      at: hands.map(function (h) { return { x: h.x - O.anchor.x + 1, y: h.y - O.anchor.y - 1 }; }) }   // where the orange goes in each frame: on the palm
+  };
+  // to look at it: the strip and the orange on its hand, at 4x
+  var show = document.createElement('canvas'); show.width = strip.width * 4; show.height = H * 4;
+  var sg = show.getContext('2d'); sg.imageSmoothingEnabled = false; sg.drawImage(strip, 0, 0, show.width, show.height);
+  window.SHEET.meta.at.forEach(function (a, i) { sg.drawImage(O, (i * W + a.x) * 4, a.y * 4, O.width * 4, O.height * 4); });
+  document.body.appendChild(show);
+  window.READY = true;
+})();
+</script>

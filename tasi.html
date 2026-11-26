@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Eski kayıt taşınıyor…</title>
+<title>Moving your old save…</title>
 <style>
   body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: linear-gradient(#7cc8f7, #cdeeff);
          font: 600 20px/1.4 "Trebuchet MS", "Segoe UI", sans-serif; color: #4a3222; }
@@ -15,8 +15,8 @@
 <!-- The games' old address (citron-code.github.io) keeps their old saves in this browser. The new site
      (site/ in this repo) sends a child here with a one-time code; this page reads that game's save here
      and hands it to the site, then goes back. It only talks to the site's own addresses (site/shared/config.js). -->
-<div class="c"><p id="m">Eski kaydın aranıyor…</p></div>
-<script nomodule>document.getElementById('m').textContent = 'Bu tarayıcı çok eski. Lütfen güncelleyin.';</script>
+<div class="c"><p id="m">Looking for your old save…</p></div>
+<script nomodule>document.getElementById('m').textContent = 'This browser is too old. Please update it.';</script>
 <script type="module">
 import { CONFIG } from './site/shared/config.js';
 import { gameById, ownsKey } from './site/shared/games.js';
@@ -29,7 +29,7 @@ const here = location.hostname === 'localhost' || location.hostname === '127.0.0
 const allowed = CONFIG.siteOrigins.concat(here ? [CONFIG.testSite] : []);
 
 if (!code || !g || !allowed.includes(site)) {
-  m.textContent = 'Bu bağlantı geçersiz.';
+  m.textContent = 'This link does not work.';
 } else {
   const back = (s) => location.replace(site + '/oyna?oyun=' + encodeURIComponent(g.id) + '&eski=' + s);
   const keys = {};
@@ -41,7 +41,7 @@ if (!code || !g || !allowed.includes(site)) {
   } catch (e) { /* no storage here */ }
   if (!Object.keys(keys).length) back('yok');
   else {
-    m.textContent = 'Eski kaydın bulundu, taşınıyor…';
+    m.textContent = 'Found your old save, moving it…';
     fetch(site + '/api/move/finish', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ code, game: g.id, keys }) })
       .then((r) => r.json().then((d) => back(r.ok ? (d.applied ? 'tamam' : 'yedek') : 'hata'), () => back('hata')))
       .catch(() => back('hata'));

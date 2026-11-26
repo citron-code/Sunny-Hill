@@ -1,4 +1,4 @@
-/* Builds the site into dist/ (what goes to Cloudflare Pages).
+/* Builds the site into dist/ (the files the Cloudflare Worker serves).
      node build.mjs           the games as they are published: Sunny Hill from this repo's origin/main
                               (run "git fetch origin main" first; yayinla.mjs does), Pocket Quest from its web address
      node build.mjs --local   the games from the files on this computer (for the tests)
@@ -35,7 +35,7 @@ const SOURCES = {
       if (!r.ok) throw new Error('Pocket Quest indirilemedi (' + r.status + ')');
       return r.text();
     },
-    expect: ["'pq.unit2.save'", "'pq.unit3.save'"],
+    expect: ["'pq.unit2.save'"],          // unit 3's key comes with season 2; every pq.* key syncs anyway
     files: { 'icon-180.png': join(SITE, 'public', 'img', 'pq-icon-180.png'), 'icon-192.png': join(SITE, 'public', 'img', 'pq-icon-192.png') },
   },
 };

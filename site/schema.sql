@@ -64,6 +64,13 @@ CREATE TABLE IF NOT EXISTS codes (
   expires_at INTEGER NOT NULL
 ) WITHOUT ROWID;
 
+-- the days a student played, in Turkey's date (for "days in a row" on the child's page)
+CREATE TABLE IF NOT EXISTS play_days (
+  student_id INTEGER NOT NULL,
+  day TEXT NOT NULL,                   -- 'YYYY-MM-DD'
+  PRIMARY KEY (student_id, day)
+) WITHOUT ROWID;
+
 CREATE TABLE IF NOT EXISTS kv (
   k TEXT PRIMARY KEY,
   v TEXT NOT NULL
