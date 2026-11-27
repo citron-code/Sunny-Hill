@@ -21,7 +21,8 @@ export const GAMES = [
     main: ['sunnyHill.save.v1'],   // removed only by "New Game": the cloud keeps a backup first
     classParam: 'sinif',          // the game takes the class from ?sinif=A for its boards
     needs3d: true,
-    levels: 7,                    // how many levels the game has now (the child's page shows Level n of 7): change it with a new level
+    levels: 8,                    // how many levels the game has now (the child's page shows Level n of 8). A new level in the game: raise this
+                                  // and add its line to summary() below, then publish the site and run yayinla.mjs
     summary(get) {                // a short line for the teacher's list and the games page
       const s = parse(get('sunnyHill.save.v1'));
       if (!s) return '';
@@ -32,6 +33,7 @@ export const GAMES = [
       if (s.isle && s.isle.stage) lv = 5;
       if (s.school && s.school.stage) lv = 6;
       if (s.school && s.school.trip && s.school.trip.st) lv = 7;          // (the game makes trip = { st: '' } for everyone)
+      if (s.school && s.school.trip && s.school.trip.wk >= 2) lv = 8;          // unit 3, week 2: the Green Islands' south (trip.wk = 2)
       return 'Level ' + lv + ' · ' + stars(s.stars);
     },
   },
