@@ -6,6 +6,7 @@ import { $, ago, registerSW } from './util.js';
 import { greet } from './batu.js';
 import { startWorld, startStrip } from './hero.js';
 import { blip, back, buzz, jingle, start as startSound, fanfare, confetti, wipe, soundOn, setSound } from './sfx.js';
+import { showGuide, canInstall, installNow, onInstallable } from './guide.js';
 
 const S = window.OyunSitesi;
 const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -325,8 +326,7 @@ function tile(g, info, isLast, n, p) {          // a game's window, like the log
   return a;
 }
 
-let installEvent = null;
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; if (!$('games').hidden) warnings(); });
+onInstallable(() => { if (!$('games').hidden) warnings(); });          // (Chrome offers to add the site: guide.js keeps that offer)
 
 function warnings(offline) {
   const box = $('warns');
@@ -355,7 +355,7 @@ function warnings(offline) {
   const standalone = matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches || navigator.standalone;
   if (!standalone && S.get('oyunSitesi.ipucu') !== 'kapali') {
     const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (installEvent) add('Add this site to your home screen: the games open full screen, like an app.', { t: 'Add to home screen', go: () => { installEvent.prompt(); installEvent = null; S.set('oyunSitesi.ipucu', 'kapali'); warnings(); } });
+    if (canInstall()) add('Add this site to your home screen: the games open full screen, like an app.', { t: 'Add to home screen', go: async () => { await installNow(); S.set('oyunSitesi.ipucu', 'kapali'); warnings(); } });
     else if (ios) add('Tip: in Safari, tap Share, then "Add to Home Screen". The games open full screen, like an app.', { t: 'OK', go: () => { S.set('oyunSitesi.ipucu', 'kapali'); warnings(); } });
   }
 }
@@ -368,6 +368,7 @@ $('logout').addEventListener('click', async () => {
 
 /* ------------------------------------------------------------------ start */
 async function start() {
+  await showGuide();          // on a phone or tablet in a browser: first how to play full screen (guide.js)
   // a personal link from the teacher: /#g=alik.4821 logs in at once
   const g = new URLSearchParams(location.hash.slice(1)).get('g');
   if (g) {

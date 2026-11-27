@@ -9,6 +9,7 @@ and from the habits of retro game menus, not from other web sites.
 
 | Screen | What it is | Where |
 | --- | --- | --- |
+| Full-screen guide | Before the title screen, only on a phone or tablet in a browser: a window on the night sky, Android or iPhone / iPad, each step in Turkish then English (the English in the second ink), the button to tap drawn beside it. | `#guide` (`guide.js`) |
 | Title screen | The Citrobit valley, alive behind the mascot and the wordmark, one line and PRESS START; the login window beside them. Nothing else. | `.hero` (`hero.js`, `valley.js`) |
 | Under the ground | Below the grass the dirt turns, in dithered rows, into the deep blue of a game menu. Everything below the title screen sits on it, the end credits too. | `.hero::after`, `.deep` |
 | Choose your game | Two game windows, each with a silent moving preview of the game (its real pictures, panned, then cut). | `#play` |

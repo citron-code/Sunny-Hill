@@ -46,6 +46,8 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .pi-shield { --i: url(/img/i/shield.svg); } .pi-noads { --i: url(/img/i/noads.svg); } .pi-chart { --i: url(/img/i/chart.svg); }
 .pi-star { --i: url(/img/i/star.svg); } .pi-home { --i: url(/img/i/home.svg); } .pi-lock { --i: url(/img/i/lock.svg); }
 .pi-search { --i: url(/img/i/search.svg); } .pi-sound { --i: url(/img/i/sound.svg); } .pi-mute { --i: url(/img/i/mute.svg); } .pi-flame { --i: url(/img/i/flame.svg); }
+.pi-kebab { --i: url(/img/i/kebab.svg); } .pi-share { --i: url(/img/i/share.svg); } .pi-more { --i: url(/img/i/more.svg); }
+.pi-addhome { --i: url(/img/i/addhome.svg); } .pi-phone { --i: url(/img/i/phone.svg); } .pi-install { --i: url(/img/i/install.svg); }
 /* the mascot: the little orange, 32 x 32 pixels, --s screen pixels each; maskot.svg holds its six frames
    (tools/make-pixels.mjs): idle, blink, wave, wave, squash, hop. Its life, 8 s long: it blinks, waves, blinks, hops. */
 .maskot { --s: 4; display: block; width: calc(32px * var(--s)); height: calc(32px * var(--s));
@@ -419,6 +421,52 @@ h2.h { margin: 46px 0 18px; font-size: var(--fs-l); font-weight: 700; }
 .warn { margin: 24px var(--px) 0; padding: 12px 16px; background: #fff1c4; color: #5c4300; font-weight: 600; --edge: #c99a12; box-shadow: var(--ol); }
 .warn .btn { margin-top: 10px; }
 
+/* ------------------------------------------------------------------ the full-screen guide (public/js/guide.js)
+   The first screen on a phone or tablet when the site is opened in a browser: how to put Citrobit on the home screen,
+   for Android or for an iPhone / iPad, each step in Turkish and then English, the button to tap drawn beside it.
+   While it is open the rest of the page waits (its entrance plays when the guide closes). */
+body.guiding { background: var(--deep) url(/img/px/stars.svg) 0 0 / 256px 128px; }
+body.guiding > :not(.guide) { display: none !important; }
+.guide { --drop: rgba(5, 9, 28, .6); display: grid; justify-items: center; min-height: 100vh; min-height: 100dvh; padding: 28px 14px 44px; }
+.gbox { width: min(640px, 100% - var(--px) * 2); margin: var(--px); background: var(--card); color: var(--ink); box-shadow: var(--ol), var(--lift);
+  align-self: start; animation: winOpen .4s steps(5, end) .1s backwards; }
+.ghead { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--orange); box-shadow: 0 var(--px) 0 0 var(--ink); }
+.ghead img { width: 64px; height: 64px; margin: var(--px); image-rendering: pixelated; box-shadow: var(--ol); }
+.ghead h1 { margin: 0; font-size: var(--fs-l); line-height: 1.1; font-weight: 700; outline: none; }
+.ghead p { margin: 2px 0 0; font-weight: 600; color: #5a3300; }
+.guide p[lang="en"], .guide p > span[lang="en"] { color: var(--ink2); font-weight: 500; }
+.gintro { display: flex; align-items: center; gap: 16px; padding: 22px 22px 4px; }
+.gintro .maskot { --s: 3; flex: none; }
+.gintro p { margin: 0 0 6px; font-weight: 600; line-height: 1.4; }
+.gask { margin: 16px 22px 10px; font-size: var(--fs-s); font-weight: 700; }
+.gtabs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 22px; }
+.gtabs button { display: flex; align-items: center; justify-content: center; gap: 10px; margin: var(--px); padding: 12px 10px 14px; border: 0; cursor: pointer;
+  font: 700 var(--fs-m)/1.1 var(--font); color: var(--ink); background: #fff;
+  box-shadow: var(--bevel), var(--ol), 0 calc(var(--px) * 2) 0 0 var(--ink); }
+.gtabs button:hover { background: #fffbe0; }
+.gtabs button[aria-selected="true"] { background: var(--citron); transform: translateY(var(--px)); box-shadow: var(--bevel), var(--ol), 0 var(--px) 0 0 var(--ink); }
+.gos { padding: 22px 22px 4px; }
+.gsteps { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; }
+.gsteps li { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.gsteps .n { display: grid; place-items: center; width: 32px; height: 32px; margin: var(--px); padding-top: 2px; font: 400 16px/1 "Press Start 2P", var(--font);
+  background: var(--citron); box-shadow: var(--bevel), var(--ol); }
+.gsteps .key { display: grid; place-items: center; width: 48px; height: 48px; margin: var(--px); background: #fff;
+  box-shadow: inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 #dfe5f2, var(--ol); }
+.gsteps .key img { width: 32px; height: 32px; image-rendering: pixelated; }
+.gsteps p { margin: 0; line-height: 1.4; }
+.gsteps p + p { margin-top: 3px; }
+.gsteps p .pi { vertical-align: -5px; }
+.gquick { margin: 0 0 20px; }
+.gquick p { margin: 12px 0 0; font-size: var(--fs-s); font-weight: 700; }
+.gdone { margin: 0 0 20px; padding: 10px 14px; background: var(--grass-l); color: #1d6b2c; font-weight: 700; box-shadow: var(--ol); }
+.gnote { margin: 18px 0 0; font-size: var(--fs-s); }
+.gfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 22px; padding: 22px 22px 24px;
+  background: linear-gradient(90deg, var(--ink3) 50%, transparent 0) 0 0 / 8px var(--px) repeat-x; }
+.gnever { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: var(--fs-s); font-weight: 600; }
+.gnever span[lang="en"] { color: var(--ink2); font-weight: 500; }
+.gnever input { -webkit-appearance: none; appearance: none; flex: none; width: 24px; height: 24px; margin: var(--px); cursor: pointer; background: #fff; box-shadow: var(--ol); }
+.gnever input:checked { background: var(--citron) url(/img/i/check-ink.svg) center / 12px no-repeat; }
+
 /* ------------------------------------------------------------------ opening a game: the game's window on the menu ground */
 body.deepbg { --drop: rgba(5, 9, 28, .6); background: var(--deep) url(/img/px/stars.svg) 0 0 / 256px 128px; }
 .launch { max-width: 560px; margin: 56px auto; padding: 0 0 30px; text-align: center; background: var(--card); box-shadow: var(--ol), var(--lift);
@@ -500,4 +548,14 @@ body.deepbg { --drop: rgba(5, 9, 28, .6); background: var(--deep) url(/img/px/st
   .gwin .act { flex-direction: column; align-items: stretch; gap: 10px; }
   .footer a { margin: 0 18px 0 0; }
   .doc { margin: 24px auto; padding: 26px 20px; }
+  .guide { padding: 14px 6px 28px; }
+  .gintro { padding: 18px 16px 4px; gap: 12px; }
+  .gintro .maskot { --s: 2; }
+  .gask { margin: 14px 16px 10px; }
+  .gtabs { gap: 10px; padding: 0 16px; }
+  .gos { padding: 20px 16px 4px; }
+  .gsteps li { gap: 8px; }
+  .gsteps .key { width: 40px; height: 40px; }
+  .gfoot { padding: 18px 16px 20px; }
+  .gfoot .btn { flex: 1 1 100%; }
 }
