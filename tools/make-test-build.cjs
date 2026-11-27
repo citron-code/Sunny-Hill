@@ -93,6 +93,9 @@ const buttons = FULL ? `
     <button data-p="trpF">Yeşil Adalar: orman (tabela, dürbün)</button>
     <button data-p="trpB">Yeşil Adalar: hepsi bitti, iskeleye dönüş</button>
     <button data-p="trpO">Okulda: sınıfta poster (Our Living Things)</button>
+    <button data-p="trw0">2. hafta: okul adasında çağrı, Yeşil Adalar'a tekrar</button>
+    <button data-p="trw1">2. hafta: Yeşil Adalar'da (Grandma Daisy, kitaplar, gölet, şarkı, yusufçuk)</button>
+    <button data-p="trw2">2. hafta: okulda kartpostal</button>
     <button data-p="funH">Serbest oyun: köyde, okul bugün bitti (balık, elma, uçurtma, iksir, 📷, hazine, saklambaç)</button>
     <button data-p="funR">Serbest oyun: okul bahçesinde, yarış çizgisinde</button>
     <button data-p="newDay">🔁 Yeni gün: tören yeniden (adada)</button>
@@ -141,6 +144,9 @@ const buttons = FULL ? `
     <button data-p="trpF">Yeşil Adalar: orman (tabela, dürbün)</button>
     <button data-p="trpB">Yeşil Adalar: hepsi bitti, iskeleye dönüş</button>
     <button data-p="trpO">Okulda: sınıfta poster (Our Living Things)</button>
+    <button data-p="trw0">2. hafta: okul adasında çağrı, Yeşil Adalar'a tekrar</button>
+    <button data-p="trw1">2. hafta: Yeşil Adalar'da (Grandma Daisy, kitaplar, gölet, şarkı, yusufçuk)</button>
+    <button data-p="trw2">2. hafta: okulda kartpostal</button>
     <button data-p="funH">Serbest oyun: köyde, okul bugün bitti (balık, elma, uçurtma, iksir, 📷, hazine, saklambaç)</button>
     <button data-p="funR">Serbest oyun: okul bahçesinde, yarış çizgisinde</button>
     <button data-p="newDay">🔁 Yeni gün: tören yeniden (adada)</button>
@@ -232,9 +238,13 @@ rep(`</body>`, `<div id="testBar" style="position:fixed;left:50%;bottom:calc(6px
     trpF: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'forestSign', got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3 }),
     trpB: () => tripPupil({ st: 'green', d: today(), seen: 1, landed: 1, seen3: 'back', got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
     trpO: () => tripPupil({ st: 'poster', d: today(), seen: 1, landed: 1, seen3: 'back', in: 1, got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
+    // week 2 (WEEK2): week 1 done on an earlier day; then on the islands; then the postcard at school
+    trw0: () => tripPupil({ st: 'done', d: '01.01.2026', seen: 1, landed: 1, seen3: 'back', in: 1, poster: 1, got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
+    trw1: () => tripPupil({ st: 'green', wk: 2, w2: {}, d: today(), seen: 1, landed: 1, seen3: 'gran', poster: 1, got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
+    trw2: () => tripPupil({ st: 'poster', wk: 2, w2: { garden: 1, books: 1, pond: { lily: 2, cattail: 2, koi: 3, frog: 1, strider: 1, dragonfly: 2 }, said: ['There are three koi in the pond.', 'There is a frog on the rock.'], song: 1, heli: 1 }, d: today(), seen: 1, landed: 1, seen3: 'back', in: 1, poster: 1, got: Object.assign({}, P12), bin: Object.assign({}, BIN), ps: 1, dip: 3, fs: 1, saw: Object.assign({}, SAW), end: 1 }),
   });
   for (let i = 0; i < 8; i++) P['q' + i] = () => atQuest(i);
-  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm', isle0: 'helm', isle1: 'isle', isle3: 'hill', isleW: 'isle', sch0: 'helm', sch1: 'school', schP: 'school', schL: 'school', schI: 'classroom', schM: 'musicroom', schG: 'gym', schA: 'artroom', schR: 'libroom', schW: 'pcroom', schLu: 'cafe', schLf: 'lobbybox', schK: 'office', schH: 'office', schS: 'shopfront', funH: [1200, 1110], funR: 'race', trp0: 'school', trpG: 'gym', trpS: 'eastpier', trpI: 'green', trpP: 'greenPond', trpF: 'greenForest', trpB: 'greenPier', trpO: 'classroom' };
+  const where = { l2b7: [2900, 2480], l3: [2760, 660], ship7: [2950, 1320], ship8: [2950, 1320], cert: [3240, 1350], sea0: 'helm', sea3: 'helm', sea4: 'helm', seamap: 'helm', seawon: 'helm', isle0: 'helm', isle1: 'isle', isle3: 'hill', isleW: 'isle', sch0: 'helm', sch1: 'school', schP: 'school', schL: 'school', schI: 'classroom', schM: 'musicroom', schG: 'gym', schA: 'artroom', schR: 'libroom', schW: 'pcroom', schLu: 'cafe', schLf: 'lobbybox', schK: 'office', schH: 'office', schS: 'shopfront', funH: [1200, 1110], funR: 'race', trp0: 'school', trpG: 'gym', trpS: 'eastpier', trpI: 'green', trpP: 'greenPond', trpF: 'greenForest', trpB: 'greenPier', trpO: 'classroom', trw0: 'school', trw1: 'green', trw2: 'classroom' };
   const menu = document.getElementById('testMenu');
   const refresh = () => { try { Hud.cardKey = ''; Hud.refresh(); } catch (e) { /* older game */ } };          // the quest card, after a jump
   // what has been reached so far (read from the game itself)
