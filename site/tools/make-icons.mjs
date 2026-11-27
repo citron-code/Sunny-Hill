@@ -1,5 +1,7 @@
 /* The site's icons (home screen, browser tab) from public/img/logo.svg: node tools/make-icons.mjs
-   Draws the picture in headless Chrome and saves public/img/icon-512.png, icon-192.png and apple-touch-icon.png. */
+   Draws the picture in headless Chrome and saves public/img/icon-512.png, icon-192.png, apple-touch-icon.png, and
+   icon-maskable-512.png: the same tile smaller on night blue, since Android may cut a home-screen icon to a circle
+   (only its middle 80% is sure to show; the mascot fills the tile). */
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -27,9 +29,9 @@ const pending = new Map();
 ws.addEventListener('message', (e) => { const m = JSON.parse(e.data); if (pending.has(m.id)) { pending.get(m.id)(m.result); pending.delete(m.id); } });
 const send = (method, params = {}) => new Promise((r) => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
 
-for (const [name, size] of [['icon-512.png', 512], ['icon-192.png', 192], ['apple-touch-icon.png', 180]]) {
+for (const [name, size, inner] of [['icon-512.png', 512, 512], ['icon-192.png', 192, 192], ['apple-touch-icon.png', 180, 180], ['icon-maskable-512.png', 512, 384]]) {
   await send('Emulation.setDeviceMetricsOverride', { width: size, height: size, deviceScaleFactor: 1, mobile: false });
-  const html = `<html><body style="margin:0;overflow:hidden"><div style="width:${size}px;height:${size}px">${svg.replace('<svg ', `<svg width="${size}" height="${size}" `)}</div></body></html>`;
+  const html = `<html><body style="margin:0;overflow:hidden"><div style="width:${size}px;height:${size}px;display:grid;place-items:center;background:#1d2b53">${svg.replace('<svg ', `<svg width="${inner}" height="${inner}" `)}</div></body></html>`;
   await send('Page.navigate', { url: 'data:text/html;base64,' + Buffer.from(html).toString('base64') });
   let r = null;
   for (let i = 0; i < 10 && !(r && r.data); i++) {           // (the first try can come before the page is drawn)

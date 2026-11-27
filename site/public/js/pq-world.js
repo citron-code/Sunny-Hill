@@ -778,6 +778,22 @@ PQ.world = (function () {
     if (off > 0) off -= w;
     for (var x = off; x < W; x += w) g.drawImage(layer, x, y || 0);
   }
+
+  /** (added by the site's tools/make-world.mjs) the far layers only: sky, clouds, birds, mountains, hills */
+  function far(g, camX, t) {
+    if (!skyCv) { buildSky(); buildClouds(); buildMountains(); buildHills(); buildTown(); buildPark(); }
+    t = t || 0;
+    g.drawImage(skyCv, 0, 0);
+    var drift = t * 3;
+    [[5, 92, 0.02, 0.2], [6, 104, 0.025, 0.25], [7, 84, 0.03, 0.3], [0, 30, 0.04, 1], [1, 62, 0.05, 1], [2, 18, 0.03, 1], [3, 84, 0.06, 1], [4, 50, 0.045, 1]].forEach(function (c, i) {
+      var cl = clouds[c[0]], span = W + cl.width + 60;
+      var x = ((i * 157 + 40 - camX * c[2] - drift * (0.5 + i * 0.15) * c[3]) % span + span) % span - cl.width;
+      g.drawImage(cl, Math.round(x), c[1]);
+    });
+    birds(g, camX, t);
+    tiled(g, mountCv, camX, 0.03);
+    tiled(g, hillsCv, camX, 0.08);
+  }
   /** the whole background, back to front */
   function background(g, camX, t) {
     if (!skyCv) { buildSky(); buildClouds(); buildMountains(); buildHills(); buildTown(); buildPark(); }
@@ -1075,7 +1091,7 @@ PQ.world = (function () {
     for (var i = 0; i < 3; i++) { var ww = Math.round(w * (1 - i * 0.22)); g.fillRect(Math.round(cx - ww / 2), y - 1 + i, ww, 1); }
   }
 
-  return { W: W, H: H, GY: GY, background: background, ground: ground, school: school, fence: fence, bench: bench, lamp: lamp,
+  return { W: W, H: H, GY: GY, background: background, far: far, ground: ground, school: school, fence: fence, bench: bench, lamp: lamp,
     bush: bush, signpost: signpost, pad: pad, gate: gate, ledge: ledge, foreground: foreground, light: light, shadow: shadow,
     tree: function (g, x, base, r) { tree(g, x, base, r, LEAF, TRUNK); }, flower: flower, rainbow: rainbow, bluebird: bluebird, hash: hash, dirt: dirt };
 })();

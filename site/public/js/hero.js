@@ -1,17 +1,15 @@
-// The front page's living world, like a game's title screen: Pocket Quest's school yard (pq-world.js) scrolls slowly,
-// Batuhan Teacher walks with his orange, Grabbo sneaks up for it and flees when the teacher turns round, Pip flies by.
-// The sky follows the clock: day, sunset, night with stars and a moon. It stops when nobody can see it.
+// The front page's living world, like a game's title screen: the Citrobit valley (valley.js: orange groves, and a place
+// for each game) scrolls slowly; Batuhan Teacher walks through it with his orange, Grabbo sneaks up for it and flees
+// when the teacher turns round, Pip flies by. The sky follows the clock: day, sunset, night with stars and a moon.
+// It stops when nobody can see it. Drawn with Pocket Quest's pixel engine (pq-world.js), so it is all one style.
 import { CAST } from './pq-cast.js';
+import { buildValley, drawValley, orangeTree } from './valley.js';
 
-const W = 480, H = 270, GY = 224, LOOP = 1440, FPS = 30;
+const W = 480, H = 270, GY = 224, FPS = 30;
 const TX = 196;                     // where the teacher walks on the screen (the world moves under him)
 const CYCLE = 18;                   // seconds: walk, turn round, look, shrug, walk on
-const PROPS = [                     // the things along the way, in one loop of the world
-  ['school', 40], ['tree', 372, 24], ['bench', 470], ['lamp', 530], ['bush', 610, 44], ['fence', 690, 830], ['tree', 905, 20],
-  ['bush', 960, 30], ['lamp', 1075], ['bench', 1130], ['tree', 1255, 30], ['bush', 1335, 36],
-];
 
-let g, PQW, sheet, strip, stars, moodNow = '', camX = 0, last = 0, running = false, shown = true;
+let g, PQW, sheet, stars, moodNow = '', camX = 0, last = 0, running = false, shown = true;
 
 function load(src) {
   return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
@@ -37,33 +35,12 @@ function mood(h) {
   return h >= 7 && h < 17 ? 'day' : (h >= 17 && h < 20) || (h >= 5 && h < 7) ? 'dusk' : 'night';
 }
 
-function build() {
-  // the ground: three screens of it, drawn once by the game's own ground art, then scrolled as one strip
-  strip = document.createElement('canvas'); strip.width = LOOP; strip.height = H;
-  const sg = strip.getContext('2d');
-  for (let i = 0; i < LOOP / W; i++) {
-    const c = document.createElement('canvas'); c.width = W; c.height = H;
-    PQW.ground(c.getContext('2d'), i * W, -100000, 100000, GY);
-    sg.drawImage(c, i * W, 0);
-  }
+function build() {          // the night's stars (the valley builds itself: valley.js)
   const r = (i, n) => { const x = Math.sin(i * 127.1 + n * 311.7) * 43758.5453; return x - Math.floor(x); };
   stars = [];
   for (let i = 0; i < 46; i++) {
     const s = [Math.floor(r(i, 1) * W), Math.floor(r(i, 2) * 104), r(i, 3) * 6.28, r(i, 4) < 0.2 ? 2 : 1];
     if (Math.hypot(s[0] - 402, s[1] - 46) > 30) stars.push(s);
-  }
-}
-
-function props(cam) {
-  const off = cam % LOOP;
-  for (const rep of [0, LOOP]) for (const p of PROPS) {
-    const x = p[1] - off + rep;
-    if (x < -300 || x > W + 300) continue;
-    if (p[0] === 'school') PQW.school(g, x, GY);
-    else if (p[0] === 'tree') PQW.tree(g, x, GY, p[2]);
-    else if (p[0] === 'bush') PQW.bush(g, x, GY, p[2]);
-    else if (p[0] === 'fence') PQW.fence(g, x, p[2] - off + rep, GY);
-    else PQW[p[0]](g, x, GY);
   }
 }
 
@@ -97,10 +74,7 @@ function frame(t) {
   const m = mood(new Date().getHours());
   if (m !== moodNow) { moodNow = m; document.documentElement.dataset.mood = m; }
   const tau = t % CYCLE, walking = tau < 10 || tau >= 13.6;
-  PQW.background(g, camX, t);
-  const off = Math.round(camX % LOOP);
-  g.drawImage(strip, -off, 0); g.drawImage(strip, LOOP - off, 0);
-  props(camX);
+  drawValley(g, camX, t);
   if (m === 'day') PQW.light(g, t, camX);
 
   // Grabbo: creeps up behind the teacher, flees up and away when he turns round, comes back from the left
@@ -144,7 +118,7 @@ function play() {
 let ready = null;                   // the world's drawing code and the cast sheet, loaded once for both canvases
 function loadWorld() {
   ready ||= Promise.all([window.PQ && window.PQ.world ? null : load('/js/pq-world.js'), img('/img/pq-cast.png')])
-    .then((both) => { sheet = both[1]; PQW = window.PQ.world; return true; }, () => false);
+    .then((both) => { sheet = both[1]; PQW = window.PQ.world; buildValley(); return true; }, () => false);
   return ready;
 }
 
@@ -213,11 +187,11 @@ export async function startStrip(canvas) {
     if (wide) {
       const xs = [cw / 6, cw / 2, cw * 5 / 6].map(Math.round);
       PQW.fence(b, xs[0] + 24, xs[1] - 26, G);
-      PQW.lamp(b, Math.round((xs[1] + xs[2]) / 2), G);
+      orangeTree(b, Math.round((xs[1] + xs[2]) / 2), G, 13);
       xs.forEach((x, i) => PQW.signpost(b, x, G, String(i + 1)));
       stops = xs.map((x) => x - 22);
       padX = Math.min(cw - 26, xs[2] + 44);
-    } else PQW.lamp(b, Math.round(cw * 0.42), G);
+    } else orangeTree(b, Math.round(cw * 0.42), G, 13);
     goal(b, padX, G);
     PQW.bush(b, cw - 4, G, 22);
     // the walk, as pieces of time: walk to each post and look at it, walk to the star and cheer, walk off, wait

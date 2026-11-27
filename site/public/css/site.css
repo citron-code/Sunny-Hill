@@ -46,15 +46,33 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .pi-shield { --i: url(/img/i/shield.svg); } .pi-noads { --i: url(/img/i/noads.svg); } .pi-chart { --i: url(/img/i/chart.svg); }
 .pi-star { --i: url(/img/i/star.svg); } .pi-home { --i: url(/img/i/home.svg); } .pi-lock { --i: url(/img/i/lock.svg); }
 .pi-search { --i: url(/img/i/search.svg); } .pi-sound { --i: url(/img/i/sound.svg); } .pi-mute { --i: url(/img/i/mute.svg); } .pi-flame { --i: url(/img/i/flame.svg); }
-.maskot { --s: 4; display: block; width: calc(24px * var(--s)); height: calc(24px * var(--s));
-  background: url(/img/maskot.svg) 0 0 / 200% 100% no-repeat; animation: blink 5s steps(1, end) infinite; }
-.maskot.hop { animation: blink 5s steps(1, end) infinite, hop 1.8s steps(1, end) infinite; }
-@keyframes blink { 0%, 92% { background-position: 0 0; } 93%, 96% { background-position: 100% 0; } 97% { background-position: 0 0; } }
+/* the mascot: the little orange, 32 x 32 pixels, --s screen pixels each; maskot.svg holds its six frames
+   (tools/make-pixels.mjs): idle, blink, wave, wave, squash, hop. Its life, 8 s long: it blinks, waves, blinks, hops. */
+.maskot { --s: 4; display: block; width: calc(32px * var(--s)); height: calc(32px * var(--s));
+  background: url(/img/maskot.svg) 0 0 / 600% 100% no-repeat; animation: life 8s steps(1, end) infinite; }
+.maskot.hop { animation: life 8s steps(1, end) infinite, hop 8s steps(1, end) infinite; }
+@keyframes life {
+  0%, 22% { background-position: 0 0; }
+  23%, 25% { background-position: 20% 0; }
+  26%, 38% { background-position: 0 0; }
+  39%, 42%, 48%, 54% { background-position: 40% 0; }
+  45%, 51%, 57% { background-position: 60% 0; }
+  60%, 70% { background-position: 0 0; }
+  71%, 73% { background-position: 80% 0; }
+  74%, 80% { background-position: 100% 0; }
+  81%, 83% { background-position: 80% 0; }
+  84%, 93% { background-position: 0 0; }
+  94%, 96% { background-position: 20% 0; }
+  97%, 100% { background-position: 0 0; }
+}
 @keyframes hop {
-  0%, 52%, 100% { transform: none; }
-  58%, 82% { transform: translateY(calc(var(--s) * -2px)); }
-  64%, 76% { transform: translateY(calc(var(--s) * -4px)); }
-  70% { transform: translateY(calc(var(--s) * -5px)); }
+  0%, 73% { transform: none; }
+  74% { transform: translateY(calc(var(--s) * -4px)); }
+  75.5% { transform: translateY(calc(var(--s) * -7px)); }
+  77% { transform: translateY(calc(var(--s) * -8px)); }
+  78.5% { transform: translateY(calc(var(--s) * -6px)); }
+  80% { transform: translateY(calc(var(--s) * -2px)); }
+  81%, 100% { transform: none; }
 }
 
 /* ------------------------------------------------------------------ the top bar */
@@ -412,7 +430,7 @@ body.deepbg { --drop: rgba(5, 9, 28, .6); background: var(--deep) url(/img/px/st
 .launch .row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; padding: 0 12px; }
 .dotsload { display: flex; justify-content: center; align-items: flex-end; height: 104px; }
 .dotsload i { display: none; }
-.dotsload::before { content: ''; width: 96px; height: 96px; background: url(/img/maskot.svg) 0 0 / 200% 100% no-repeat; animation: jump .8s steps(1, end) infinite; }
+.dotsload::before { content: ''; width: 96px; height: 96px; background: url(/img/maskot.svg) 0 0 / 600% 100% no-repeat; animation: jump .8s steps(1, end) infinite; }
 @keyframes jump { 0%, 100% { transform: none; } 20%, 80% { transform: translateY(-8px); } 40%, 60% { transform: translateY(-16px); } }
 
 /* ------------------------------------------------------------------ a page of text */

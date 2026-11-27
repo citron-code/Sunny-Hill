@@ -9,7 +9,7 @@ and from the habits of retro game menus, not from other web sites.
 
 | Screen | What it is | Where |
 | --- | --- | --- |
-| Title screen | Pocket Quest's school yard, alive behind the wordmark, one line and PRESS START; the login window beside them. Nothing else. | `.hero` (`hero.js`) |
+| Title screen | The Citrobit valley, alive behind the mascot and the wordmark, one line and PRESS START; the login window beside them. Nothing else. | `.hero` (`hero.js`, `valley.js`) |
 | Under the ground | Below the grass the dirt turns, in dithered rows, into the deep blue of a game menu. Everything below the title screen sits on it, the end credits too. | `.hero::after`, `.deep` |
 | Choose your game | Two game windows, each with a silent moving preview of the game (its real pictures, panned, then cut). | `#play` |
 | How to play | A strip of Pocket Quest's ground with three signposts; Batuhan Teacher walks past them. Over each post, its step in a window. | `#how` (`hero.js` `startStrip`) |
@@ -86,6 +86,9 @@ No all-caps labels in Pixelify; capitals only where a game would print them, in 
 
 ## Pictures
 
-Pixel art only from the games (Pocket Quest's own drawing code, `make-pixels.mjs` icons). Game pictures are real
-screenshots, shown inside a window's screen. Icons are the 12 px set in `img/i/`, used as masks so they take the text
+Pixel art only, in one style: Pocket Quest's drawing code (its engine, ground and cast) and `make-pixels.mjs` (the
+mascot, the icons). The world is the Citrobit valley, not one game's: orange groves (the brand) and a place for each
+game (`PLACES` in `valley.js`), each with a sign in its game's colour; more games become more places, and the guests
+(Grabbo, Pip, a Sunny Hill villager) come from the games. The mascot is a living sprite (blink, wave, hop), never a
+still picture. Game pictures are real screenshots, shown inside a window's screen. Icons are the 12 px set in `img/i/`, used as masks so they take the text
 colour. No emoji, no stock art.
