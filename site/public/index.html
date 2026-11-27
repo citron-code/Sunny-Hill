@@ -18,6 +18,62 @@
 <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
+<!-- The full-screen guide: the very first screen on a phone or tablet when the site is opened in a browser (guide.js) -->
+<section class="guide" id="guide" aria-labelledby="guideT" lang="tr" hidden>
+  <div class="gbox">
+    <div class="ghead"><img src="/img/logo.svg" alt=""><div><h1 id="guideT" tabindex="-1">Tam ekran oyna!</h1><p lang="en">Play full screen!</p></div></div>
+    <div class="gintro">
+      <i class="maskot" aria-hidden="true"></i>
+      <div><p>Citrobit'i telefonun ana ekranına ekleyin: oyunlar bir uygulama gibi tam ekran açılır.</p>
+        <p lang="en">Add Citrobit to your home screen: the games open full screen, like an app.</p></div>
+    </div>
+    <p class="gask">Telefonunuz hangisi? <span lang="en">Which phone do you have?</span></p>
+    <div class="gtabs" role="tablist">
+      <button type="button" role="tab" id="tabAndroid" data-os="android" aria-controls="osAndroid" aria-selected="true"><i class="pi pi-phone"></i>Android</button>
+      <button type="button" role="tab" id="tabIos" data-os="ios" aria-controls="osIos" aria-selected="false"><i class="pi pi-phone"></i>iPhone / iPad</button>
+    </div>
+
+    <div class="gos" id="osAndroid" role="tabpanel" aria-labelledby="tabAndroid">
+      <div class="gquick" id="quick" hidden>
+        <button class="btn o" type="button" id="quickBtn"><i class="pi pi-install"></i>Tek dokunuşla ekle <span lang="en">/ Add with one tap</span></button>
+        <p>ya da adım adım: <span lang="en">or step by step:</span></p>
+      </div>
+      <p class="gdone" id="added" hidden>Eklendi! Ana ekrandaki Citrobit simgesinden açın. <span lang="en">Added! Open Citrobit from your home screen.</span></p>
+      <ol class="gsteps">
+        <li><span class="n" aria-hidden="true">1</span><span class="key" aria-hidden="true"><i class="pi pi-kebab"></i></span>
+          <div><p>Chrome'da sağ üstteki <b>üç noktaya</b> dokunun.</p><p lang="en">In Chrome, tap the <b>three dots</b> at the top right.</p></div></li>
+        <li><span class="n" aria-hidden="true">2</span><span class="key" aria-hidden="true"><i class="pi pi-addhome"></i></span>
+          <div><p><b>Ana ekrana ekle</b> ya da <b>Uygulamayı yükle</b> seçeneğine dokunun.</p><p lang="en">Tap <b>Add to Home screen</b> or <b>Install app</b>.</p></div></li>
+        <li><span class="n" aria-hidden="true">3</span><span class="key" aria-hidden="true"><i class="pi pi-check"></i></span>
+          <div><p><b>Ekle</b> ya da <b>Yükle</b> ile onaylayın.</p><p lang="en">Confirm with <b>Add</b> or <b>Install</b>.</p></div></li>
+        <li><span class="n" aria-hidden="true">4</span><span class="key logo" aria-hidden="true"><img src="/img/logo.svg" alt=""></span>
+          <div><p>Ana ekrandaki <b>Citrobit</b> simgesinden açın.</p><p lang="en">Open <b>Citrobit</b> from your home screen.</p></div></li>
+      </ol>
+      <p class="gnote">Başka bir tarayıcı kullanıyorsanız siteyi Chrome'da açın. <span lang="en">Using another browser? Open the site in Chrome.</span></p>
+    </div>
+
+    <div class="gos" id="osIos" role="tabpanel" aria-labelledby="tabIos" hidden>
+      <ol class="gsteps">
+        <li><span class="n" aria-hidden="true">1</span><span class="key" aria-hidden="true"><i class="pi pi-share"></i></span>
+          <div><p>Safari'de <b>Paylaş</b> düğmesine dokunun: iPhone'da altta, iPad'de sağ üstte. Göremiyorsanız önce <i class="pi pi-more" role="img" aria-label="üç nokta"></i> düğmesine dokunun.</p>
+            <p lang="en">In Safari, tap <b>Share</b>: at the bottom on an iPhone, at the top right on an iPad. Can't see it? Tap <i class="pi pi-more" role="img" aria-label="three dots"></i> first.</p></div></li>
+        <li><span class="n" aria-hidden="true">2</span><span class="key" aria-hidden="true"><i class="pi pi-addhome"></i></span>
+          <div><p>Aşağı kaydırıp <b>Ana Ekrana Ekle</b>'ye dokunun.</p><p lang="en">Scroll down and tap <b>Add to Home Screen</b>.</p></div></li>
+        <li><span class="n" aria-hidden="true">3</span><span class="key" aria-hidden="true"><i class="pi pi-check"></i></span>
+          <div><p>Sağ üstteki <b>Ekle</b>'ye dokunun.</p><p lang="en">Tap <b>Add</b> at the top right.</p></div></li>
+        <li><span class="n" aria-hidden="true">4</span><span class="key logo" aria-hidden="true"><img src="/img/logo.svg" alt=""></span>
+          <div><p>Ana ekrandaki <b>Citrobit</b> simgesinden açın. İlk açılışta bir kez daha giriş yapın.</p>
+            <p lang="en">Open <b>Citrobit</b> from your home screen. The first time, log in once more.</p></div></li>
+      </ol>
+    </div>
+
+    <div class="gfoot">
+      <button class="btn go lg" type="button" id="guideGo"><i class="pi pi-play"></i>Devam et <span lang="en">/ Continue</span></button>
+      <label class="gnever"><input type="checkbox" id="guideNever"><span>Bir daha gösterme <span lang="en">/ Don't show again</span></span></label>
+    </div>
+  </div>
+</section>
+
 <a class="skip" id="skip" href="#login">Skip to the login</a>
 <header class="nav">
   <div class="container">
