@@ -1,5 +1,5 @@
 /* The site's pixel art, drawn here as text and saved as crisp SVG files: node tools/make-pixels.mjs
-   Writes public/img/maskot.svg (the little orange, 2 frames: eyes open, blink), logo.svg (the icon tile),
+   Writes public/img/maskot.svg (the little orange, 6 frames), logo.svg (the icon tile: the mascot on night blue),
    px/*.svg (sun, cloud, orange tree, hills, stars) and i/*.svg (icons, black: the CSS colours them as masks).
    After a change here, run node tools/make-icons.mjs for the home-screen PNGs. */
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -43,45 +43,62 @@ function svg(name, art, pal) {            // one path per colour, pixels merged 
 const save = (file, text) => { writeFileSync(join(IMG, file), text); console.log('public/img/' + file); };
 
 /* ------------------------------------------------------------ the mascot: a little orange */
-// A round orange with a leaf, a happy face and green shoes. Drawn without its outer line; outline() adds that.
+// A round orange with a leaf, a happy face, little arms and green shoes. Drawn without its outer line; outline() adds that.
 function outline(art) {
   const g = art.map((r) => [...r]);
   const filled = (x, y) => art[y] && art[y][x] && art[y][x] !== '.';
   return g.map((r, y) => r.map((ch, x) => (ch === '.' && (filled(x - 1, y) || filled(x + 1, y) || filled(x, y - 1) || filled(x, y + 1)) ? 'K' : ch)).join(''));
 }
-const FRUIT_FILL = [
-  '........................',
-  '.............GGG........',
-  '...........bGGGGG.......',
-  '...........bgg..........',
-  '.........OOOOOO.........',
-  '.......OLLLOOOOOO.......',
-  '.....OLLOOOOOOOOOOO.....',
-  '....OLOOOOOOOOOOOOOO....',
-  '....OLOOOOOOOOOOOdOO....',
-  '...OLOOOOOOOOOOOOOOOO...',
-  '...OOOOWEOOOOOWEOOOOO...',
-  '...OOOOEEOOOOOEEOOOOS...',
-  '...OdOOEEOOOOOEEOOOOS...',
-  '...OOBBOOOMOOMOOOBBOS...',
-  '...OOOOOOOOMMOOOOOOOS...',
-  '...OOOOOOOOOOOOOOOOSS...',
-  '....OOdOOOOOOOOOOOSS....',
-  '....OOOOOOOOOOOOdSSS....',
-  '.....OOOOOOOOOOSSSS.....',
-  '.......OOOOOOSSSS.......',
-  '.........SSSSSS.........',
-  '......GGGG....GGGG......',
-  '.....ggggg....ggggg.....',
-  '........................',
-];
-const FRUIT = outline(FRUIT_FILL);
-const BLINK = outline(FRUIT_FILL.map((r, y) => (y === 10 || y === 11 ? r.slice(0, 7) + 'OO' + r.slice(9, 14) + 'OO' + r.slice(16) : r)));
 const FRUIT_PAL = {
   K: '#3a1f12', O: '#ff9f1c', L: '#ffcf7a', S: '#e2711d', d: '#d0601a', E: '#1d1b2e', W: '#ffffff',
-  B: '#ff5e78', M: '#5a2a12', G: '#4cc93f', g: '#24873a', b: '#7a4a24',
+  B: '#ff5e78', M: '#5a2a12', G: '#4cc93f', g: '#24873a', b: '#7a4a24', P: '#ff8fa3',
 };
-save('maskot.svg', svg('maskot', FRUIT.map((r, y) => r + BLINK[y]), FRUIT_PAL));
+
+/* The mascot, 32 x 32, six frames side by side in maskot.svg: idle, blink, wave (arm up), wave (arm over), squash (before and after a hop), hop (in the air).
+   site.css plays them: a blink now and then, a wave, a hop. Its body is an ellipse lit from the top left. */
+const MASCOT_FRAMES = ['idle', 'blink', 'wave', 'wave2', 'squash', 'hop'];
+function mascot(f) {
+  const g = grid(32, 32), put = (x, y, ch) => { if (g[y] && g[y][x] !== undefined) g[y][x] = ch; };
+  const sq = f === 'squash' ? 1 : 0, up = f === 'hop' ? 1 : 0;
+  const cx = 16, rx = 11 + sq - up, ry = 10.5 - sq * 1.5 + up * 0.5, cy = 17.5 + sq * 1.5 - up * 0.5;          // (its bottom stays on row 27)
+  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+    const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry, d = dx * dx + dy * dy;
+    if (d > 1) continue;
+    put(x, y, (dx + 0.42) ** 2 + (dy + 0.5) ** 2 < 0.07 ? 'L' : dx * 0.55 + dy * 0.85 > 0.6 && d > 0.5 ? 'S' : 'O');
+  }
+  const c = Math.round(cy), top = Math.floor(cy - ry) + 1;
+  for (const [x, y] of [[cx + 6, c - 6], [cx - 8, c + 4], [cx + 4, c + 7], [cx + 8, c + 1], [cx - 3, c - 7]]) if (g[y][x] === 'O') put(x, y, 'd');
+  // the leaf on its stem
+  for (let i = 1; i <= 3; i++) put(16, top - i, 'b');
+  stamp(g, ['..GGG..', '.GGGGGG', 'gGGGGg.'], 17, top - 5);
+  // the face: big shiny eyes, rosy cheeks, a smile (open when it waves or hops)
+  const ey = c - 3, eyes = [10, 20];
+  for (const x of eyes) {
+    if (f === 'blink' || f === 'squash') { put(x, ey + 2, 'E'); put(x + 1, ey + 2, 'E'); }
+    else if (f === 'hop') { put(x - 1, ey + 2, 'E'); put(x, ey + 1, 'E'); put(x + 1, ey + 1, 'E'); put(x + 2, ey + 2, 'E'); }
+    else for (let y = 0; y < 4; y++) { put(x, ey + y, y < 2 ? 'W' : 'E'); put(x + 1, ey + y, 'E'); }
+  }
+  for (const x of [7, 8, 23, 24]) put(x, ey + 4, 'B');
+  if (f === 'wave' || f === 'wave2' || f === 'hop') {
+    for (let x = 14; x <= 17; x++) put(x, ey + 4, 'M');
+    put(14, ey + 5, 'M'); put(15, ey + 5, 'P'); put(16, ey + 5, 'P'); put(17, ey + 5, 'M'); put(15, ey + 6, 'M'); put(16, ey + 6, 'M');
+  } else { put(14, ey + 4, 'M'); put(17, ey + 4, 'M'); put(15, ey + 5, 'M'); put(16, ey + 5, 'M'); }
+  // arms: little nubs at its sides; one waves, both go up in a hop
+  const ax = [cx - rx - 1, cx + rx];
+  if (f === 'hop') for (const x of ax) { put(x, c - 1, 'S'); put(x, c - 2, 'S'); put(x + (x < cx ? -1 : 1), c - 3, 'O'); }
+  else {
+    put(ax[0], c + 1, 'S'); put(ax[0] - 1, c + 1, 'S'); put(ax[0], c + 2, 'S'); put(ax[0] - 1, c + 2, 'S');
+    if (f === 'wave') { for (const [x, y] of [[27, 15], [27, 14], [28, 13], [28, 12]]) put(x, y, 'S'); stamp(g, ['OO', 'OO'], 28, 10); }
+    else if (f === 'wave2') { for (const [x, y] of [[27, 15], [27, 14], [27, 13], [26, 12]]) put(x, y, 'S'); stamp(g, ['OO', 'OO'], 25, 10); }
+    else { put(ax[1], c + 1, 'S'); put(ax[1] + 1, c + 1, 'S'); put(ax[1], c + 2, 'S'); put(ax[1] + 1, c + 2, 'S'); }
+  }
+  // green shoes, a bit apart when it lands
+  const s = sq ? 1 : 0;
+  stamp(g, ['.GGGG', 'ggggg'], 9 - s, 28); stamp(g, ['GGGG.', 'ggggg'], 18 + s, 28);
+  return outline(rows(g));
+}
+const MASCOT = MASCOT_FRAMES.map(mascot);
+save('maskot.svg', svg('maskot', MASCOT[0].map((r, y) => MASCOT.map((m) => m[y]).join('')), FRUIT_PAL));
 
 /* ------------------------------------------------------------ scenery */
 const SUN = [
@@ -169,7 +186,7 @@ for (const [x, y, big] of [[5, 4, 1], [20, 10, 0], [33, 3, 0], [44, 14, 1], [57,
 save('px/stars.svg', svg('stars', stars, { S: '#ffffff', s: '#8ea2e8' }));
 
 /* ------------------------------------------------------------ the icon tile (favicon, home screen) */
-// the orange on a night-blue tile, with a soft light behind it and a few stars
+// the mascot on a night-blue tile, with a soft light behind it and a few stars
 function logo() {
   const g = grid(32, 32, 'n');
   for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
@@ -178,7 +195,7 @@ function logo() {
     else if (r < 13.5 && (x + y) % 2) g[y][x] = 'm';          // a dithered edge
   }
   for (const [x, y] of [[3, 4], [27, 3], [4, 27], [28, 26], [26, 9]]) g[y][x] = 'z';
-  stamp(g, FRUIT, 4, 4);
+  stamp(g, MASCOT[0], 0, 0);          // the mascot, standing still, fills the tile; the light shows round it
   return g;
 }
 save('logo.svg', svg('logo', logo(), { ...FRUIT_PAL, n: '#1d2b53', m: '#2b3f78', z: '#ffffff' }));

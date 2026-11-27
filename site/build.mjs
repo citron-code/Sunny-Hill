@@ -66,7 +66,6 @@ writeFileSync(join(DIST, 'js', 'oyun-sitesi.js'),
   readFileSync(join(SITE, 'src', 'oyun-sitesi.js'), 'utf8'));
 
 // Sunny Hill's picture from the repo (the site's own icons are in public/img, drawn by tools/make-icons.mjs)
-copyFileSync(join(REPO, 'og-image.jpg'), join(DIST, 'img', 'sunny-hill.jpg'));
 
 // the site's name (shared/config.js) into the pages and the home-screen app
 const html = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
